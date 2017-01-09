@@ -7,17 +7,18 @@
 typedef struct _PLAYER_INFO {
 	int key_;
 
-	bool submit_card;
-	int submit_card_num;
+	bool submit_card_;
+	int submit_card_num_;
 
-	connected_session* session;
+	connected_session* session_;
 
-	int money;
+	int total_money_;
+	int money_;
 
 	_PLAYER_INFO()
 	{
-		money = 10;
-		submit_card = false;
+		money_ = 10;
+		submit_card_ = false;
 	}
 
 } PLAYER_INFO;
@@ -27,15 +28,22 @@ typedef struct _ROOM_INFO {
 	PLAYER_INFO player_2_;
 	
 	int room_key_;
-	int time;
+	int time_;
+	int turn_count_;
 
-	int ready_player_num;
+	int ready_player_num_;
 
-	std::shared_ptr<spd::logger> match_log;
+	enum GAME_STATE { READY, START, END };
+	GAME_STATE state_;
+
+	int public_card_[2];
+
+	std::shared_ptr<spd::logger> match_log_;
 
 	_ROOM_INFO()
 	{
-		match_log = spd::daily_logger_st("logic_server", "match_log", 0, 0);
+		match_log_ = spd::daily_logger_st("logic_server", "match_log", 0, 0);
+		spd::drop_all();
 	}
 
 } ROOM_INFO;
@@ -45,7 +53,7 @@ public:
 	virtual bool init_singleton();
 	
 	bool enter_room_player(connected_session* session, int room_key, int player_key);
-	bool submit_card();
+	bool process_turn(int player_key, int money);
 	void process_queue();
 
 	logic_worker();
@@ -53,8 +61,8 @@ public:
 
 private:
 	std::vector<ROOM_INFO> room_list_;
-	boost::thread* logic_thread;
-	CRITICAL_SECTION critical_section;
+	boost::thread* logic_thread_;
+	CRITICAL_SECTION critical_section_;
 
 	bool create_room(connected_session* session, int room_key, int player_key);
 };

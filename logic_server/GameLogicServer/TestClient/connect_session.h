@@ -16,6 +16,9 @@ private:
 	boost::array<BYTE, BUFSIZE> recv_buf_;
 	boost::array<BYTE, BUFSIZE> send_buf_;
 
+	int money_;
+	bool wait_turn;
+
 public:
 	connect_session(boost::asio::io_service& io);
 
@@ -32,6 +35,6 @@ public:
 
 private:
 	void process_packet_enter_ans(logic_server::packet_enter_ans packet);
-	void process_packet_submit_card_req(logic_server::packet_submit_card_req packet);
+	void process_packet_process_turn_req(logic_server::packet_process_turn_req packet);
 	void process_packet_game_state_ntf(logic_server::packet_game_state_ntf packet);
 };

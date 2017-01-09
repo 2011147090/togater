@@ -13,15 +13,6 @@ std::string make_daytime_string()
 connected_session::connected_session(boost::asio::io_service& io_service) : socket_(io_service), valied_key_(-1)
 {}
 
-void connected_session::handle_accept(const boost::system::error_code& /*error*/, size_t /*bytes_transferred*/)
-{
-	//socket_.async_read_some(boost::asio::buffer(recv_buf_),
-	//	boost::bind(&connected_session::handle_read, shared_from_this(),
-	//		boost::asio::placeholders::error,
-	//		boost::asio::placeholders::bytes_transferred));
-
-}
-
 bool connected_session::handle_check_keep_alive()
 {
 	boost::system::error_code error;
@@ -87,14 +78,14 @@ void connected_session::handle_read(const boost::system::error_code& error, size
 			}
 			break;
 
-		case logic_server::SUBMIT_CARD_ANS:
+		case logic_server::PROCESS_TURN_ANS:
 			{
-				logic_server::packet_submit_card_ans message;
+				logic_server::packet_process_turn_ans message;
 
 				if (false == message.ParseFromCodedStream(&payload_input_stream))
 					break;
 
-				process_packet_submit_card_ans(message);
+				process_packet_process_turn_ans(message);
 			}
 			break;
 		}
@@ -119,11 +110,4 @@ void connected_session::start()
 		boost::bind(&connected_session::handle_read, shared_from_this(),
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred));
-
-	// success accept
-
-	//boost::asio::async_write(socket_, boost::asio::buffer(send_buf_), 
-	//	boost::bind(&connected_session::handle_accept, shared_from_this(),
-	//	boost::asio::placeholders::error,
-	//	boost::asio::placeholders::bytes_transferred));
 }

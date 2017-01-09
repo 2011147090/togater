@@ -25,18 +25,19 @@ private:
 private:
 	connected_session(boost::asio::io_service& io_service);
 
-	void handle_accept(const boost::system::error_code& /*error*/, size_t /*bytes_transferred*/);
+	//void handle_accept(const boost::system::error_code& /*error*/, size_t /*bytes_transferred*/);
 	void handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/);
 	bool handle_check_keep_alive();
-	void handle_send(logic_server::message_type msg_type, const protobuf::Message& message);
-
+	
 	void process_packet_enter_req(logic_server::packet_enter_req packet);
-	void process_packet_submit_card_ans(logic_server::packet_submit_card_ans packet);
+	void process_packet_process_turn_ans(logic_server::packet_process_turn_ans packet);
 	
 public:
 	typedef boost::shared_ptr<connected_session> pointer;
 
 	static pointer create(boost::asio::io_service& io_service);
+
+	void handle_send(logic_server::message_type msg_type, const protobuf::Message& message);
 
 	tcp::socket& get_socket();
 

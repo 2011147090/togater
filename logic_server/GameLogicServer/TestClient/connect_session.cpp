@@ -84,14 +84,14 @@ void connect_session::handle_read()
 		}
 		break;
 
-		case logic_server::SUBMIT_CARD_REQ:
+		case logic_server::PROCESS_TURN_REQ:
 		{
-			logic_server::packet_submit_card_req message;
+			logic_server::packet_process_turn_req message;
 
 			if (false == message.ParseFromCodedStream(&payload_input_stream))
 				break;
 
-			process_packet_submit_card_req(message);
+			process_packet_process_turn_req(message);
 		}
 		break;
 
@@ -130,36 +130,32 @@ void connect_session::handle_write()
 {
 	int player_key;
 	int room_key;
+	int money;
+	
+	std::cout << "enter room key : " << std::endl;
+	std::cin >> room_key;
+
+	std::cout << "enter player key : " << std::endl;
+	std::cin >> player_key;
+
+	logic_server::packet_enter_req enter_req_packet;
+	enter_req_packet.set_room_key(room_key);
+	enter_req_packet.set_player_key(player_key);
+
+	this->handle_send(logic_server::ENTER_REQ, enter_req_packet);
 
 	while (is_socket_open())
 	{
-		std::cout << "enter room key : " << std::endl;
-		std::cin >> room_key;
+		while (!wait_turn) {}
 
-		std::cout << "enter player key : " << std::endl;
-		std::cin >> player_key;
+		std::cout << "enter turn money key : " << std::endl;
+		std::cin >> money;
 
-		logic_server::packet_enter_req packet;
-		packet.set_room_key(room_key);
-		packet.set_player_key(player_key);
+		logic_server::packet_process_turn_ans process_turn_packet;
+		process_turn_packet.set_money(money);
+		process_turn_packet.set_player_key(player_key);
 
-		this->handle_send(logic_server::ENTER_REQ, packet);
-
-		/*try {
-			boost::system::error_code error;
-			boost::asio::write(socket_, boost::asio::buffer(buf, length), error);
-
-			delete buf;
-		}
-		catch (std::exception& e)
-		{
-			is_connected_ = false;
-			std::cerr << e.what() << std::endl;
-		}
-
-		std::cout << "send packet : PACKET_PROTOCOL::ENTER_REQ" << std::endl;*/
-
-		//socket_.async_read_some(boost::asio::buffer(recv_buf_), boost::bind(&connect_session::handle_read, this));
+		this->handle_send(logic_server::PROCESS_TURN_ANS, process_turn_packet);
 	}
 }
 

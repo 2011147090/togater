@@ -24,14 +24,14 @@
     <Filter Include="소스 파일\network">
       <UniqueIdentifier>{fb6050ef-3d03-4b87-8649-97feb129bd37}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\network\logic">
-      <UniqueIdentifier>{2d35dc8c-3e27-4dc1-afbf-4a4543208ae6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\network\interface">
       <UniqueIdentifier>{f7cae4e4-7106-4a9b-b048-1cac745b3331}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\network\packet_generator">
       <UniqueIdentifier>{ced920db-75f3-44da-b33f-9ca5d612f02c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\network\logic_worker">
+      <UniqueIdentifier>{2d35dc8c-3e27-4dc1-afbf-4a4543208ae6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -48,7 +48,7 @@
       <Filter>소스 파일\network\packet_generator</Filter>
     </ClCompile>
     <ClCompile Include="logic_worker.cpp">
-      <Filter>소스 파일\network\logic</Filter>
+      <Filter>소스 파일\network\logic_worker</Filter>
     </ClCompile>
     <ClCompile Include="log_manager.cpp">
       <Filter>소스 파일\log_manager</Filter>
@@ -80,7 +80,7 @@
       <Filter>소스 파일\network\packet_generator</Filter>
     </ClInclude>
     <ClInclude Include="logic_worker.h">
-      <Filter>소스 파일\network\logic</Filter>
+      <Filter>소스 파일\network\logic_worker</Filter>
     </ClInclude>
     <ClInclude Include="log_manager.h">
       <Filter>소스 파일\log_manager</Filter>

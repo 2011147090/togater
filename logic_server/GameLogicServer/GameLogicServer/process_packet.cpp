@@ -16,7 +16,8 @@ void connected_session::process_packet_enter_req(logic_server::packet_enter_req 
 	handle_send(logic_server::ENTER_ANS, recevie_packet);
 }
 
-void connected_session::process_packet_submit_card_ans(logic_server::packet_submit_card_ans packet)
+void connected_session::process_packet_process_turn_ans(logic_server::packet_process_turn_ans packet)
 {
-	//logic_worker::get_instance()->submit_card(packet.money())
+	if (!logic_worker::get_instance()->process_turn(packet.player_key(), packet.money()))
+		return;
 }
