@@ -92,8 +92,9 @@ namespace logic_server {
 				sizeof(packet_game_state_ntf),
 				GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_game_state_ntf, _internal_metadata_));
 		packet_process_turn_req_descriptor_ = file->message_type(3);
-		static const int packet_process_turn_req_offsets_[4] = {
+		static const int packet_process_turn_req_offsets_[5] = {
 			GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_process_turn_req, money_),
+			GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_process_turn_req, total_money_),
 			GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_process_turn_req, card_number_),
 			GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_process_turn_req, public_card_number_1_),
 			GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_process_turn_req, public_card_number_2_),
@@ -193,14 +194,15 @@ namespace logic_server {
 			"cket_enter_req\022\022\n\nplayer_key\030\001 \002(\005\022\020\n\010ro"
 			"om_key\030\002 \002(\005\"\"\n\020packet_enter_ans\022\016\n\006resu"
 			"lt\030\001 \002(\005\"&\n\025packet_game_state_ntf\022\r\n\005sta"
-			"te\030\001 \002(\005\"y\n\027packet_process_turn_req\022\r\n\005m"
-			"oney\030\001 \002(\005\022\023\n\013card_number\030\002 \002(\005\022\034\n\024publi"
-			"c_card_number_1\030\003 \002(\005\022\034\n\024public_card_num"
-			"ber_2\030\004 \002(\005\"<\n\027packet_process_turn_ans\022\022"
-			"\n\nplayer_key\030\001 \002(\005\022\r\n\005money\030\002 \002(\005*l\n\014mes"
-			"sage_type\022\r\n\tENTER_REQ\020\000\022\r\n\tENTER_ANS\020\001\022"
-			"\022\n\016GAME_STATE_NTF\020\002\022\024\n\020PROCESS_TURN_REQ\020"
-			"\003\022\024\n\020PROCESS_TURN_ANS\020\004", 463);
+			"te\030\001 \002(\005\"\216\001\n\027packet_process_turn_req\022\r\n\005"
+			"money\030\001 \002(\005\022\023\n\013total_money\030\002 \002(\005\022\023\n\013card"
+			"_number\030\003 \002(\005\022\034\n\024public_card_number_1\030\004 "
+			"\002(\005\022\034\n\024public_card_number_2\030\005 \002(\005\"<\n\027pac"
+			"ket_process_turn_ans\022\022\n\nplayer_key\030\001 \002(\005"
+			"\022\r\n\005money\030\002 \002(\005*l\n\014message_type\022\r\n\tENTER"
+			"_REQ\020\000\022\r\n\tENTER_ANS\020\001\022\022\n\016GAME_STATE_NTF\020"
+			"\002\022\024\n\020PROCESS_TURN_REQ\020\003\022\024\n\020PROCESS_TURN_"
+			"ANS\020\004", 485);
 		::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
 			"logic_server.proto", &protobuf_RegisterTypes);
 		::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_logic_5fserver_2eproto);
@@ -1200,6 +1202,7 @@ namespace logic_server {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 	const int packet_process_turn_req::kMoneyFieldNumber;
+	const int packet_process_turn_req::kTotalMoneyFieldNumber;
 	const int packet_process_turn_req::kCardNumberFieldNumber;
 	const int packet_process_turn_req::kPublicCardNumber1FieldNumber;
 	const int packet_process_turn_req::kPublicCardNumber2FieldNumber;
@@ -1312,13 +1315,29 @@ namespace logic_server {
 				else {
 					goto handle_unusual;
 				}
-				if (input->ExpectTag(16)) goto parse_card_number;
+				if (input->ExpectTag(16)) goto parse_total_money;
 				break;
 			}
 
-					// required int32 card_number = 2;
+					// required int32 total_money = 2;
 			case 2: {
 				if (tag == 16) {
+				parse_total_money:
+					set_has_total_money();
+					DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+						::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+							input, &total_money_)));
+				}
+				else {
+					goto handle_unusual;
+				}
+				if (input->ExpectTag(24)) goto parse_card_number;
+				break;
+			}
+
+					// required int32 card_number = 3;
+			case 3: {
+				if (tag == 24) {
 				parse_card_number:
 					set_has_card_number();
 					DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
@@ -1328,13 +1347,13 @@ namespace logic_server {
 				else {
 					goto handle_unusual;
 				}
-				if (input->ExpectTag(24)) goto parse_public_card_number_1;
+				if (input->ExpectTag(32)) goto parse_public_card_number_1;
 				break;
 			}
 
-					// required int32 public_card_number_1 = 3;
-			case 3: {
-				if (tag == 24) {
+					// required int32 public_card_number_1 = 4;
+			case 4: {
+				if (tag == 32) {
 				parse_public_card_number_1:
 					set_has_public_card_number_1();
 					DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
@@ -1344,13 +1363,13 @@ namespace logic_server {
 				else {
 					goto handle_unusual;
 				}
-				if (input->ExpectTag(32)) goto parse_public_card_number_2;
+				if (input->ExpectTag(40)) goto parse_public_card_number_2;
 				break;
 			}
 
-					// required int32 public_card_number_2 = 4;
-			case 4: {
-				if (tag == 32) {
+					// required int32 public_card_number_2 = 5;
+			case 5: {
+				if (tag == 40) {
 				parse_public_card_number_2:
 					set_has_public_card_number_2();
 					DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
@@ -1394,19 +1413,24 @@ namespace logic_server {
 			::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->money(), output);
 		}
 
-		// required int32 card_number = 2;
+		// required int32 total_money = 2;
+		if (has_total_money()) {
+			::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->total_money(), output);
+		}
+
+		// required int32 card_number = 3;
 		if (has_card_number()) {
-			::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->card_number(), output);
+			::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->card_number(), output);
 		}
 
-		// required int32 public_card_number_1 = 3;
+		// required int32 public_card_number_1 = 4;
 		if (has_public_card_number_1()) {
-			::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->public_card_number_1(), output);
+			::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->public_card_number_1(), output);
 		}
 
-		// required int32 public_card_number_2 = 4;
+		// required int32 public_card_number_2 = 5;
 		if (has_public_card_number_2()) {
-			::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->public_card_number_2(), output);
+			::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->public_card_number_2(), output);
 		}
 
 		if (_internal_metadata_.have_unknown_fields()) {
@@ -1425,19 +1449,24 @@ namespace logic_server {
 			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->money(), target);
 		}
 
-		// required int32 card_number = 2;
+		// required int32 total_money = 2;
+		if (has_total_money()) {
+			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->total_money(), target);
+		}
+
+		// required int32 card_number = 3;
 		if (has_card_number()) {
-			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->card_number(), target);
+			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->card_number(), target);
 		}
 
-		// required int32 public_card_number_1 = 3;
+		// required int32 public_card_number_1 = 4;
 		if (has_public_card_number_1()) {
-			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->public_card_number_1(), target);
+			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->public_card_number_1(), target);
 		}
 
-		// required int32 public_card_number_2 = 4;
+		// required int32 public_card_number_2 = 5;
 		if (has_public_card_number_2()) {
-			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->public_card_number_2(), target);
+			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->public_card_number_2(), target);
 		}
 
 		if (_internal_metadata_.have_unknown_fields()) {
@@ -1459,22 +1488,29 @@ namespace logic_server {
 					this->money());
 		}
 
+		if (has_total_money()) {
+			// required int32 total_money = 2;
+			total_size += 1 +
+				::google::protobuf::internal::WireFormatLite::Int32Size(
+					this->total_money());
+		}
+
 		if (has_card_number()) {
-			// required int32 card_number = 2;
+			// required int32 card_number = 3;
 			total_size += 1 +
 				::google::protobuf::internal::WireFormatLite::Int32Size(
 					this->card_number());
 		}
 
 		if (has_public_card_number_1()) {
-			// required int32 public_card_number_1 = 3;
+			// required int32 public_card_number_1 = 4;
 			total_size += 1 +
 				::google::protobuf::internal::WireFormatLite::Int32Size(
 					this->public_card_number_1());
 		}
 
 		if (has_public_card_number_2()) {
-			// required int32 public_card_number_2 = 4;
+			// required int32 public_card_number_2 = 5;
 			total_size += 1 +
 				::google::protobuf::internal::WireFormatLite::Int32Size(
 					this->public_card_number_2());
@@ -1486,23 +1522,28 @@ namespace logic_server {
 		// @@protoc_insertion_point(message_byte_size_start:logic_server.packet_process_turn_req)
 		size_t total_size = 0;
 
-		if (((_has_bits_[0] & 0x0000000f) ^ 0x0000000f) == 0) {  // All required fields are present.
+		if (((_has_bits_[0] & 0x0000001f) ^ 0x0000001f) == 0) {  // All required fields are present.
 																 // required int32 money = 1;
 			total_size += 1 +
 				::google::protobuf::internal::WireFormatLite::Int32Size(
 					this->money());
 
-			// required int32 card_number = 2;
+			// required int32 total_money = 2;
+			total_size += 1 +
+				::google::protobuf::internal::WireFormatLite::Int32Size(
+					this->total_money());
+
+			// required int32 card_number = 3;
 			total_size += 1 +
 				::google::protobuf::internal::WireFormatLite::Int32Size(
 					this->card_number());
 
-			// required int32 public_card_number_1 = 3;
+			// required int32 public_card_number_1 = 4;
 			total_size += 1 +
 				::google::protobuf::internal::WireFormatLite::Int32Size(
 					this->public_card_number_1());
 
-			// required int32 public_card_number_2 = 4;
+			// required int32 public_card_number_2 = 5;
 			total_size += 1 +
 				::google::protobuf::internal::WireFormatLite::Int32Size(
 					this->public_card_number_2());
@@ -1555,6 +1596,9 @@ namespace logic_server {
 			if (from.has_money()) {
 				set_money(from.money());
 			}
+			if (from.has_total_money()) {
+				set_total_money(from.total_money());
+			}
 			if (from.has_card_number()) {
 				set_card_number(from.card_number());
 			}
@@ -1586,7 +1630,7 @@ namespace logic_server {
 	}
 
 	bool packet_process_turn_req::IsInitialized() const {
-		if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
+		if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
 
 		return true;
 	}
@@ -1597,6 +1641,7 @@ namespace logic_server {
 	}
 	void packet_process_turn_req::InternalSwap(packet_process_turn_req* other) {
 		std::swap(money_, other->money_);
+		std::swap(total_money_, other->total_money_);
 		std::swap(card_number_, other->card_number_);
 		std::swap(public_card_number_1_, other->public_card_number_1_);
 		std::swap(public_card_number_2_, other->public_card_number_2_);
@@ -1640,15 +1685,39 @@ namespace logic_server {
 		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_req.money)
 	}
 
-	// required int32 card_number = 2;
-	bool packet_process_turn_req::has_card_number() const {
+	// required int32 total_money = 2;
+	bool packet_process_turn_req::has_total_money() const {
 		return (_has_bits_[0] & 0x00000002u) != 0;
 	}
-	void packet_process_turn_req::set_has_card_number() {
+	void packet_process_turn_req::set_has_total_money() {
 		_has_bits_[0] |= 0x00000002u;
 	}
-	void packet_process_turn_req::clear_has_card_number() {
+	void packet_process_turn_req::clear_has_total_money() {
 		_has_bits_[0] &= ~0x00000002u;
+	}
+	void packet_process_turn_req::clear_total_money() {
+		total_money_ = 0;
+		clear_has_total_money();
+	}
+	::google::protobuf::int32 packet_process_turn_req::total_money() const {
+		// @@protoc_insertion_point(field_get:logic_server.packet_process_turn_req.total_money)
+		return total_money_;
+	}
+	void packet_process_turn_req::set_total_money(::google::protobuf::int32 value) {
+		set_has_total_money();
+		total_money_ = value;
+		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_req.total_money)
+	}
+
+	// required int32 card_number = 3;
+	bool packet_process_turn_req::has_card_number() const {
+		return (_has_bits_[0] & 0x00000004u) != 0;
+	}
+	void packet_process_turn_req::set_has_card_number() {
+		_has_bits_[0] |= 0x00000004u;
+	}
+	void packet_process_turn_req::clear_has_card_number() {
+		_has_bits_[0] &= ~0x00000004u;
 	}
 	void packet_process_turn_req::clear_card_number() {
 		card_number_ = 0;
@@ -1664,15 +1733,15 @@ namespace logic_server {
 		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_req.card_number)
 	}
 
-	// required int32 public_card_number_1 = 3;
+	// required int32 public_card_number_1 = 4;
 	bool packet_process_turn_req::has_public_card_number_1() const {
-		return (_has_bits_[0] & 0x00000004u) != 0;
+		return (_has_bits_[0] & 0x00000008u) != 0;
 	}
 	void packet_process_turn_req::set_has_public_card_number_1() {
-		_has_bits_[0] |= 0x00000004u;
+		_has_bits_[0] |= 0x00000008u;
 	}
 	void packet_process_turn_req::clear_has_public_card_number_1() {
-		_has_bits_[0] &= ~0x00000004u;
+		_has_bits_[0] &= ~0x00000008u;
 	}
 	void packet_process_turn_req::clear_public_card_number_1() {
 		public_card_number_1_ = 0;
@@ -1688,15 +1757,15 @@ namespace logic_server {
 		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_req.public_card_number_1)
 	}
 
-	// required int32 public_card_number_2 = 4;
+	// required int32 public_card_number_2 = 5;
 	bool packet_process_turn_req::has_public_card_number_2() const {
-		return (_has_bits_[0] & 0x00000008u) != 0;
+		return (_has_bits_[0] & 0x00000010u) != 0;
 	}
 	void packet_process_turn_req::set_has_public_card_number_2() {
-		_has_bits_[0] |= 0x00000008u;
+		_has_bits_[0] |= 0x00000010u;
 	}
 	void packet_process_turn_req::clear_has_public_card_number_2() {
-		_has_bits_[0] &= ~0x00000008u;
+		_has_bits_[0] &= ~0x00000010u;
 	}
 	void packet_process_turn_req::clear_public_card_number_2() {
 		public_card_number_2_ = 0;

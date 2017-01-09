@@ -161,7 +161,6 @@
     <ClCompile Include="logic_worker.cpp" />
     <ClCompile Include="log_manager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="packet_generator.cpp" />
     <ClCompile Include="process_packet.cpp" />
     <ClCompile Include="random_generator.cpp" />
     <ClCompile Include="redispp.cpp" />
@@ -177,7 +176,6 @@
     <ClInclude Include="singleton.h" />
     <ClInclude Include="logic_worker.h" />
     <ClInclude Include="log_manager.h" />
-    <ClInclude Include="packet_generator.h" />
     <ClInclude Include="preHeaders.h" />
     <ClInclude Include="tcp_server.h" />
   </ItemGroup>

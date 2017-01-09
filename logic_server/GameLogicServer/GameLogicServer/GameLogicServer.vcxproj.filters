@@ -27,9 +27,6 @@
     <Filter Include="소스 파일\network\interface">
       <UniqueIdentifier>{f7cae4e4-7106-4a9b-b048-1cac745b3331}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\network\packet_generator">
-      <UniqueIdentifier>{ced920db-75f3-44da-b33f-9ca5d612f02c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\network\logic_worker">
       <UniqueIdentifier>{2d35dc8c-3e27-4dc1-afbf-4a4543208ae6}</UniqueIdentifier>
     </Filter>
@@ -46,9 +43,6 @@
     </ClCompile>
     <ClCompile Include="tcp_server.cpp">
       <Filter>소스 파일\network</Filter>
-    </ClCompile>
-    <ClCompile Include="packet_generator.cpp">
-      <Filter>소스 파일\network\packet_generator</Filter>
     </ClCompile>
     <ClCompile Include="logic_worker.cpp">
       <Filter>소스 파일\network\logic_worker</Filter>
@@ -81,9 +75,6 @@
     </ClInclude>
     <ClInclude Include="tcp_server.h">
       <Filter>소스 파일\network</Filter>
-    </ClInclude>
-    <ClInclude Include="packet_generator.h">
-      <Filter>소스 파일\network\packet_generator</Filter>
     </ClInclude>
     <ClInclude Include="logic_worker.h">
       <Filter>소스 파일\network\logic_worker</Filter>

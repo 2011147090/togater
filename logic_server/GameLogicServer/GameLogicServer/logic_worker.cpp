@@ -4,7 +4,8 @@
 _PLAYER_INFO::_PLAYER_INFO()
 {
 	money_ = 0;
-	total_money_ = 10;
+	total_money_ = 0;
+	remain_money_ = 10;
 	submit_card_ = false;
 }
 
@@ -208,20 +209,23 @@ void logic_worker::process_queue()
 
 					logic_server::packet_process_turn_req turn_req_packet;
 					
-					(*iter).player_1_.submit_card_num_ = (*iter).get_card();
-					(*iter).player_2_.submit_card_num_ = (*iter).get_card();
+					(*iter).player_1_.opponent_card_num_ = (*iter).get_card();
+					(*iter).player_2_.opponent_card_num_ = (*iter).get_card();
 					
 					(*iter).public_card_[0] = (*iter).get_card();
 					(*iter).public_card_[1] = (*iter).get_card();
 					turn_req_packet.set_public_card_number_1((*iter).public_card_[0]);
 					turn_req_packet.set_public_card_number_2((*iter).public_card_[1]);
 
-					turn_req_packet.set_card_number((*iter).player_1_.submit_card_num_);
-					turn_req_packet.set_money(10);
+					turn_req_packet.set_card_number((*iter).player_1_.opponent_card_num_);
+					turn_req_packet.set_money((*iter).player_1_.remain_money_);
+					turn_req_packet.set_total_money(0);
 
 					(*iter).player_1_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
 
-					turn_req_packet.set_card_number((*iter).player_2_.submit_card_num_);
+					turn_req_packet.set_card_number((*iter).player_2_.opponent_card_num_);
+					turn_req_packet.set_money((*iter).player_2_.remain_money_);
+					turn_req_packet.set_total_money(0);
 					(*iter).player_2_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
 				}
 			}
@@ -239,68 +243,77 @@ void logic_worker::process_queue()
 						(*iter).player_1_.key_,
 						(*iter).player_2_.key_);
 
+					(*iter).player_1_.total_money_ += (*iter).player_1_.money_;
+					(*iter).player_2_.total_money_ += (*iter).player_2_.money_;
+
 					bool is_die = false;
+					
+					logic_server::packet_process_turn_req turn_req_packet;
 
 					if ((*iter).player_1_.money_ == 0 || (*iter).player_2_.money_ == 0)
 						is_die = true;
 
-					HOLDEM_HANDS player_1_result = check_card_mix(
-						(*iter).player_1_.submit_card_num_,
-						(*iter).public_card_[0],
-						(*iter).public_card_[1]
-					);
+					if (is_die) {
+						HOLDEM_HANDS player_1_result = check_card_mix(
+							(*iter).player_2_.opponent_card_num_,
+							(*iter).public_card_[0],
+							(*iter).public_card_[1]
+						);
 
-					HOLDEM_HANDS player_2_result = check_card_mix(
-						(*iter).player_2_.submit_card_num_,
-						(*iter).public_card_[0],
-						(*iter).public_card_[1]
-					);
-					
-					if (player_1_result > player_2_result)
-					{
-						(*iter).player_1_.total_money_ += (*iter).player_2_.money_;
-						(*iter).player_2_.total_money_ -= (*iter).player_2_.money_;
-					}
-					else if (player_1_result < player_2_result)
-					{
-						(*iter).player_1_.total_money_ -= (*iter).player_1_.money_;
-						(*iter).player_2_.total_money_ += (*iter).player_1_.money_;
-					}
-					else
-					{
-						if (player_1_result == HOLDEM_HANDS::NONE)
+						HOLDEM_HANDS player_2_result = check_card_mix(
+							(*iter).player_1_.opponent_card_num_,
+							(*iter).public_card_[0],
+							(*iter).public_card_[1]
+						);
+
+						if (player_1_result > player_2_result)
 						{
-							if ((*iter).player_1_.submit_card_num_ > (*iter).player_2_.submit_card_num_)
-							{
-								(*iter).player_1_.total_money_ += (*iter).player_2_.money_;
-								(*iter).player_2_.total_money_ -= (*iter).player_2_.money_;
-							}
-							else if ((*iter).player_1_.submit_card_num_ > (*iter).player_2_.submit_card_num_)
-							{
-								(*iter).player_1_.total_money_ -= (*iter).player_1_.money_;
-								(*iter).player_2_.total_money_ += (*iter).player_1_.money_;
-							}
+							(*iter).player_1_.remain_money_ += (*iter).player_2_.total_money_;
+							(*iter).player_2_.remain_money_ -= (*iter).player_2_.total_money_;
 						}
-							
+						else if (player_1_result < player_2_result)
+						{
+							(*iter).player_1_.remain_money_ -= (*iter).player_1_.total_money_;
+							(*iter).player_2_.remain_money_ += (*iter).player_1_.total_money_;
+						}
+						else
+						{
+							if (player_1_result == HOLDEM_HANDS::NONE)
+							{
+								if ((*iter).player_1_.opponent_card_num_ > (*iter).player_2_.opponent_card_num_)
+								{
+									(*iter).player_1_.remain_money_ += (*iter).player_2_.total_money_;
+									(*iter).player_2_.remain_money_ -= (*iter).player_2_.total_money_;
+								}
+								else if ((*iter).player_1_.opponent_card_num_ > (*iter).player_2_.opponent_card_num_)
+								{
+									(*iter).player_1_.remain_money_ -= (*iter).player_1_.total_money_;
+									(*iter).player_2_.remain_money_ += (*iter).player_1_.total_money_;
+								}
+							}
+
+						}
+
+						(*iter).player_1_.opponent_card_num_ = (*iter).get_card();
+						(*iter).player_2_.opponent_card_num_ = (*iter).get_card();
+
+						(*iter).public_card_[0] = (*iter).get_card();
+						(*iter).public_card_[1] = (*iter).get_card();
 					}
 
-					logic_server::packet_process_turn_req turn_req_packet;
-
-					(*iter).player_1_.submit_card_num_ = (*iter).get_card();
-					(*iter).player_2_.submit_card_num_ = (*iter).get_card();
-
-					(*iter).public_card_[0] = (*iter).get_card();
-					(*iter).public_card_[1] = (*iter).get_card();
 					turn_req_packet.set_public_card_number_1((*iter).public_card_[0]);
 					turn_req_packet.set_public_card_number_2((*iter).public_card_[1]);
-
-					turn_req_packet.set_card_number((*iter).player_1_.submit_card_num_);
-					turn_req_packet.set_money((*iter).player_1_.total_money_);
+						
+					turn_req_packet.set_total_money((*iter).player_1_.total_money_);
+					turn_req_packet.set_card_number((*iter).player_1_.opponent_card_num_);
+					turn_req_packet.set_money((*iter).player_1_.remain_money_);
 
 					(*iter).player_1_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
 
-					turn_req_packet.set_card_number((*iter).player_2_.submit_card_num_);
-					turn_req_packet.set_money((*iter).player_2_.total_money_);
+					turn_req_packet.set_total_money((*iter).player_2_.total_money_);
+					turn_req_packet.set_card_number((*iter).player_2_.opponent_card_num_);
+					turn_req_packet.set_money((*iter).player_2_.remain_money_);
+
 					(*iter).player_2_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
 				}
 			}

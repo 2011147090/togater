@@ -8,11 +8,12 @@ typedef struct _PLAYER_INFO {
 	int key_;
 
 	bool submit_card_;
-	int submit_card_num_;
+	int opponent_card_num_;
 
 	connected_session* session_;
 
 	int total_money_;
+	int remain_money_;
 	int money_;
 
 	_PLAYER_INFO();

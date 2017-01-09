@@ -132,6 +132,8 @@ void connect_session::handle_write()
 	int room_key;
 	int money;
 	
+	wait_turn = false;
+
 	std::cout << "enter room key : " << std::endl;
 	std::cin >> room_key;
 
@@ -148,13 +150,14 @@ void connect_session::handle_write()
 	{
 		while (!wait_turn) {}
 
-		std::cout << "enter turn money key : " << std::endl;
+		std::cout << "enter batting money key (give up - input 0) : " << std::endl;
 		std::cin >> money;
 
 		logic_server::packet_process_turn_ans process_turn_packet;
 		process_turn_packet.set_money(money);
 		process_turn_packet.set_player_key(player_key);
 
+		wait_turn = false;
 		this->handle_send(logic_server::PROCESS_TURN_ANS, process_turn_packet);
 	}
 }
