@@ -11,3 +11,5 @@
 *.ilk
 *.pdb
 *.pch
+*.VC
+*.opendb
