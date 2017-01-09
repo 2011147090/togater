@@ -1,0 +1,5 @@
+﻿  TEST_server.cpp
+c:\local\protocol_buffer\google\protobuf\message_lite.h(247): warning C4267: 'return': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\visual studio 2015\projects\myserver\myserver\test_server.cpp(79): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  MyServer.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\MyServer\x64\Debug\MyServer.exe
+  MyServer.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\MyServer\x64\Debug\MyServer.pdb (Full PDB)
