@@ -1,4 +1,49 @@
 #include "logic_worker.h"
+#include "random_generator.h"
+
+_PLAYER_INFO::_PLAYER_INFO()
+{
+	money_ = 0;
+	total_money_ = 10;
+	submit_card_ = false;
+}
+
+_ROOM_INFO::_ROOM_INFO()
+{
+	ready_player_num_ = 1;
+	time_ = 0;
+	turn_count_ = 0;
+	state_ = GAME_STATE::READY;
+
+	match_log_ = spd::daily_logger_st("logic_server", "match_log", 0, 0);
+	spd::drop_all();
+}
+
+void _ROOM_INFO::generate_card_queue()
+{
+	while (!card_list_.empty())
+		card_list_.pop();
+
+	std::deque<int> d;
+	
+	for (int i = 0; i < 4; i++)
+		for (int j = 1; j <= 10; j++)
+			d.push_back(j);
+
+	std::random_shuffle(d.begin(), d.end());
+	card_list_ = std::queue<int>(d);
+}
+
+int _ROOM_INFO::get_card()
+{
+	if (card_list_.empty())
+		generate_card_queue();
+
+	int num = card_list_.front();
+	card_list_.pop();
+
+	return num;
+}
 
 logic_worker::logic_worker() : logic_thread_(NULL)
 {
@@ -29,16 +74,12 @@ bool logic_worker::create_room(connected_session* session, int room_key, int pla
 	}
 
 	ROOM_INFO room_info;
-	
+
 	room_info.player_1_.key_ = player_key;
 	room_info.player_1_.session_ = session;
 	room_info.player_1_.total_money_ = 10;
 	room_info.player_1_.money_ = 0;
-	room_info.ready_player_num_ = 1;
 	room_info.room_key_ = room_key;
-	room_info.time_ = 0;
-	room_info.turn_count_ = 0;
-	room_info.state_ = ROOM_INFO::READY;
 
 	room_list_.push_back(room_info);
 
@@ -112,6 +153,31 @@ bool logic_worker::process_turn(int player_key, int money)
 	return false;
 }
 
+bool comp(int const& a, int const& b) {
+	if (a >= b) return true;
+
+	return false;
+}
+
+logic_worker::HOLDEM_HANDS logic_worker::check_card_mix(int i, int j, int k)
+{
+	if (i == j)
+		if (i == k)
+			return HOLDEM_HANDS::TRIPLE;
+
+	if (i == j || i == k || j == k)
+		return HOLDEM_HANDS::PAIR;
+
+	int iarray[3] = {i, j, k};
+	std::sort(iarray, iarray + 2, comp);
+
+	if (iarray[0] + 1 == iarray[1])
+		if (iarray[1] + 1 == iarray[2])
+			return HOLDEM_HANDS::STRAIGHT;
+
+	return HOLDEM_HANDS::NONE;
+}
+
 void logic_worker::process_queue()
 {
 	while (true)
@@ -126,7 +192,7 @@ void logic_worker::process_queue()
 			{
 				if ((*iter).ready_player_num_ == 2)
 				{
-					(*iter).state_ = ROOM_INFO::START;
+					(*iter).state_ = ROOM_INFO::PLAYING;
 
 					logic_server::packet_game_state_ntf start_ntf_packet;
 
@@ -141,19 +207,27 @@ void logic_worker::process_queue()
 						(*iter).player_2_.key_);
 
 					logic_server::packet_process_turn_req turn_req_packet;
+					
+					(*iter).player_1_.submit_card_num_ = (*iter).get_card();
+					(*iter).player_2_.submit_card_num_ = (*iter).get_card();
+					
+					(*iter).public_card_[0] = (*iter).get_card();
+					(*iter).public_card_[1] = (*iter).get_card();
+					turn_req_packet.set_public_card_number_1((*iter).public_card_[0]);
+					turn_req_packet.set_public_card_number_2((*iter).public_card_[1]);
 
-					turn_req_packet.set_card_number(10);
+					turn_req_packet.set_card_number((*iter).player_1_.submit_card_num_);
 					turn_req_packet.set_money(10);
 
 					(*iter).player_1_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
 
-					turn_req_packet.set_card_number(12);
+					turn_req_packet.set_card_number((*iter).player_2_.submit_card_num_);
 					(*iter).player_2_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
 				}
 			}
 			break;
 
-			case ROOM_INFO::START:
+			case ROOM_INFO::PLAYING:
 			{
 				if ((*iter).player_1_.submit_card_ && (*iter).player_2_.submit_card_)
 				{
@@ -165,15 +239,68 @@ void logic_worker::process_queue()
 						(*iter).player_1_.key_,
 						(*iter).player_2_.key_);
 
+					bool is_die = false;
+
+					if ((*iter).player_1_.money_ == 0 || (*iter).player_2_.money_ == 0)
+						is_die = true;
+
+					HOLDEM_HANDS player_1_result = check_card_mix(
+						(*iter).player_1_.submit_card_num_,
+						(*iter).public_card_[0],
+						(*iter).public_card_[1]
+					);
+
+					HOLDEM_HANDS player_2_result = check_card_mix(
+						(*iter).player_2_.submit_card_num_,
+						(*iter).public_card_[0],
+						(*iter).public_card_[1]
+					);
+					
+					if (player_1_result > player_2_result)
+					{
+						(*iter).player_1_.total_money_ += (*iter).player_2_.money_;
+						(*iter).player_2_.total_money_ -= (*iter).player_2_.money_;
+					}
+					else if (player_1_result < player_2_result)
+					{
+						(*iter).player_1_.total_money_ -= (*iter).player_1_.money_;
+						(*iter).player_2_.total_money_ += (*iter).player_1_.money_;
+					}
+					else
+					{
+						if (player_1_result == HOLDEM_HANDS::NONE)
+						{
+							if ((*iter).player_1_.submit_card_num_ > (*iter).player_2_.submit_card_num_)
+							{
+								(*iter).player_1_.total_money_ += (*iter).player_2_.money_;
+								(*iter).player_2_.total_money_ -= (*iter).player_2_.money_;
+							}
+							else if ((*iter).player_1_.submit_card_num_ > (*iter).player_2_.submit_card_num_)
+							{
+								(*iter).player_1_.total_money_ -= (*iter).player_1_.money_;
+								(*iter).player_2_.total_money_ += (*iter).player_1_.money_;
+							}
+						}
+							
+					}
+
 					logic_server::packet_process_turn_req turn_req_packet;
 
-					turn_req_packet.set_card_number(5);
-					turn_req_packet.set_money((*iter).player_1_.money_);
+					(*iter).player_1_.submit_card_num_ = (*iter).get_card();
+					(*iter).player_2_.submit_card_num_ = (*iter).get_card();
+
+					(*iter).public_card_[0] = (*iter).get_card();
+					(*iter).public_card_[1] = (*iter).get_card();
+					turn_req_packet.set_public_card_number_1((*iter).public_card_[0]);
+					turn_req_packet.set_public_card_number_2((*iter).public_card_[1]);
+
+					turn_req_packet.set_card_number((*iter).player_1_.submit_card_num_);
+					turn_req_packet.set_money((*iter).player_1_.total_money_);
 
 					(*iter).player_1_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
 
-					turn_req_packet.set_card_number(8);
-					turn_req_packet.set_money((*iter).player_2_.money_);
+					turn_req_packet.set_card_number((*iter).player_2_.submit_card_num_);
+					turn_req_packet.set_money((*iter).player_2_.total_money_);
 					(*iter).player_2_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
 				}
 			}

@@ -15,11 +15,7 @@ typedef struct _PLAYER_INFO {
 	int total_money_;
 	int money_;
 
-	_PLAYER_INFO()
-	{
-		money_ = 10;
-		submit_card_ = false;
-	}
+	_PLAYER_INFO();
 
 } PLAYER_INFO;
 
@@ -33,18 +29,19 @@ typedef struct _ROOM_INFO {
 
 	int ready_player_num_;
 
-	enum GAME_STATE { READY, START, END };
+	enum GAME_STATE { READY, PLAYING, END };
 	GAME_STATE state_;
 
 	int public_card_[2];
 
+	std::queue<int> card_list_;
+
 	std::shared_ptr<spd::logger> match_log_;
 
-	_ROOM_INFO()
-	{
-		match_log_ = spd::daily_logger_st("logic_server", "match_log", 0, 0);
-		spd::drop_all();
-	}
+	_ROOM_INFO();
+
+	void generate_card_queue();
+	int get_card();
 
 } ROOM_INFO;
 
@@ -63,6 +60,9 @@ private:
 	std::vector<ROOM_INFO> room_list_;
 	boost::thread* logic_thread_;
 	CRITICAL_SECTION critical_section_;
+
+	enum HOLDEM_HANDS { NONE = 0, STRAIGHT = 1, PAIR = 2, TRIPLE = 3 };
+	HOLDEM_HANDS check_card_mix(int i, int j, int k);
 
 	bool create_room(connected_session* session, int room_key, int player_key);
 };
