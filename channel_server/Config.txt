@@ -1,0 +1,22 @@
+1. boost install
+	header dir : $(BOOST_DIR)
+	lib dir : $(BOOST_DIR)\lib-xx.xxx.xx
+
+2. spd_log install
+	header dir : $(SPD_LOG_DIR)\include
+
+3. json_spirit install
+	header dir : $(JSON_SPIRIT_DIR)\include
+	lib dir : $(JSON_SPIRIT_DIR)\lib\debug
+        lib dir : $(JSON_SPIRIT_DIR)\lib\release
+	lib (release) : json_spirit_release.lib
+	lib (debug) :   json_spirit_debug.lib
+
+4. protocolbuffer install
+	header : $(PROTOBUF_DIR)
+	lib : $(PROTOBUF_DIR)
+	lib (release) : libprotobuf.lib
+	lib (debug) :   libprotobufd.lib
+	-> .bat 파일 protobuf_dir 에 생성
+
+5. redis install
