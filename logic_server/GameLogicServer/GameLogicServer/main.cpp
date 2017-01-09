@@ -12,7 +12,21 @@ int main(int argc, char* argv[])
 
 		if (!log_manager::get_instance()->init_singleton())
 		{
-			log->info("");
+			log->error("failed_init_log_manager");
+
+			return 0;
+		}
+
+		if (!redis_manager::get_instance()->init_singleton())
+		{
+			log->error("failed_init_redis_manager");
+
+			return 0;
+		}
+
+		if (!logic_worker::get_instance()->init_singleton())
+		{
+			log->error("failed_init_logic_worker");
 
 			return 0;
 		}

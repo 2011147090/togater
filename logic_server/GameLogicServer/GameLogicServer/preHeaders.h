@@ -32,7 +32,6 @@
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 #include "logic_server.pb.h"
 
-
 enum { BUFSIZE = 128 };
 
 using boost::asio::ip::tcp;

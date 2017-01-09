@@ -1,5 +1,5 @@
 #include "preHeader.h"
-#include "protocol.h"
+#include "connect_session.h"
 
 void main()
 {
@@ -7,13 +7,13 @@ void main()
 	{
 		boost::asio::io_service io_service;
 
-		protocol proto(io_service);
+		connect_session proto(io_service);
 
 		boost::thread t(boost::bind(&boost::asio::io_service::run, &io_service));
 		proto.connect();
 
-		boost::thread send(boost::bind(&protocol::handle_write, &proto));
-		boost::thread recv(boost::bind(&protocol::handle_read, &proto));
+		boost::thread send(boost::bind(&connect_session::handle_write, &proto));
+		boost::thread recv(boost::bind(&connect_session::handle_read, &proto));
 
 		io_service.run();
 

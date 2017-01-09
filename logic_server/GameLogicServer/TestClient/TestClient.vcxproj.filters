@@ -13,33 +13,39 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="소스 파일\packet_generator">
-      <UniqueIdentifier>{d2fc3887-1117-4402-a1a5-d77ed2545eeb}</UniqueIdentifier>
+    <Filter Include="소스 파일\network">
+      <UniqueIdentifier>{189706f7-46fd-45c3-bbd9-d2abc192906f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\protocol">
+    <Filter Include="소스 파일\network\protocol">
       <UniqueIdentifier>{109ea034-0542-4e1a-bd7b-1763cc2171ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\network\protobuf">
+      <UniqueIdentifier>{ca21d1e6-3c6e-4f54-ab37-c12cac01b41a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="packet_generator.cpp">
-      <Filter>소스 파일\packet_generator</Filter>
+    <ClCompile Include="logic_server.pb.cc">
+      <Filter>소스 파일\network\protobuf</Filter>
     </ClCompile>
-    <ClCompile Include="protocol.cpp">
-      <Filter>소스 파일\protocol</Filter>
+    <ClCompile Include="connect_session.cpp">
+      <Filter>소스 파일\network\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="process_packet.cpp">
+      <Filter>소스 파일\network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="packet_generator.h">
-      <Filter>소스 파일\packet_generator</Filter>
-    </ClInclude>
-    <ClInclude Include="protocol.h">
-      <Filter>소스 파일\protocol</Filter>
-    </ClInclude>
     <ClInclude Include="preHeader.h">
       <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="logic_server.pb.h">
+      <Filter>소스 파일\network\protobuf</Filter>
+    </ClInclude>
+    <ClInclude Include="connect_session.h">
+      <Filter>소스 파일\network\protocol</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

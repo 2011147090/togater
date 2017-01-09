@@ -49,14 +49,6 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
 	socket_.write_some(boost::asio::buffer(send_buf_));
 }
 
-void connected_session::handle_write(const boost::system::error_code& /*error*/, size_t /*bytes_transferred*/)
-{
-	socket_.async_write_some(boost::asio::buffer(send_buf_),
-		boost::bind(&connected_session::handle_write, shared_from_this(),
-				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred));
-}
-
 void connected_session::handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/)
 {
 	if (!error)
@@ -70,6 +62,8 @@ void connected_session::handle_read(const boost::system::error_code& error, size
 		protobuf::io::CodedInputStream input_coded_stream(&input_array_stream);
 
 		MESSAGE_HEADER message_header;
+
+		input_coded_stream.ReadRaw(&message_header, message_header_size);
 
 		const void* payload_ptr = NULL;
 		int remainSize = 0;
