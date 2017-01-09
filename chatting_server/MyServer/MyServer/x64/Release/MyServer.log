@@ -1,6 +1,0 @@
-﻿  server.cpp
-  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
-  - add -D_WIN32_WINNT=0x0501 to the compiler command line; or
-  - add _WIN32_WINNT=0x0501 to your project's Preprocessor Definitions.
-  Assuming _WIN32_WINNT=0x0501 (i.e. Windows XP target).
-c:\users\user\documents\visual studio 2015\projects\myserver\myserver\chat_protocol.h(6): fatal error C1083: 포함 파일을 열 수 없습니다. 'json_spirit.h': No such file or directory
