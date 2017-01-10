@@ -18,9 +18,7 @@ private:
 
 	boost::array<BYTE, BUFSIZE> recv_buf_;
 	boost::array<BYTE, BUFSIZE> send_buf_;
-
-	int valied_key_;
-
+	
 private:
 	connected_session(boost::asio::io_service& io_service);
 

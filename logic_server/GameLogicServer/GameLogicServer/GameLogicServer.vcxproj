@@ -169,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="connected_session.h" />
+    <ClInclude Include="critical_section.h" />
     <ClInclude Include="logic_server.pb.h" />
     <ClInclude Include="random_generator.h" />
     <ClInclude Include="redispp.h" />

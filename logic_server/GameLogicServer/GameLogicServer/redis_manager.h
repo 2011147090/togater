@@ -5,7 +5,6 @@
 class redis_manager : public singleton<redis_manager> {
 private:
 	redispp::Connection* conn;
-	CRITICAL_SECTION critical_section;
 
 public:
 	virtual bool init_singleton();

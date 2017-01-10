@@ -12,7 +12,7 @@ typedef struct _PLAYER_INFO {
 
 	connected_session* session_;
 
-	int total_money_;
+	int sum_money_;
 	int remain_money_;
 	int money_;
 
@@ -21,8 +21,9 @@ typedef struct _PLAYER_INFO {
 } PLAYER_INFO;
 
 typedef struct _ROOM_INFO {
-	PLAYER_INFO player_1_;
-	PLAYER_INFO player_2_;
+	PLAYER_INFO player_[2];
+
+	PLAYER_INFO* turn_player_;
 	
 	int room_key_;
 	int time_;
@@ -60,7 +61,6 @@ public:
 private:
 	std::vector<ROOM_INFO> room_list_;
 	boost::thread* logic_thread_;
-	CRITICAL_SECTION critical_section_;
 
 	enum HOLDEM_HANDS { NONE = 0, STRAIGHT = 1, PAIR = 2, TRIPLE = 3 };
 	HOLDEM_HANDS check_card_mix(int i, int j, int k);

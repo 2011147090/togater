@@ -8,7 +8,7 @@ private:
 	tcp::acceptor acceptor_;
 	int accept_cut_;
 
-	std::vector<connected_session::pointer> connected_session_list;
+	std::vector<connected_session::pointer> connected_session_list_;
 
 public:
 	tcp_server(boost::asio::io_service& io_service);

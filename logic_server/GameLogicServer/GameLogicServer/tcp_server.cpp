@@ -16,7 +16,7 @@ void tcp_server::wait_accept()
 	acceptor_.async_accept(new_connection->get_socket(),
 		boost::bind(&tcp_server::handle_accept, this, new_connection, boost::asio::placeholders::error));
 
-	connected_session_list.push_back(new_connection);
+	connected_session_list_.push_back(new_connection);
 }
 
 void tcp_server::handle_accept(connected_session::pointer new_Connection, const boost::system::error_code& error)

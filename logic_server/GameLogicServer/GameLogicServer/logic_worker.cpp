@@ -4,7 +4,7 @@
 _PLAYER_INFO::_PLAYER_INFO()
 {
 	money_ = 0;
-	total_money_ = 0;
+	sum_money_ = 0;
 	remain_money_ = 10;
 	submit_card_ = false;
 }
@@ -47,17 +47,15 @@ int _ROOM_INFO::get_card()
 }
 
 logic_worker::logic_worker() : logic_thread_(NULL)
-{
-	InitializeCriticalSection(&critical_section_);
-}
+{}
 
 logic_worker::~logic_worker() 
-{
-	DeleteCriticalSection(&critical_section_);
-}
+{}
 
 bool logic_worker::init_singleton()
 {
+	thread_sync sync;
+
 	if (logic_thread_ == NULL)
 		logic_thread_ = new boost::thread(&logic_worker::process_queue, this);
 
@@ -66,90 +64,75 @@ bool logic_worker::init_singleton()
 
 bool logic_worker::create_room(connected_session* session, int room_key, int player_key)
 {
-	EnterCriticalSection(&critical_section_);
+	thread_sync sync;
 
 	if (!redis_manager::get_instance()->check_room(room_key))
-	{
-		LeaveCriticalSection(&critical_section_);
 		return false;
-	}
 
 	ROOM_INFO room_info;
 
-	room_info.player_1_.key_ = player_key;
-	room_info.player_1_.session_ = session;
-	room_info.player_1_.total_money_ = 10;
-	room_info.player_1_.money_ = 0;
+	room_info.player_[1].key_ = player_key;
+	room_info.player_[1].session_ = session;
+	room_info.player_[1].remain_money_ = 10;
+	room_info.player_[1].sum_money_ = 0;
+	room_info.player_[1].money_ = 0;
 	room_info.room_key_ = room_key;
 
 	room_list_.push_back(room_info);
 
 	room_info.match_log_->info("create_room, room_key:{}", room_key);
 
-	LeaveCriticalSection(&critical_section_);
-
 	return true;
 }
 
 bool logic_worker::enter_room_player(connected_session* session, int room_key, int player_key)
 {
-	EnterCriticalSection(&critical_section_);
+	thread_sync sync;
 	
 	for (auto iter = room_list_.begin(); iter != room_list_.end(); iter++)
 	{
 		if ((*iter).room_key_ == room_key)
 		{
 			(*iter).ready_player_num_++;
-			(*iter).player_2_.total_money_ = 10;
-			(*iter).player_2_.money_ = 0;
-			(*iter).player_2_.key_ = player_key;
-			(*iter).player_2_.session_ = session;
+			(*iter).player_[2].remain_money_ = 10;
+			(*iter).player_[2].money_ = 0;
+			(*iter).player_[2].sum_money_ = 0;
+			(*iter).player_[2].key_ = player_key;
+			(*iter).player_[2].session_ = session;
 
 			(*iter).match_log_->info("enter_room_player, room_key:{}, player_key:{}", player_key);
 
-			LeaveCriticalSection(&critical_section_);
 			return true;
 		}
 	}
 
 	if (create_room(session, room_key, player_key))
-	{
-		LeaveCriticalSection(&critical_section_);
 		return true;
-	}
-
-	LeaveCriticalSection(&critical_section_);
 
 	return false;
 }
 
 bool logic_worker::process_turn(int player_key, int money)
 {
-	EnterCriticalSection(&critical_section_);
+	thread_sync sync;
 
 	for (auto iter = room_list_.begin(); iter != room_list_.end(); iter++)
 	{
-		if ((*iter).player_1_.key_ == player_key)
+		if ((*iter).player_[1].key_ == player_key)
 		{
-			(*iter).player_1_.submit_card_ = true;
-			(*iter).player_1_.money_ = money;
-
-			LeaveCriticalSection(&critical_section_);
+			(*iter).player_[1].submit_card_ = true;
+			(*iter).player_[1].money_ = money;
 
 			return true;
 		}
-		else if ((*iter).player_2_.key_ == player_key)
+		else if ((*iter).player_[2].key_ == player_key)
 		{
-			(*iter).player_2_.submit_card_ = true;
-			(*iter).player_2_.money_ = money;
-
-			LeaveCriticalSection(&critical_section_);
+			(*iter).player_[2].submit_card_ = true;
+			(*iter).player_[2].money_ = money;
 
 			return true;
 		}
 	}
-
-	LeaveCriticalSection(&critical_section_);
 
 	return false;
 }
@@ -183,7 +166,7 @@ void logic_worker::process_queue()
 {
 	while (true)
 	{
-		EnterCriticalSection(&critical_section_);
+		thread_sync sync;
 
 		for (auto iter = room_list_.begin(); iter != room_list_.end(); iter++)
 		{
@@ -199,122 +182,131 @@ void logic_worker::process_queue()
 
 					start_ntf_packet.set_state(1);
 
-					(*iter).player_1_.session_->handle_send(logic_server::GAME_STATE_NTF, start_ntf_packet);
-					(*iter).player_2_.session_->handle_send(logic_server::GAME_STATE_NTF, start_ntf_packet);
+					(*iter).player_[1].session_->handle_send(logic_server::GAME_STATE_NTF, start_ntf_packet);
+					(*iter).player_[2].session_->handle_send(logic_server::GAME_STATE_NTF, start_ntf_packet);
 
 					(*iter).match_log_->info("game start, room_key:{}, player_1_key:{}, player_2_key:{}",
 						(*iter).room_key_,
-						(*iter).player_1_.key_,
-						(*iter).player_2_.key_);
+						(*iter).player_[1].key_,
+						(*iter).player_[2].key_);
 
-					logic_server::packet_process_turn_req turn_req_packet;
+
+					logic_server::packet_process_turn_ntf turn_ntf_packet;
 					
-					(*iter).player_1_.opponent_card_num_ = (*iter).get_card();
-					(*iter).player_2_.opponent_card_num_ = (*iter).get_card();
-					
-					(*iter).public_card_[0] = (*iter).get_card();
-					(*iter).public_card_[1] = (*iter).get_card();
-					turn_req_packet.set_public_card_number_1((*iter).public_card_[0]);
-					turn_req_packet.set_public_card_number_2((*iter).public_card_[1]);
+					turn_ntf_packet.set_public_card_number_1((*iter).public_card_[0]);
+					turn_ntf_packet.set_public_card_number_2((*iter).public_card_[1]);
 
-					turn_req_packet.set_card_number((*iter).player_1_.opponent_card_num_);
-					turn_req_packet.set_money((*iter).player_1_.remain_money_);
-					turn_req_packet.set_total_money(0);
+					for (int i = 0; i < 2; i++)
+					{
+						(*iter).player_[i].opponent_card_num_ = (*iter).get_card();
+						
+						(*iter).public_card_[i] = (*iter).get_card();
+						
+						turn_ntf_packet.set_opponent_card_number((*iter).player_[i].opponent_card_num_);
+						turn_ntf_packet.set_money((*iter).player_[i].remain_money_);
 
-					(*iter).player_1_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
+						(*iter).player_[i].session_->handle_send(logic_server::PROCESS_TURN_NTF, turn_ntf_packet);
+					}
 
-					turn_req_packet.set_card_number((*iter).player_2_.opponent_card_num_);
-					turn_req_packet.set_money((*iter).player_2_.remain_money_);
-					turn_req_packet.set_total_money(0);
-					(*iter).player_2_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
+					if (random_generator::get_random_int(0, 100) < 50)
+						(*iter).turn_player_ = &(*iter).player_[1];
+					else
+						(*iter).turn_player_ = &(*iter).player_[2];
 				}
 			}
 			break;
 
 			case ROOM_INFO::PLAYING:
 			{
-				if ((*iter).player_1_.submit_card_ && (*iter).player_2_.submit_card_)
+				if ((*iter).turn_player_->submit_card_)
 				{
-					(*iter).player_1_.submit_card_ = false;
-					(*iter).player_2_.submit_card_ = false;
+					(*iter).turn_player_->submit_card_ = false;
 
-					(*iter).match_log_->info("turn play result, room_key:{}, player_1_key:{}, player_2_key:{}",
-						(*iter).room_key_,
-						(*iter).player_1_.key_,
-						(*iter).player_2_.key_);
-
-					(*iter).player_1_.total_money_ += (*iter).player_1_.money_;
-					(*iter).player_2_.total_money_ += (*iter).player_2_.money_;
-
+					(*iter).turn_player_->sum_money_ += (*iter).turn_player_->money_;
+					
 					bool is_die = false;
 					
-					logic_server::packet_process_turn_req turn_req_packet;
-
-					if ((*iter).player_1_.money_ == 0 || (*iter).player_2_.money_ == 0)
+					if ((*iter).turn_player_->money_ == 0)
 						is_die = true;
 
 					if (is_die) {
 						HOLDEM_HANDS player_1_result = check_card_mix(
-							(*iter).player_2_.opponent_card_num_,
+							(*iter).player_[2].opponent_card_num_,
 							(*iter).public_card_[0],
 							(*iter).public_card_[1]
 						);
 
 						HOLDEM_HANDS player_2_result = check_card_mix(
-							(*iter).player_1_.opponent_card_num_,
+							(*iter).player_[1].opponent_card_num_,
 							(*iter).public_card_[0],
 							(*iter).public_card_[1]
 						);
 
 						if (player_1_result > player_2_result)
 						{
-							(*iter).player_1_.remain_money_ += (*iter).player_2_.total_money_;
-							(*iter).player_2_.remain_money_ -= (*iter).player_2_.total_money_;
+							(*iter).player_[1].remain_money_ += (*iter).player_[2].sum_money_;
+							(*iter).player_[2].remain_money_ -= (*iter).player_[1].sum_money_;
 						}
 						else if (player_1_result < player_2_result)
 						{
-							(*iter).player_1_.remain_money_ -= (*iter).player_1_.total_money_;
-							(*iter).player_2_.remain_money_ += (*iter).player_1_.total_money_;
+							(*iter).player_[1].remain_money_ -= (*iter).player_[2].sum_money_;
+							(*iter).player_[2].remain_money_ += (*iter).player_[1].sum_money_;
 						}
 						else
 						{
 							if (player_1_result == HOLDEM_HANDS::NONE)
 							{
-								if ((*iter).player_1_.opponent_card_num_ > (*iter).player_2_.opponent_card_num_)
+								if ((*iter).player_[1].opponent_card_num_ >(*iter).player_[2].opponent_card_num_)
 								{
-									(*iter).player_1_.remain_money_ += (*iter).player_2_.total_money_;
-									(*iter).player_2_.remain_money_ -= (*iter).player_2_.total_money_;
+									(*iter).player_[1].remain_money_ += (*iter).player_[2].sum_money_;
+									(*iter).player_[2].remain_money_ -= (*iter).player_[1].sum_money_;
 								}
-								else if ((*iter).player_1_.opponent_card_num_ > (*iter).player_2_.opponent_card_num_)
+								else if ((*iter).player_[1].opponent_card_num_ > (*iter).player_[2].opponent_card_num_)
 								{
-									(*iter).player_1_.remain_money_ -= (*iter).player_1_.total_money_;
-									(*iter).player_2_.remain_money_ += (*iter).player_1_.total_money_;
+									(*iter).player_[1].remain_money_ -= (*iter).player_[2].sum_money_;
+									(*iter).player_[2].remain_money_ += (*iter).player_[1].sum_money_;
 								}
 							}
 
 						}
 
-						(*iter).player_1_.opponent_card_num_ = (*iter).get_card();
-						(*iter).player_2_.opponent_card_num_ = (*iter).get_card();
+						logic_server::packet_process_turn_ntf turn_ntf_packet;
 
-						(*iter).public_card_[0] = (*iter).get_card();
-						(*iter).public_card_[1] = (*iter).get_card();
+						turn_ntf_packet.set_public_card_number_1((*iter).public_card_[0]);
+						turn_ntf_packet.set_public_card_number_2((*iter).public_card_[1]);
+
+						for (int i = 0; i < 2; i++)
+						{
+							(*iter).player_[i].sum_money_ = 0;
+							(*iter).player_[i].money_ = 0;
+							(*iter).player_[i].opponent_card_num_ = (*iter).get_card();
+
+							(*iter).public_card_[i] = (*iter).get_card();
+
+							turn_ntf_packet.set_opponent_card_number((*iter).player_[i].opponent_card_num_);
+							turn_ntf_packet.set_money((*iter).player_[i].remain_money_);
+							
+							(*iter).player_[i].session_->handle_send(logic_server::PROCESS_TURN_NTF, turn_ntf_packet);
+						}
+
+						if ((*iter).turn_player_ == &(*iter).player_[0])
+							(*iter).turn_player_ = &(*iter).player_[1];
+						else
+							(*iter).turn_player_ = &(*iter).player_[0];
+
+						break;
 					}
 
-					turn_req_packet.set_public_card_number_1((*iter).public_card_[0]);
-					turn_req_packet.set_public_card_number_2((*iter).public_card_[1]);
-						
-					turn_req_packet.set_total_money((*iter).player_1_.total_money_);
-					turn_req_packet.set_card_number((*iter).player_1_.opponent_card_num_);
-					turn_req_packet.set_money((*iter).player_1_.remain_money_);
+					logic_server::packet_process_turn_req turn_req_packet;
 
-					(*iter).player_1_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
+					turn_req_packet.set_total_money((*iter).player_[0].sum_money_ + (*iter).player_[1].sum_money_);
+					
+					(*iter).turn_player_->session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
 
-					turn_req_packet.set_total_money((*iter).player_2_.total_money_);
-					turn_req_packet.set_card_number((*iter).player_2_.opponent_card_num_);
-					turn_req_packet.set_money((*iter).player_2_.remain_money_);
-
-					(*iter).player_2_.session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
+					if ((*iter).turn_player_ == &(*iter).player_[0])
+						(*iter).turn_player_ = &(*iter).player_[1];
+					else
+						(*iter).turn_player_ = &(*iter).player_[0];
 				}
 			}
 			break;
@@ -325,7 +317,5 @@ void logic_worker::process_queue()
 			break;
 			}
 		}
-
-		LeaveCriticalSection(&critical_section_);
 	}
 }

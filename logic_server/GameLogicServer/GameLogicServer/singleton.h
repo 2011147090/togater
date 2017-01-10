@@ -1,19 +1,15 @@
 #pragma once
+#include "critical_section.h"
+
 template <typename T>
-class singleton {
+class singleton : public multi_thread_sync<singleton> {
 protected:
 	static T* instance;
 
-	singleton()
-	{
-
-	}
+	singleton() {}
 
 public:
-	virtual ~singleton()
-	{
-
-	}
+	virtual ~singleton() {}
 
 	static T* get_instance()
 	{

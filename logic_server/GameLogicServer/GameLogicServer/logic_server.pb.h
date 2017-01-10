@@ -42,6 +42,7 @@ namespace logic_server {
 	class packet_enter_req;
 	class packet_game_state_ntf;
 	class packet_process_turn_ans;
+	class packet_process_turn_ntf;
 	class packet_process_turn_req;
 
 	enum message_type {
@@ -49,11 +50,12 @@ namespace logic_server {
 		ENTER_ANS = 1,
 		GAME_STATE_NTF = 2,
 		PROCESS_TURN_REQ = 3,
-		PROCESS_TURN_ANS = 4
+		PROCESS_TURN_ANS = 4,
+		PROCESS_TURN_NTF = 5
 	};
 	bool message_type_IsValid(int value);
 	const message_type message_type_MIN = ENTER_REQ;
-	const message_type message_type_MAX = PROCESS_TURN_ANS;
+	const message_type message_type_MAX = PROCESS_TURN_NTF;
 	const int message_type_ARRAYSIZE = message_type_MAX + 1;
 
 	const ::google::protobuf::EnumDescriptor* message_type_descriptor();
@@ -446,13 +448,6 @@ namespace logic_server {
 
 		// accessors -------------------------------------------------------
 
-		// required int32 money = 1;
-		bool has_money() const;
-		void clear_money();
-		static const int kMoneyFieldNumber = 1;
-		::google::protobuf::int32 money() const;
-		void set_money(::google::protobuf::int32 value);
-
 		// required int32 total_money = 2;
 		bool has_total_money() const;
 		void clear_total_money();
@@ -460,51 +455,15 @@ namespace logic_server {
 		::google::protobuf::int32 total_money() const;
 		void set_total_money(::google::protobuf::int32 value);
 
-		// required int32 card_number = 3;
-		bool has_card_number() const;
-		void clear_card_number();
-		static const int kCardNumberFieldNumber = 3;
-		::google::protobuf::int32 card_number() const;
-		void set_card_number(::google::protobuf::int32 value);
-
-		// required int32 public_card_number_1 = 4;
-		bool has_public_card_number_1() const;
-		void clear_public_card_number_1();
-		static const int kPublicCardNumber1FieldNumber = 4;
-		::google::protobuf::int32 public_card_number_1() const;
-		void set_public_card_number_1(::google::protobuf::int32 value);
-
-		// required int32 public_card_number_2 = 5;
-		bool has_public_card_number_2() const;
-		void clear_public_card_number_2();
-		static const int kPublicCardNumber2FieldNumber = 5;
-		::google::protobuf::int32 public_card_number_2() const;
-		void set_public_card_number_2(::google::protobuf::int32 value);
-
 		// @@protoc_insertion_point(class_scope:logic_server.packet_process_turn_req)
 	private:
-		inline void set_has_money();
-		inline void clear_has_money();
 		inline void set_has_total_money();
 		inline void clear_has_total_money();
-		inline void set_has_card_number();
-		inline void clear_has_card_number();
-		inline void set_has_public_card_number_1();
-		inline void clear_has_public_card_number_1();
-		inline void set_has_public_card_number_2();
-		inline void clear_has_public_card_number_2();
-
-		// helper for ByteSizeLong()
-		size_t RequiredFieldsByteSizeFallback() const;
 
 		::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
 		::google::protobuf::internal::HasBits<1> _has_bits_;
 		mutable int _cached_size_;
-		::google::protobuf::int32 money_;
 		::google::protobuf::int32 total_money_;
-		::google::protobuf::int32 card_number_;
-		::google::protobuf::int32 public_card_number_1_;
-		::google::protobuf::int32 public_card_number_2_;
 		friend void  protobuf_InitDefaults_logic_5fserver_2eproto_impl();
 		friend void  protobuf_AddDesc_logic_5fserver_2eproto_impl();
 		friend void protobuf_AssignDesc_logic_5fserver_2eproto();
@@ -624,6 +583,137 @@ namespace logic_server {
 		void InitAsDefaultInstance();
 	};
 	extern ::google::protobuf::internal::ExplicitlyConstructed<packet_process_turn_ans> packet_process_turn_ans_default_instance_;
+
+	// -------------------------------------------------------------------
+
+	class packet_process_turn_ntf : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:logic_server.packet_process_turn_ntf) */ {
+	public:
+		packet_process_turn_ntf();
+		virtual ~packet_process_turn_ntf();
+
+		packet_process_turn_ntf(const packet_process_turn_ntf& from);
+
+		inline packet_process_turn_ntf& operator=(const packet_process_turn_ntf& from) {
+			CopyFrom(from);
+			return *this;
+		}
+
+		inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+			return _internal_metadata_.unknown_fields();
+		}
+
+		inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+			return _internal_metadata_.mutable_unknown_fields();
+		}
+
+		static const ::google::protobuf::Descriptor* descriptor();
+		static const packet_process_turn_ntf& default_instance();
+
+		static const packet_process_turn_ntf* internal_default_instance();
+
+		void Swap(packet_process_turn_ntf* other);
+
+		// implements Message ----------------------------------------------
+
+		inline packet_process_turn_ntf* New() const { return New(NULL); }
+
+		packet_process_turn_ntf* New(::google::protobuf::Arena* arena) const;
+		void CopyFrom(const ::google::protobuf::Message& from);
+		void MergeFrom(const ::google::protobuf::Message& from);
+		void CopyFrom(const packet_process_turn_ntf& from);
+		void MergeFrom(const packet_process_turn_ntf& from);
+		void Clear();
+		bool IsInitialized() const;
+
+		size_t ByteSizeLong() const;
+		bool MergePartialFromCodedStream(
+			::google::protobuf::io::CodedInputStream* input);
+		void SerializeWithCachedSizes(
+			::google::protobuf::io::CodedOutputStream* output) const;
+		::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+			bool deterministic, ::google::protobuf::uint8* output) const;
+		::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+			return InternalSerializeWithCachedSizesToArray(false, output);
+		}
+		int GetCachedSize() const { return _cached_size_; }
+	private:
+		void SharedCtor();
+		void SharedDtor();
+		void SetCachedSize(int size) const;
+		void InternalSwap(packet_process_turn_ntf* other);
+		void UnsafeMergeFrom(const packet_process_turn_ntf& from);
+	private:
+		inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+			return _internal_metadata_.arena();
+		}
+		inline void* MaybeArenaPtr() const {
+			return _internal_metadata_.raw_arena_ptr();
+		}
+	public:
+
+		::google::protobuf::Metadata GetMetadata() const;
+
+		// nested types ----------------------------------------------------
+
+		// accessors -------------------------------------------------------
+
+		// required int32 public_card_number_1 = 1;
+		bool has_public_card_number_1() const;
+		void clear_public_card_number_1();
+		static const int kPublicCardNumber1FieldNumber = 1;
+		::google::protobuf::int32 public_card_number_1() const;
+		void set_public_card_number_1(::google::protobuf::int32 value);
+
+		// required int32 public_card_number_2 = 2;
+		bool has_public_card_number_2() const;
+		void clear_public_card_number_2();
+		static const int kPublicCardNumber2FieldNumber = 2;
+		::google::protobuf::int32 public_card_number_2() const;
+		void set_public_card_number_2(::google::protobuf::int32 value);
+
+		// required int32 opponent_card_number = 3;
+		bool has_opponent_card_number() const;
+		void clear_opponent_card_number();
+		static const int kOpponentCardNumberFieldNumber = 3;
+		::google::protobuf::int32 opponent_card_number() const;
+		void set_opponent_card_number(::google::protobuf::int32 value);
+
+		// required int32 money = 4;
+		bool has_money() const;
+		void clear_money();
+		static const int kMoneyFieldNumber = 4;
+		::google::protobuf::int32 money() const;
+		void set_money(::google::protobuf::int32 value);
+
+		// @@protoc_insertion_point(class_scope:logic_server.packet_process_turn_ntf)
+	private:
+		inline void set_has_public_card_number_1();
+		inline void clear_has_public_card_number_1();
+		inline void set_has_public_card_number_2();
+		inline void clear_has_public_card_number_2();
+		inline void set_has_opponent_card_number();
+		inline void clear_has_opponent_card_number();
+		inline void set_has_money();
+		inline void clear_has_money();
+
+		// helper for ByteSizeLong()
+		size_t RequiredFieldsByteSizeFallback() const;
+
+		::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+		::google::protobuf::internal::HasBits<1> _has_bits_;
+		mutable int _cached_size_;
+		::google::protobuf::int32 public_card_number_1_;
+		::google::protobuf::int32 public_card_number_2_;
+		::google::protobuf::int32 opponent_card_number_;
+		::google::protobuf::int32 money_;
+		friend void  protobuf_InitDefaults_logic_5fserver_2eproto_impl();
+		friend void  protobuf_AddDesc_logic_5fserver_2eproto_impl();
+		friend void protobuf_AssignDesc_logic_5fserver_2eproto();
+		friend void protobuf_ShutdownFile_logic_5fserver_2eproto();
+
+		void InitAsDefaultInstance();
+	};
+	extern ::google::protobuf::internal::ExplicitlyConstructed<packet_process_turn_ntf> packet_process_turn_ntf_default_instance_;
 
 	// ===================================================================
 
@@ -750,39 +840,15 @@ namespace logic_server {
 
 	// packet_process_turn_req
 
-	// required int32 money = 1;
-	inline bool packet_process_turn_req::has_money() const {
-		return (_has_bits_[0] & 0x00000001u) != 0;
-	}
-	inline void packet_process_turn_req::set_has_money() {
-		_has_bits_[0] |= 0x00000001u;
-	}
-	inline void packet_process_turn_req::clear_has_money() {
-		_has_bits_[0] &= ~0x00000001u;
-	}
-	inline void packet_process_turn_req::clear_money() {
-		money_ = 0;
-		clear_has_money();
-	}
-	inline ::google::protobuf::int32 packet_process_turn_req::money() const {
-		// @@protoc_insertion_point(field_get:logic_server.packet_process_turn_req.money)
-		return money_;
-	}
-	inline void packet_process_turn_req::set_money(::google::protobuf::int32 value) {
-		set_has_money();
-		money_ = value;
-		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_req.money)
-	}
-
 	// required int32 total_money = 2;
 	inline bool packet_process_turn_req::has_total_money() const {
-		return (_has_bits_[0] & 0x00000002u) != 0;
+		return (_has_bits_[0] & 0x00000001u) != 0;
 	}
 	inline void packet_process_turn_req::set_has_total_money() {
-		_has_bits_[0] |= 0x00000002u;
+		_has_bits_[0] |= 0x00000001u;
 	}
 	inline void packet_process_turn_req::clear_has_total_money() {
-		_has_bits_[0] &= ~0x00000002u;
+		_has_bits_[0] &= ~0x00000001u;
 	}
 	inline void packet_process_turn_req::clear_total_money() {
 		total_money_ = 0;
@@ -796,78 +862,6 @@ namespace logic_server {
 		set_has_total_money();
 		total_money_ = value;
 		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_req.total_money)
-	}
-
-	// required int32 card_number = 3;
-	inline bool packet_process_turn_req::has_card_number() const {
-		return (_has_bits_[0] & 0x00000004u) != 0;
-	}
-	inline void packet_process_turn_req::set_has_card_number() {
-		_has_bits_[0] |= 0x00000004u;
-	}
-	inline void packet_process_turn_req::clear_has_card_number() {
-		_has_bits_[0] &= ~0x00000004u;
-	}
-	inline void packet_process_turn_req::clear_card_number() {
-		card_number_ = 0;
-		clear_has_card_number();
-	}
-	inline ::google::protobuf::int32 packet_process_turn_req::card_number() const {
-		// @@protoc_insertion_point(field_get:logic_server.packet_process_turn_req.card_number)
-		return card_number_;
-	}
-	inline void packet_process_turn_req::set_card_number(::google::protobuf::int32 value) {
-		set_has_card_number();
-		card_number_ = value;
-		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_req.card_number)
-	}
-
-	// required int32 public_card_number_1 = 4;
-	inline bool packet_process_turn_req::has_public_card_number_1() const {
-		return (_has_bits_[0] & 0x00000008u) != 0;
-	}
-	inline void packet_process_turn_req::set_has_public_card_number_1() {
-		_has_bits_[0] |= 0x00000008u;
-	}
-	inline void packet_process_turn_req::clear_has_public_card_number_1() {
-		_has_bits_[0] &= ~0x00000008u;
-	}
-	inline void packet_process_turn_req::clear_public_card_number_1() {
-		public_card_number_1_ = 0;
-		clear_has_public_card_number_1();
-	}
-	inline ::google::protobuf::int32 packet_process_turn_req::public_card_number_1() const {
-		// @@protoc_insertion_point(field_get:logic_server.packet_process_turn_req.public_card_number_1)
-		return public_card_number_1_;
-	}
-	inline void packet_process_turn_req::set_public_card_number_1(::google::protobuf::int32 value) {
-		set_has_public_card_number_1();
-		public_card_number_1_ = value;
-		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_req.public_card_number_1)
-	}
-
-	// required int32 public_card_number_2 = 5;
-	inline bool packet_process_turn_req::has_public_card_number_2() const {
-		return (_has_bits_[0] & 0x00000010u) != 0;
-	}
-	inline void packet_process_turn_req::set_has_public_card_number_2() {
-		_has_bits_[0] |= 0x00000010u;
-	}
-	inline void packet_process_turn_req::clear_has_public_card_number_2() {
-		_has_bits_[0] &= ~0x00000010u;
-	}
-	inline void packet_process_turn_req::clear_public_card_number_2() {
-		public_card_number_2_ = 0;
-		clear_has_public_card_number_2();
-	}
-	inline ::google::protobuf::int32 packet_process_turn_req::public_card_number_2() const {
-		// @@protoc_insertion_point(field_get:logic_server.packet_process_turn_req.public_card_number_2)
-		return public_card_number_2_;
-	}
-	inline void packet_process_turn_req::set_public_card_number_2(::google::protobuf::int32 value) {
-		set_has_public_card_number_2();
-		public_card_number_2_ = value;
-		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_req.public_card_number_2)
 	}
 
 	inline const packet_process_turn_req* packet_process_turn_req::internal_default_instance() {
@@ -928,7 +922,112 @@ namespace logic_server {
 	inline const packet_process_turn_ans* packet_process_turn_ans::internal_default_instance() {
 		return &packet_process_turn_ans_default_instance_.get();
 	}
+	// -------------------------------------------------------------------
+
+	// packet_process_turn_ntf
+
+	// required int32 public_card_number_1 = 1;
+	inline bool packet_process_turn_ntf::has_public_card_number_1() const {
+		return (_has_bits_[0] & 0x00000001u) != 0;
+	}
+	inline void packet_process_turn_ntf::set_has_public_card_number_1() {
+		_has_bits_[0] |= 0x00000001u;
+	}
+	inline void packet_process_turn_ntf::clear_has_public_card_number_1() {
+		_has_bits_[0] &= ~0x00000001u;
+	}
+	inline void packet_process_turn_ntf::clear_public_card_number_1() {
+		public_card_number_1_ = 0;
+		clear_has_public_card_number_1();
+	}
+	inline ::google::protobuf::int32 packet_process_turn_ntf::public_card_number_1() const {
+		// @@protoc_insertion_point(field_get:logic_server.packet_process_turn_ntf.public_card_number_1)
+		return public_card_number_1_;
+	}
+	inline void packet_process_turn_ntf::set_public_card_number_1(::google::protobuf::int32 value) {
+		set_has_public_card_number_1();
+		public_card_number_1_ = value;
+		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_ntf.public_card_number_1)
+	}
+
+	// required int32 public_card_number_2 = 2;
+	inline bool packet_process_turn_ntf::has_public_card_number_2() const {
+		return (_has_bits_[0] & 0x00000002u) != 0;
+	}
+	inline void packet_process_turn_ntf::set_has_public_card_number_2() {
+		_has_bits_[0] |= 0x00000002u;
+	}
+	inline void packet_process_turn_ntf::clear_has_public_card_number_2() {
+		_has_bits_[0] &= ~0x00000002u;
+	}
+	inline void packet_process_turn_ntf::clear_public_card_number_2() {
+		public_card_number_2_ = 0;
+		clear_has_public_card_number_2();
+	}
+	inline ::google::protobuf::int32 packet_process_turn_ntf::public_card_number_2() const {
+		// @@protoc_insertion_point(field_get:logic_server.packet_process_turn_ntf.public_card_number_2)
+		return public_card_number_2_;
+	}
+	inline void packet_process_turn_ntf::set_public_card_number_2(::google::protobuf::int32 value) {
+		set_has_public_card_number_2();
+		public_card_number_2_ = value;
+		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_ntf.public_card_number_2)
+	}
+
+	// required int32 opponent_card_number = 3;
+	inline bool packet_process_turn_ntf::has_opponent_card_number() const {
+		return (_has_bits_[0] & 0x00000004u) != 0;
+	}
+	inline void packet_process_turn_ntf::set_has_opponent_card_number() {
+		_has_bits_[0] |= 0x00000004u;
+	}
+	inline void packet_process_turn_ntf::clear_has_opponent_card_number() {
+		_has_bits_[0] &= ~0x00000004u;
+	}
+	inline void packet_process_turn_ntf::clear_opponent_card_number() {
+		opponent_card_number_ = 0;
+		clear_has_opponent_card_number();
+	}
+	inline ::google::protobuf::int32 packet_process_turn_ntf::opponent_card_number() const {
+		// @@protoc_insertion_point(field_get:logic_server.packet_process_turn_ntf.opponent_card_number)
+		return opponent_card_number_;
+	}
+	inline void packet_process_turn_ntf::set_opponent_card_number(::google::protobuf::int32 value) {
+		set_has_opponent_card_number();
+		opponent_card_number_ = value;
+		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_ntf.opponent_card_number)
+	}
+
+	// required int32 money = 4;
+	inline bool packet_process_turn_ntf::has_money() const {
+		return (_has_bits_[0] & 0x00000008u) != 0;
+	}
+	inline void packet_process_turn_ntf::set_has_money() {
+		_has_bits_[0] |= 0x00000008u;
+	}
+	inline void packet_process_turn_ntf::clear_has_money() {
+		_has_bits_[0] &= ~0x00000008u;
+	}
+	inline void packet_process_turn_ntf::clear_money() {
+		money_ = 0;
+		clear_has_money();
+	}
+	inline ::google::protobuf::int32 packet_process_turn_ntf::money() const {
+		// @@protoc_insertion_point(field_get:logic_server.packet_process_turn_ntf.money)
+		return money_;
+	}
+	inline void packet_process_turn_ntf::set_money(::google::protobuf::int32 value) {
+		set_has_money();
+		money_ = value;
+		// @@protoc_insertion_point(field_set:logic_server.packet_process_turn_ntf.money)
+	}
+
+	inline const packet_process_turn_ntf* packet_process_turn_ntf::internal_default_instance() {
+		return &packet_process_turn_ntf_default_instance_.get();
+	}
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+	// -------------------------------------------------------------------
+
 	// -------------------------------------------------------------------
 
 	// -------------------------------------------------------------------
