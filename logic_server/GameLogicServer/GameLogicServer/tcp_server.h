@@ -5,15 +5,15 @@
 
 class tcp_server {
 private:
-	tcp::acceptor acceptor_;
-	int accept_cut_;
+    tcp::acceptor acceptor_;
+    int accept_cut_;
 
-	std::vector<connected_session::pointer> connected_session_list_;
+    std::vector<connected_session::pointer> connected_session_list_;
 
 public:
-	tcp_server(boost::asio::io_service& io_service);
+    tcp_server(boost::asio::io_service& io_service);
 
 private:
-	void wait_accept();
-	void handle_accept(connected_session::pointer new_Connection, const boost::system::error_code& error);
+    void wait_accept();
+    void handle_accept(connected_session::pointer new_Connection, const boost::system::error_code& error);
 };

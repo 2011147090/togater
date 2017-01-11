@@ -16,7 +16,8 @@ private:
 	boost::array<BYTE, BUFSIZE> recv_buf_;
 	boost::array<BYTE, BUFSIZE> send_buf_;
 
-	int money_;
+	int total_money_;
+	int batting_money_;
 	bool wait_turn;
 
 public:
@@ -36,5 +37,6 @@ public:
 private:
 	void process_packet_enter_ans(logic_server::packet_enter_ans packet);
 	void process_packet_process_turn_req(logic_server::packet_process_turn_req packet);
+	void process_packet_process_turn_ntf(logic_server::packet_process_turn_ntf packet);
 	void process_packet_game_state_ntf(logic_server::packet_game_state_ntf packet);
 };

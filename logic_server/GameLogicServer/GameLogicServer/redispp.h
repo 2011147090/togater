@@ -15,7 +15,7 @@ namespace redispp
 
 class NullReplyException : std::out_of_range {
 public:
-	NullReplyException();
+    NullReplyException();
 };
 
 struct Command
@@ -292,9 +292,9 @@ public:
 
     operator std::string()
     {
-    	result();
+        result();
         if (!storedResult) {
-        	throw NullReplyException();
+            throw NullReplyException();
         }
         return *storedResult;
     }

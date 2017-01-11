@@ -12,7 +12,7 @@ random_generator::~random_generator()
 
 int random_generator::get_random_int(int min, int max)
 {
-	std::uniform_int_distribution<int> random(min, max);
+    std::uniform_int_distribution<int> random(min, max);
 
-	return random(engine);
+    return random(engine);
 }

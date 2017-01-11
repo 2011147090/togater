@@ -267,7 +267,7 @@ public:
     
     ~Buffer()
     {
-    	delete[] buffer;
+        delete[] buffer;
     }
 
     void write(char c)
@@ -665,17 +665,17 @@ bool MultiBulkEnumerator::nextOptional(boost::optional<std::string> &out)
 }
 
 bool MultiBulkEnumerator::next(std::string *out) {
-	bool result;
-	boost::optional<std::string> optionalOut;
-	result = nextOptional(optionalOut);
-	if (!result) {
-		return result;
-	}
-	if (!optionalOut) {
-		throw NullReplyException();
-	}
-	out->swap(*optionalOut);
-	return result;
+    bool result;
+    boost::optional<std::string> optionalOut;
+    result = nextOptional(optionalOut);
+    if (!result) {
+        return result;
+    }
+    if (!optionalOut) {
+        throw NullReplyException();
+    }
+    out->swap(*optionalOut);
+    return result;
 }
 
 Connection::Connection(const std::string& host, const std::string& port, const std::string& password, bool noDelay, size_t bufferSize)
@@ -748,7 +748,7 @@ int64_t Connection::readIntegerReply()
 
 boost::optional<std::string> Connection::readBulkReply()
 {
-	boost::optional<std::string> ret;
+    boost::optional<std::string> ret;
     readBulkReply(ret);
     return ret;
 }

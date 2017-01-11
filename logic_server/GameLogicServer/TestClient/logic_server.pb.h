@@ -148,12 +148,17 @@ namespace logic_server {
 		::google::protobuf::int32 player_key() const;
 		void set_player_key(::google::protobuf::int32 value);
 
-		// required int32 room_key = 2;
+		// required string room_key = 2;
 		bool has_room_key() const;
 		void clear_room_key();
 		static const int kRoomKeyFieldNumber = 2;
-		::google::protobuf::int32 room_key() const;
-		void set_room_key(::google::protobuf::int32 value);
+		const ::std::string& room_key() const;
+		void set_room_key(const ::std::string& value);
+		void set_room_key(const char* value);
+		void set_room_key(const char* value, size_t size);
+		::std::string* mutable_room_key();
+		::std::string* release_room_key();
+		void set_allocated_room_key(::std::string* room_key);
 
 		// @@protoc_insertion_point(class_scope:logic_server.packet_enter_req)
 	private:
@@ -168,8 +173,8 @@ namespace logic_server {
 		::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
 		::google::protobuf::internal::HasBits<1> _has_bits_;
 		mutable int _cached_size_;
+		::google::protobuf::internal::ArenaStringPtr room_key_;
 		::google::protobuf::int32 player_key_;
-		::google::protobuf::int32 room_key_;
 		friend void  protobuf_InitDefaults_logic_5fserver_2eproto_impl();
 		friend void  protobuf_AddDesc_logic_5fserver_2eproto_impl();
 		friend void protobuf_AssignDesc_logic_5fserver_2eproto();
@@ -747,7 +752,7 @@ namespace logic_server {
 		// @@protoc_insertion_point(field_set:logic_server.packet_enter_req.player_key)
 	}
 
-	// required int32 room_key = 2;
+	// required string room_key = 2;
 	inline bool packet_enter_req::has_room_key() const {
 		return (_has_bits_[0] & 0x00000002u) != 0;
 	}
@@ -758,17 +763,48 @@ namespace logic_server {
 		_has_bits_[0] &= ~0x00000002u;
 	}
 	inline void packet_enter_req::clear_room_key() {
-		room_key_ = 0;
+		room_key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 		clear_has_room_key();
 	}
-	inline ::google::protobuf::int32 packet_enter_req::room_key() const {
+	inline const ::std::string& packet_enter_req::room_key() const {
 		// @@protoc_insertion_point(field_get:logic_server.packet_enter_req.room_key)
-		return room_key_;
+		return room_key_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 	}
-	inline void packet_enter_req::set_room_key(::google::protobuf::int32 value) {
+	inline void packet_enter_req::set_room_key(const ::std::string& value) {
 		set_has_room_key();
-		room_key_ = value;
+		room_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
 		// @@protoc_insertion_point(field_set:logic_server.packet_enter_req.room_key)
+	}
+	inline void packet_enter_req::set_room_key(const char* value) {
+		set_has_room_key();
+		room_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+		// @@protoc_insertion_point(field_set_char:logic_server.packet_enter_req.room_key)
+	}
+	inline void packet_enter_req::set_room_key(const char* value, size_t size) {
+		set_has_room_key();
+		room_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+			::std::string(reinterpret_cast<const char*>(value), size));
+		// @@protoc_insertion_point(field_set_pointer:logic_server.packet_enter_req.room_key)
+	}
+	inline ::std::string* packet_enter_req::mutable_room_key() {
+		set_has_room_key();
+		// @@protoc_insertion_point(field_mutable:logic_server.packet_enter_req.room_key)
+		return room_key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+	}
+	inline ::std::string* packet_enter_req::release_room_key() {
+		// @@protoc_insertion_point(field_release:logic_server.packet_enter_req.room_key)
+		clear_has_room_key();
+		return room_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+	}
+	inline void packet_enter_req::set_allocated_room_key(::std::string* room_key) {
+		if (room_key != NULL) {
+			set_has_room_key();
+		}
+		else {
+			clear_has_room_key();
+		}
+		room_key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), room_key);
+		// @@protoc_insertion_point(field_set_allocated:logic_server.packet_enter_req.room_key)
 	}
 
 	inline const packet_enter_req* packet_enter_req::internal_default_instance() {

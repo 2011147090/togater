@@ -188,6 +188,7 @@ namespace logic_server {
 	void protobuf_InitDefaults_logic_5fserver_2eproto_impl() {
 		GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+		::google::protobuf::internal::GetEmptyString();
 		packet_enter_req_default_instance_.DefaultConstruct();
 		packet_enter_ans_default_instance_.DefaultConstruct();
 		packet_game_state_ntf_default_instance_.DefaultConstruct();
@@ -214,7 +215,7 @@ namespace logic_server {
 		::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
 			"\n\022logic_server.proto\022\014logic_server\"8\n\020pa"
 			"cket_enter_req\022\022\n\nplayer_key\030\001 \002(\005\022\020\n\010ro"
-			"om_key\030\002 \002(\005\"\"\n\020packet_enter_ans\022\016\n\006resu"
+			"om_key\030\002 \002(\t\"\"\n\020packet_enter_ans\022\016\n\006resu"
 			"lt\030\001 \002(\005\"&\n\025packet_game_state_ntf\022\r\n\005sta"
 			"te\030\001 \002(\005\".\n\027packet_process_turn_req\022\023\n\013t"
 			"otal_money\030\002 \002(\005\"<\n\027packet_process_turn_"
@@ -298,8 +299,8 @@ namespace logic_server {
 
 	void packet_enter_req::SharedCtor() {
 		_cached_size_ = 0;
-		::memset(&player_key_, 0, reinterpret_cast<char*>(&room_key_) -
-			reinterpret_cast<char*>(&player_key_) + sizeof(room_key_));
+		room_key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+		player_key_ = 0;
 	}
 
 	packet_enter_req::~packet_enter_req() {
@@ -308,6 +309,7 @@ namespace logic_server {
 	}
 
 	void packet_enter_req::SharedDtor() {
+		room_key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 	}
 
 	void packet_enter_req::SetCachedSize(int size) const {
@@ -337,27 +339,12 @@ namespace logic_server {
 
 	void packet_enter_req::Clear() {
 		// @@protoc_insertion_point(message_clear_start:logic_server.packet_enter_req)
-#if defined(__clang__)
-#define ZR_HELPER_(f) \
-  _Pragma("clang diagnostic push") \
-  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
-  __builtin_offsetof(packet_enter_req, f) \
-  _Pragma("clang diagnostic pop")
-#else
-#define ZR_HELPER_(f) reinterpret_cast<char*>(\
-  &reinterpret_cast<packet_enter_req*>(16)->f)
-#endif
-
-#define ZR_(first, last) do {\
-  ::memset(&(first), 0,\
-           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
-} while (0)
-
-		ZR_(player_key_, room_key_);
-
-#undef ZR_HELPER_
-#undef ZR_
-
+		if (_has_bits_[0 / 32] & 3u) {
+			player_key_ = 0;
+			if (has_room_key()) {
+				room_key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+			}
+		}
 		_has_bits_.Clear();
 		if (_internal_metadata_.have_unknown_fields()) {
 			mutable_unknown_fields()->Clear();
@@ -385,18 +372,20 @@ namespace logic_server {
 				else {
 					goto handle_unusual;
 				}
-				if (input->ExpectTag(16)) goto parse_room_key;
+				if (input->ExpectTag(18)) goto parse_room_key;
 				break;
 			}
 
-					// required int32 room_key = 2;
+					// required string room_key = 2;
 			case 2: {
-				if (tag == 16) {
+				if (tag == 18) {
 				parse_room_key:
-					set_has_room_key();
-					DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-						::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-							input, &room_key_)));
+					DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+						input, this->mutable_room_key()));
+					::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+						this->room_key().data(), this->room_key().length(),
+						::google::protobuf::internal::WireFormat::PARSE,
+						"logic_server.packet_enter_req.room_key");
 				}
 				else {
 					goto handle_unusual;
@@ -435,9 +424,14 @@ namespace logic_server {
 			::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->player_key(), output);
 		}
 
-		// required int32 room_key = 2;
+		// required string room_key = 2;
 		if (has_room_key()) {
-			::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->room_key(), output);
+			::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+				this->room_key().data(), this->room_key().length(),
+				::google::protobuf::internal::WireFormat::SERIALIZE,
+				"logic_server.packet_enter_req.room_key");
+			::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+				2, this->room_key(), output);
 		}
 
 		if (_internal_metadata_.have_unknown_fields()) {
@@ -456,9 +450,15 @@ namespace logic_server {
 			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->player_key(), target);
 		}
 
-		// required int32 room_key = 2;
+		// required string room_key = 2;
 		if (has_room_key()) {
-			target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->room_key(), target);
+			::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+				this->room_key().data(), this->room_key().length(),
+				::google::protobuf::internal::WireFormat::SERIALIZE,
+				"logic_server.packet_enter_req.room_key");
+			target =
+				::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+					2, this->room_key(), target);
 		}
 
 		if (_internal_metadata_.have_unknown_fields()) {
@@ -481,9 +481,9 @@ namespace logic_server {
 		}
 
 		if (has_room_key()) {
-			// required int32 room_key = 2;
+			// required string room_key = 2;
 			total_size += 1 +
-				::google::protobuf::internal::WireFormatLite::Int32Size(
+				::google::protobuf::internal::WireFormatLite::StringSize(
 					this->room_key());
 		}
 
@@ -499,9 +499,9 @@ namespace logic_server {
 				::google::protobuf::internal::WireFormatLite::Int32Size(
 					this->player_key());
 
-			// required int32 room_key = 2;
+			// required string room_key = 2;
 			total_size += 1 +
-				::google::protobuf::internal::WireFormatLite::Int32Size(
+				::google::protobuf::internal::WireFormatLite::StringSize(
 					this->room_key());
 
 		}
@@ -553,7 +553,8 @@ namespace logic_server {
 				set_player_key(from.player_key());
 			}
 			if (from.has_room_key()) {
-				set_room_key(from.room_key());
+				set_has_room_key();
+				room_key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.room_key_);
 			}
 		}
 		if (from._internal_metadata_.have_unknown_fields()) {
@@ -588,7 +589,7 @@ namespace logic_server {
 	}
 	void packet_enter_req::InternalSwap(packet_enter_req* other) {
 		std::swap(player_key_, other->player_key_);
-		std::swap(room_key_, other->room_key_);
+		room_key_.Swap(&other->room_key_);
 		std::swap(_has_bits_[0], other->_has_bits_[0]);
 		_internal_metadata_.Swap(&other->_internal_metadata_);
 		std::swap(_cached_size_, other->_cached_size_);
@@ -629,7 +630,7 @@ namespace logic_server {
 		// @@protoc_insertion_point(field_set:logic_server.packet_enter_req.player_key)
 	}
 
-	// required int32 room_key = 2;
+	// required string room_key = 2;
 	bool packet_enter_req::has_room_key() const {
 		return (_has_bits_[0] & 0x00000002u) != 0;
 	}
@@ -640,17 +641,48 @@ namespace logic_server {
 		_has_bits_[0] &= ~0x00000002u;
 	}
 	void packet_enter_req::clear_room_key() {
-		room_key_ = 0;
+		room_key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 		clear_has_room_key();
 	}
-	::google::protobuf::int32 packet_enter_req::room_key() const {
+	const ::std::string& packet_enter_req::room_key() const {
 		// @@protoc_insertion_point(field_get:logic_server.packet_enter_req.room_key)
-		return room_key_;
+		return room_key_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 	}
-	void packet_enter_req::set_room_key(::google::protobuf::int32 value) {
+	void packet_enter_req::set_room_key(const ::std::string& value) {
 		set_has_room_key();
-		room_key_ = value;
+		room_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
 		// @@protoc_insertion_point(field_set:logic_server.packet_enter_req.room_key)
+	}
+	void packet_enter_req::set_room_key(const char* value) {
+		set_has_room_key();
+		room_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+		// @@protoc_insertion_point(field_set_char:logic_server.packet_enter_req.room_key)
+	}
+	void packet_enter_req::set_room_key(const char* value, size_t size) {
+		set_has_room_key();
+		room_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+			::std::string(reinterpret_cast<const char*>(value), size));
+		// @@protoc_insertion_point(field_set_pointer:logic_server.packet_enter_req.room_key)
+	}
+	::std::string* packet_enter_req::mutable_room_key() {
+		set_has_room_key();
+		// @@protoc_insertion_point(field_mutable:logic_server.packet_enter_req.room_key)
+		return room_key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+	}
+	::std::string* packet_enter_req::release_room_key() {
+		// @@protoc_insertion_point(field_release:logic_server.packet_enter_req.room_key)
+		clear_has_room_key();
+		return room_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+	}
+	void packet_enter_req::set_allocated_room_key(::std::string* room_key) {
+		if (room_key != NULL) {
+			set_has_room_key();
+		}
+		else {
+			clear_has_room_key();
+		}
+		room_key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), room_key);
+		// @@protoc_insertion_point(field_set_allocated:logic_server.packet_enter_req.room_key)
 	}
 
 	inline const packet_enter_req* packet_enter_req::internal_default_instance() {
