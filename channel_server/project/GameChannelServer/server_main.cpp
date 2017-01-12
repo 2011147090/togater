@@ -17,13 +17,13 @@
 
 int main()
 {
-	boost::asio::io_service io_service;
-	server server(io_service);
-	server.init(MAX_SESSION_COUNT);
-	server.start();
+    boost::asio::io_service io_service;
+    tcp_server server(io_service);
+    server.init(MAX_SESSION_COUNT);
+    server.start();
 
-	io_service.run();
-	std::cout << "서버 종료" << std::endl;
-	getchar();
-	return 0;
+    io_service.run();
+    std::cout << "서버 종료" << std::endl;
+    getchar();
+    return 0;
 }

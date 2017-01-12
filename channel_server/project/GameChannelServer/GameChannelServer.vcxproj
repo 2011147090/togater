@@ -160,16 +160,26 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\..\..\local\packet.pb.cc" />
     <ClCompile Include="channel_server.cpp" />
+    <ClCompile Include="config.cpp" />
+    <ClCompile Include="db_connector.cpp" />
     <ClCompile Include="log_manager.cpp" />
+    <ClCompile Include="match_manager.cpp" />
+    <ClCompile Include="redispp.cpp" />
     <ClCompile Include="server_main.cpp" />
     <ClCompile Include="server_session.cpp" />
+    <ClCompile Include="user_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\..\..\local\packet.pb.h" />
     <ClInclude Include="channel_server.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="db_connector.h" />
     <ClInclude Include="log_manager.h" />
+    <ClInclude Include="match_manager.h" />
     <ClInclude Include="protocol.h" />
+    <ClInclude Include="redispp.h" />
     <ClInclude Include="server_session.h" />
+    <ClInclude Include="user_manager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,44 +4,70 @@
 #include <boost/bind.hpp>
 #include "protocol.h"
 
-class server;
+class tcp_server;
 
-class session
+class user
 {
 public:
-	session(int session_id, boost::asio::io_service &io_service, server* p_channel_serv);
-	~session();
-	
-	int get_session_id() { return m_session_id; }
-
-	boost::asio::ip::tcp::socket& get_socket() { return m_socket; }
-
-	void init();
-
-	void post_receive();
-
-	void post_send(const bool b_immediately, const int n_size, char *p_data);
-
-	void set_token(const int* p_token) { sprintf(m_token.data(), "%d", *p_token); }
-	const char* get_token()            { return m_token.data(); }
+    int set_user_info(int rating, int total_battle_history, int total_win, int total_lose, std::string user_id)
+    {
+        rating_ = rating;
+        total_battle_history_ = total_battle_history;
+        total_win_ = total_win;
+        total_lose_ = total_lose;
+        user_id_ = user_id;
+    }
+        
+    int get_rating() { return rating_; }
+    int get_total_battle_history() { return total_battle_history_; }
+    int get_total_win() { return total_win_; }
+    int get_total_lose() { return total_lose_; }
+    const char* get_user_id() { return user_id_.c_str(); }
 
 private:
-	void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
+    int rating_;
+    int total_battle_history_;
+    int total_win_;
+    int total_lose_;
+    std::string user_id_;
+};
 
-	void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
+class session:public user
+{
+public:
+    session(int session_id, boost::asio::io_service &io_service, tcp_server* p_channel_serv);
+    ~session();
+    
+    int get_session_id() { return session_id_; }
+
+    boost::asio::ip::tcp::socket& get_socket() { return socket_; }
+
+    void init();
+
+    void post_receive();
+
+    void post_send(const bool b_immediately, const int n_size, char *p_data);
+
+    void set_token(const int* p_token) { sprintf(token_.data(), "%d", *p_token); }
+    const char* get_token()            { return token_.data(); }
+
+private:
+    void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
+
+    void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
 
 
-	int m_session_id;
-	boost::asio::ip::tcp::socket m_socket;
-	
-	std::array<char, MAX_RECEIVE_BUFFER_LEN> m_receive_buffer;
+    int session_id_;
+    boost::asio::ip::tcp::socket socket_;
+    
+    std::array<char, MAX_RECEIVE_BUFFER_LEN> receive_buffer_;
 
-	int m_packet_buffer_mark;
-	char m_packet_buffer[MAX_RECEIVE_BUFFER_LEN * 2];
-	
-	std::deque<char *> m_send_data_queue;
+    int packet_buffer_mark_;
+    char packet_buffer_[MAX_RECEIVE_BUFFER_LEN * 2];
 
-	std::array<char, TOKEN_SIZE> m_token;
+    std::deque<char *> send_data_queue_;
 
-	server *m_channel_serv;
+    std::array<char, TOKEN_SIZE> token_;
+
+    tcp_server *channel_serv_;
 };

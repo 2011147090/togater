@@ -31,6 +31,30 @@
     <Filter Include="헤더 파일\server">
       <UniqueIdentifier>{6356e235-583c-41ae-b7c1-a729ba1e5727}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\DB">
+      <UniqueIdentifier>{0842af64-ebc5-4fe8-b98f-c7916d27361d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\DB\memcache">
+      <UniqueIdentifier>{794b31e6-b37b-4fbd-9f4b-a7ca9f4bf937}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\DB">
+      <UniqueIdentifier>{278ade97-193f-4d4c-9925-877c4b5ce159}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\DB\memcache">
+      <UniqueIdentifier>{ee0c58da-7b80-4f4b-aaf1-b3149c44bed3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\server feature">
+      <UniqueIdentifier>{f1200654-52b7-4b7a-aea9-dd7332ec2bb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\server feature">
+      <UniqueIdentifier>{3b1c22a5-5474-4cc9-933e-40a86d8dd7f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\config">
+      <UniqueIdentifier>{df28f66b-b96c-4772-bbeb-bb7af8689608}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\config">
+      <UniqueIdentifier>{348e3104-9087-4fd2-804b-ae806f36a460}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="log_manager.cpp">
@@ -48,6 +72,21 @@
     <ClCompile Include="..\..\..\..\..\..\..\local\packet.pb.cc">
       <Filter>소스 파일\packet</Filter>
     </ClCompile>
+    <ClCompile Include="redispp.cpp">
+      <Filter>소스 파일\DB\memcache</Filter>
+    </ClCompile>
+    <ClCompile Include="match_manager.cpp">
+      <Filter>소스 파일\server feature</Filter>
+    </ClCompile>
+    <ClCompile Include="user_manager.cpp">
+      <Filter>소스 파일\server feature</Filter>
+    </ClCompile>
+    <ClCompile Include="db_connector.cpp">
+      <Filter>소스 파일\DB</Filter>
+    </ClCompile>
+    <ClCompile Include="config.cpp">
+      <Filter>소스 파일\config</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log_manager.h">
@@ -64,6 +103,21 @@
     </ClInclude>
     <ClInclude Include="server_session.h">
       <Filter>헤더 파일\server</Filter>
+    </ClInclude>
+    <ClInclude Include="redispp.h">
+      <Filter>헤더 파일\DB\memcache</Filter>
+    </ClInclude>
+    <ClInclude Include="user_manager.h">
+      <Filter>헤더 파일\server feature</Filter>
+    </ClInclude>
+    <ClInclude Include="match_manager.h">
+      <Filter>헤더 파일\server feature</Filter>
+    </ClInclude>
+    <ClInclude Include="db_connector.h">
+      <Filter>헤더 파일\DB</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>헤더 파일\config</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

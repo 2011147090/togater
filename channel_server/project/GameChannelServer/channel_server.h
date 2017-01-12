@@ -8,28 +8,28 @@
 #include "server_session.h"
 #include "protocol.h"
 
-class server
+class tcp_server
 {
 public:
-	server(boost::asio::io_service& io_service);
-	~server();
+    tcp_server(boost::asio::io_service& io_service);
+    ~tcp_server();
 
-	void init(const int n_max_session_count);
+    void init(const int n_max_session_count);
 
-	void start();
+    void start();
 
-	void close_session(const int n_session_id);
-	void process_packet(const int n_session_id, const char *p_data);
+    void close_session(const int n_session_id);
+    void process_packet(const int n_session_id, const char *p_data);
 
 private:
-	bool post_accept();
-	void handle_accept(session *p_session, const boost::system::error_code& error);
+    bool post_accept();
+    void handle_accept(session *p_session, const boost::system::error_code& error);
 
-	int m_seq_number;
-	bool m_bls_accepting;
-	boost::asio::ip::tcp::acceptor m_acceptor;
+    int seq_number_;
+    bool accepting_flag_;
+    boost::asio::ip::tcp::acceptor acceptor_;
 
-	std::vector< session* > m_session_list;
-	std::deque<int> m_session_queue;
+    std::vector< session* > session_list_;
+    std::deque<int> session_queue_;
 };
 
