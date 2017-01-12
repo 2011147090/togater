@@ -2,8 +2,19 @@
 
 log_manager::log_manager() {}
 
-log_manager::~log_manager() 
+log_manager::~log_manager() {}
+
+bool log_manager::init_singleton()
 {
+    return true;
+}
+
+bool log_manager::release_singleton()
+{
+    thread_sync sync;
+
+    system_log->info("release_log_manager");
+
     spd::drop_all();
 
     for (auto iter = logger_list.begin(); iter != logger_list.end();)
@@ -12,10 +23,7 @@ log_manager::~log_manager()
 
         iter = logger_list.erase(iter);
     }
-}
 
-bool log_manager::init_singleton()
-{
     return true;
 }
 
@@ -30,20 +38,24 @@ std::shared_ptr<spd::logger> log_manager::get_logger(std::string logger_name, st
         LOGGER_INFO new_logger;
         new_logger.logger = spd::daily_logger_mt(logger_name, file_name, 0, 0);
         new_logger.write_loop_num = 10;
-        new_logger.cur_log_num = 0;
+        new_logger.cur_log_num = 1;
+
+        spd::drop_all();
         
         logger_list.insert(std::pair<std::string, LOGGER_INFO>(file_name, new_logger));
         return (*logger_list.find(file_name)).second.logger;
     }
-
+        
     if ((*iter).second.cur_log_num >= (*iter).second.write_loop_num)
     {
-        spd::drop(logger_name);
+        spd::drop_all();
 
         (*iter).second.logger.reset();
         (*iter).second.cur_log_num = 0;
         (*iter).second.logger = spd::daily_logger_mt(logger_name, file_name, 0, 0);
     }
+    else
+        (*iter).second.cur_log_num++;
 
     return (*iter).second.logger;
 }

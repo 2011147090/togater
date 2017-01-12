@@ -53,9 +53,6 @@
     <ClCompile Include="log_manager.cpp">
       <Filter>소스 파일\system\log_manager</Filter>
     </ClCompile>
-    <ClCompile Include="redis_manager.cpp">
-      <Filter>소스 파일\server\redis_manager</Filter>
-    </ClCompile>
     <ClCompile Include="redispp.cpp">
       <Filter>소스 파일\server\redis_manager\libarary_redispp</Filter>
     </ClCompile>
@@ -67,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="random_generator.cpp">
       <Filter>소스 파일\system\random_generator</Filter>
+    </ClCompile>
+    <ClCompile Include="redis_connector.cpp">
+      <Filter>소스 파일\server\redis_manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -85,9 +85,6 @@
     <ClInclude Include="log_manager.h">
       <Filter>소스 파일\system\log_manager</Filter>
     </ClInclude>
-    <ClInclude Include="redis_manager.h">
-      <Filter>소스 파일\server\redis_manager</Filter>
-    </ClInclude>
     <ClInclude Include="redispp.h">
       <Filter>소스 파일\server\redis_manager\libarary_redispp</Filter>
     </ClInclude>
@@ -102,6 +99,9 @@
     </ClInclude>
     <ClInclude Include="critical_section.h">
       <Filter>소스 파일\system\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="redis_connector.h">
+      <Filter>소스 파일\server\redis_manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #pragma once
 #include "preHeaders.h"
 #include "singleton.h"
-#include "redis_manager.h"
+#include "redis_connector.h"
 #include "connected_session.h"
 #include "critical_section.h"
 
@@ -50,17 +50,20 @@ typedef struct _ROOM_INFO {
 class logic_worker : public singleton<logic_worker>, public multi_thread_sync<logic_worker> {
 public:
     virtual bool init_singleton();
+    virtual bool release_singleton();
     
     bool enter_room_player(connected_session* session, std::string room_key, int player_key);
     bool process_turn(int player_key, int money);
     void process_queue();
 
     logic_worker();
-    ~logic_worker();
-
+    virtual ~logic_worker();
+    
 private:
     std::vector<ROOM_INFO> room_list_;
     boost::thread* logic_thread_;
+
+    bool end_server_;
 
     enum HOLDEM_HANDS { NONE = 0, STRAIGHT = 1, PAIR = 2, TRIPLE = 3 };
     HOLDEM_HANDS check_card_mix(int i, int j, int k);

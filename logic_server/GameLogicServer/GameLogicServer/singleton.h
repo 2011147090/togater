@@ -20,6 +20,7 @@ public:
     }
 
     virtual bool init_singleton() = 0;
+    virtual bool release_singleton() = 0;
 };
 
 template<typename T>

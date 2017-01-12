@@ -1,11 +1,37 @@
 #include "preHeaders.h"
 #include "tcp_server.h"
 #include "log_manager.h"
-#include "redis_manager.h"
+#include "redis_connector.h"
 #include "logic_worker.h"
+
+BOOL WINAPI ConsolHandler(DWORD handle)
+{
+    switch (handle)
+    {
+    case CTRL_C_EVENT:
+    case CTRL_CLOSE_EVENT: 
+    case CTRL_BREAK_EVENT:
+    case CTRL_LOGOFF_EVENT:
+    case CTRL_SHUTDOWN_EVENT:
+    default:
+        if (logic_worker::get_instance()->release_singleton())
+            system_log->info("release_logic_manager");
+
+        if (redis_connector::get_instance()->release_singleton())
+            system_log->info("release_redis_manager");
+
+        log_manager::get_instance()->release_singleton();
+
+        return false;
+    }
+
+    return false;
+}
 
 int main(int argc, char* argv[])
 {
+    SetConsoleCtrlHandler(ConsolHandler, true);
+
     try
     {
         system_log->info("server_start");
@@ -16,13 +42,17 @@ int main(int argc, char* argv[])
 
             return 0;
         }
+        else
+            system_log->info("init_log_manager");
 
-        if (!redis_manager::get_instance()->init_singleton())
+        if (!redis_connector::get_instance()->init_singleton())
         {
             system_log->error("failed_init_redis_manager");
 
             return 0;
         }
+        else
+            system_log->info("init_redis_manager");
 
         if (!logic_worker::get_instance()->init_singleton())
         {
@@ -30,6 +60,8 @@ int main(int argc, char* argv[])
 
             return 0;
         }
+        else
+            system_log->info("init_logic_manager");
 
         boost::asio::io_service io_Service;
         
@@ -48,10 +80,9 @@ int main(int argc, char* argv[])
     catch (std::exception& e)
     {
         system_log->error("{}", e.what());
-        std::cerr << e.what() << std::endl;
     }
 
-    system_log->error("server_close");
+    system_log->info("server_close");
 
     return 0;
 }

@@ -58,6 +58,17 @@ bool logic_worker::init_singleton()
     if (logic_thread_ == NULL)
         logic_thread_ = new boost::thread(&logic_worker::process_queue, this);
 
+    end_server_ = true;
+
+    return true;
+}
+
+bool logic_worker::release_singleton()
+{
+    end_server_ = false;
+
+    logic_thread_->join();
+
     return true;
 }
 
@@ -65,9 +76,9 @@ bool logic_worker::create_room(connected_session* session, std::string room_key,
 {
     thread_sync sync;
 
-    if (!redis_manager::get_instance()->check_room(room_key))
+    if (!redis_connector::get_instance()->check_room(room_key))
         return false;
-
+    
     ROOM_INFO room_info;
 
     room_info.player_[0].key_ = player_key;
@@ -78,8 +89,6 @@ bool logic_worker::create_room(connected_session* session, std::string room_key,
     room_info.room_key_ = room_key;
     
     room_list_.push_back(room_info);
-
-    log(room_info.room_key_)->info("create_room, room_key:{}", room_key);
 
     return true;
 }
@@ -99,16 +108,14 @@ bool logic_worker::enter_room_player(connected_session* session, std::string roo
             (*iter).player_[1].key_ = player_key;
             (*iter).player_[1].session_ = session;
 
-            log(room_key)->info("create_room, room_key:{}", room_key);
-
             return true;
         }
     }
 
-    if (create_room(session, room_key, player_key))
-        return true;
+    if (!create_room(session, room_key, player_key))
+        return false;
 
-    return false;
+    return true;
 }
 
 bool logic_worker::process_turn(int player_key, int money)
@@ -171,7 +178,7 @@ int logic_worker::get_top_card(int i, int k, int j)
 
 void logic_worker::process_queue()
 {
-    while (true)
+    while (end_server_)
     {
         thread_sync sync;
 

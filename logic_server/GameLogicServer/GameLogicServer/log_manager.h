@@ -20,8 +20,9 @@ public:
     bool erase_logger(std::string name);
     
     virtual bool init_singleton();
+    virtual bool release_singleton();
 
-    ~log_manager();
+    virtual ~log_manager();
     log_manager();
 };
 

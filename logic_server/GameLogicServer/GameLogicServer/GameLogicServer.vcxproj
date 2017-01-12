@@ -164,7 +164,7 @@
     <ClCompile Include="process_packet.cpp" />
     <ClCompile Include="random_generator.cpp" />
     <ClCompile Include="redispp.cpp" />
-    <ClCompile Include="redis_manager.cpp" />
+    <ClCompile Include="redis_connector.cpp" />
     <ClCompile Include="tcp_server.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -173,7 +173,7 @@
     <ClInclude Include="logic_server.pb.h" />
     <ClInclude Include="random_generator.h" />
     <ClInclude Include="redispp.h" />
-    <ClInclude Include="redis_manager.h" />
+    <ClInclude Include="redis_connector.h" />
     <ClInclude Include="singleton.h" />
     <ClInclude Include="logic_worker.h" />
     <ClInclude Include="log_manager.h" />

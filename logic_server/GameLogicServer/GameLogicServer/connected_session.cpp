@@ -29,7 +29,12 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
-    socket_.write_some(boost::asio::buffer(send_buf_));
+
+    boost::system::error_code error;
+    socket_.write_some(boost::asio::buffer(send_buf_), error);
+
+    if (error)
+        system_log->error(error.message());
 }
 
 void connected_session::handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/)
@@ -63,7 +68,7 @@ void connected_session::handle_read(const boost::system::error_code& error, size
             {
                 logic_server::packet_enter_req message;
 
-                if (false == message.ParseFromCodedStream(&payload_input_stream))
+                if (!message.ParseFromCodedStream(&payload_input_stream))
                     break;
 
                 process_packet_enter_req(message);
@@ -74,7 +79,7 @@ void connected_session::handle_read(const boost::system::error_code& error, size
             {
                 logic_server::packet_process_turn_ans message;
 
-                if (false == message.ParseFromCodedStream(&payload_input_stream))
+                if (!message.ParseFromCodedStream(&payload_input_stream))
                     break;
 
                 process_packet_process_turn_ans(message);
@@ -83,7 +88,7 @@ void connected_session::handle_read(const boost::system::error_code& error, size
         }
     }
     else
-        system_log->info("handle_read_error, {}", error.message());
+        system_log->error("handle_read_error:{}", error.message());
 }
 
 connected_session::pointer connected_session::create(boost::asio::io_service& io_service)
