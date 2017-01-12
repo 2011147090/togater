@@ -27,34 +27,39 @@ void session::init()
 
 void session::post_receive()
 {
-    socket_.async_read_some(boost::asio::buffer(receive_buffer_), boost::bind(&session::handle_receive, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+    socket_.async_read_some(
+        boost::asio::buffer(receive_buffer_), 
+        boost::bind(
+            &session::handle_receive, 
+            this, 
+            boost::asio::placeholders::error, 
+            boost::asio::placeholders::bytes_transferred
+        )
+    );
 }
 
 void session::post_send(const bool b_immediately, const int n_size, char * p_data)
 {
-    char* p_send_data = nullptr;
-
     if (b_immediately == false)
     {
-        p_send_data = new char[n_size];
-        memcpy(p_send_data, p_data, n_size);
+        char *send_data = p_data;
+        send_data_queue_.push_back(send_data);
+    }
 
-        send_data_queue_.push_back(p_send_data);
-    }
-    else
-    {
-        p_send_data = p_data;
-    }
 
     if (b_immediately == false && send_data_queue_.size() > 1)
     {
         return;
     }
 
-    boost::asio::async_write(socket_, boost::asio::buffer(p_send_data, n_size),
-        boost::bind(&session::handle_write, this,
+    boost::asio::async_write(
+        socket_, boost::asio::buffer(p_data, n_size),
+        boost::bind(
+            &session::handle_write, this,
             boost::asio::placeholders::error,
-            boost::asio::placeholders::bytes_transferred));
+            boost::asio::placeholders::bytes_transferred
+        )
+    );
 }
 
 void session::handle_write(const boost::system::error_code & error, size_t bytes_transferred)
@@ -66,7 +71,7 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
     {
         char *p_data = send_data_queue_.front();
         packet_header *p_header = (packet_header *)p_data;
-        post_send(true, p_header->size, p_data);
+        post_send(true, p_header->size + packet_header_size, p_data);
     }
 }
 
@@ -77,12 +82,13 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
         if (error == boost::asio::error::eof)
         {
             std::cout << "클라이언트와 연결이 끊어졌습니다" << std::endl; //log
+            channel_serv_->close_session(session_id_);
         }
         else
         {
             std::cout << "error No: " << error.value() << "error Message: " << error.message() << std::endl; //log
         }
-        channel_serv_->close_session(session_id_); //server 클래스 작성하고 주석 풀기
+         //server 클래스 작성하고 주석 풀기
     }
     else
     {

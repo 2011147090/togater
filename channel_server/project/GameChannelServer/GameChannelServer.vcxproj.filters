@@ -69,9 +69,6 @@
     <ClCompile Include="server_session.cpp">
       <Filter>소스 파일\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\local\packet.pb.cc">
-      <Filter>소스 파일\packet</Filter>
-    </ClCompile>
     <ClCompile Include="redispp.cpp">
       <Filter>소스 파일\DB\memcache</Filter>
     </ClCompile>
@@ -87,15 +84,15 @@
     <ClCompile Include="config.cpp">
       <Filter>소스 파일\config</Filter>
     </ClCompile>
+    <ClCompile Include="packet.pb.cc">
+      <Filter>소스 파일\packet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log_manager.h">
       <Filter>헤더 파일\log</Filter>
     </ClInclude>
     <ClInclude Include="protocol.h">
-      <Filter>헤더 파일\packet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\local\packet.pb.h">
       <Filter>헤더 파일\packet</Filter>
     </ClInclude>
     <ClInclude Include="channel_server.h">
@@ -118,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="config.h">
       <Filter>헤더 파일\config</Filter>
+    </ClInclude>
+    <ClInclude Include="packet.pb.h">
+      <Filter>헤더 파일\packet</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
