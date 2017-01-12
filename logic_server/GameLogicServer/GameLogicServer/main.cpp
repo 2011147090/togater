@@ -1,57 +1,88 @@
 #include "preHeaders.h"
 #include "tcp_server.h"
 #include "log_manager.h"
-#include "redis_manager.h"
+#include "redis_connector.h"
 #include "logic_worker.h"
+
+BOOL WINAPI ConsolHandler(DWORD handle)
+{
+    switch (handle)
+    {
+    case CTRL_C_EVENT:
+    case CTRL_CLOSE_EVENT: 
+    case CTRL_BREAK_EVENT:
+    case CTRL_LOGOFF_EVENT:
+    case CTRL_SHUTDOWN_EVENT:
+    default:
+        if (logic_worker::get_instance()->release_singleton())
+            system_log->info("release_logic_manager");
+
+        if (redis_connector::get_instance()->release_singleton())
+            system_log->info("release_redis_manager");
+
+        log_manager::get_instance()->release_singleton();
+
+        return false;
+    }
+
+    return false;
+}
 
 int main(int argc, char* argv[])
 {
-	try
-	{
-		log->info("server_start");
+    SetConsoleCtrlHandler(ConsolHandler, true);
 
-		if (!log_manager::get_instance()->init_singleton())
-		{
-			log->error("failed_init_log_manager");
+    try
+    {
+        system_log->info("server_start");
 
-			return 0;
-		}
+        if (!log_manager::get_instance()->init_singleton())
+        {
+            system_log->error("failed_init_log_manager");
 
-		if (!redis_manager::get_instance()->init_singleton())
-		{
-			log->error("failed_init_redis_manager");
+            return 0;
+        }
+        else
+            system_log->info("init_log_manager");
 
-			return 0;
-		}
+        if (!redis_connector::get_instance()->init_singleton())
+        {
+            system_log->error("failed_init_redis_manager");
 
-		if (!logic_worker::get_instance()->init_singleton())
-		{
-			log->error("failed_init_logic_worker");
+            return 0;
+        }
+        else
+            system_log->info("init_redis_manager");
 
-			return 0;
-		}
+        if (!logic_worker::get_instance()->init_singleton())
+        {
+            system_log->error("failed_init_logic_worker");
 
-		boost::asio::io_service io_Service;
-		
-		tcp_server tcp_server(io_Service);
-				
-		boost::thread_group io_thread;
-		io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
-		io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
-		io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
-		io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
+            return 0;
+        }
+        else
+            system_log->info("init_logic_manager");
 
-		io_thread.join_all();
+        boost::asio::io_service io_Service;
+        
+        tcp_server tcp_server(io_Service);
+                
+        boost::thread_group io_thread;
+        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
+        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
+        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
+        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
 
-		getchar();
-	}
-	catch (std::exception& e)
-	{
-		log->error("{}", e.what());
-		std::cerr << e.what() << std::endl;
-	}
+        io_thread.join_all();
 
-	log->error("server_close");
+        getchar();
+    }
+    catch (std::exception& e)
+    {
+        system_log->error("{}", e.what());
+    }
 
-	return 0;
+    system_log->info("server_close");
+
+    return 0;
 }

@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C3E1C12A-BC99-4759-83AD-A7AF715E0E4F}</ProjectGuid>
+    <ProjectGuid>{6A9B84D6-485B-4692-A2EA-E61E083DE571}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>GameLogicServer</RootNamespace>
+    <RootNamespace>MyServer</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,23 +71,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(BOOST_DIR);$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\lib64-msvc-14.0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(PROTOBUF_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(BOOST_DIR);$(IncludePath)</IncludePath>
-    <LibraryPath>$(PROTOBUF_DIR);$(JSON_SPIRIT_DIR)\lib\debug;$(BOOST_DIR)\lib64-msvc-14.0;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(PROTOBUF_DIR);$(BOOST_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(PROTOBUF_DIR);$(BOOST_DIR)\lib64-msvc-14.0;$(JSON_SPIRIT_DIR)\lib\debug;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(BOOST_DIR);$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\lib64-msvc-14.0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(PROTOBUF_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(BOOST_DIR);$(IncludePath)</IncludePath>
-    <LibraryPath>$(PROTOBUF_DIR);$(JSON_SPIRIT_DIR)\lib\release;$(BOOST_DIR)\lib64-msvc-14.0;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(PROTOBUF_DIR);$(BOOST_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(PROTOBUF_DIR);$(BOOST_DIR)\lib64-msvc-14.0;$(JSON_SPIRIT_DIR)\lib\release;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -104,12 +100,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>preHeaders.h</PrecompiledHeaderFile>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -138,13 +133,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>preHeaders.h</PrecompiledHeaderFile>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -156,29 +150,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="connected_session.cpp" />
-    <ClCompile Include="logic_server.pb.cc" />
-    <ClCompile Include="logic_worker.cpp" />
-    <ClCompile Include="log_manager.cpp" />
+    <ClCompile Include="chat_protobuf.pb.cc" />
+    <ClCompile Include="chat_protocol.cpp" />
+    <ClCompile Include="chat_session.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="process_packet.cpp" />
-    <ClCompile Include="random_generator.cpp" />
-    <ClCompile Include="redispp.cpp" />
-    <ClCompile Include="redis_connector.cpp" />
-    <ClCompile Include="tcp_server.cpp" />
+    <ClCompile Include="TEST_server.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="connected_session.h" />
-    <ClInclude Include="critical_section.h" />
-    <ClInclude Include="logic_server.pb.h" />
-    <ClInclude Include="random_generator.h" />
-    <ClInclude Include="redispp.h" />
-    <ClInclude Include="redis_connector.h" />
-    <ClInclude Include="singleton.h" />
-    <ClInclude Include="logic_worker.h" />
-    <ClInclude Include="log_manager.h" />
-    <ClInclude Include="preHeaders.h" />
-    <ClInclude Include="tcp_server.h" />
+    <ClInclude Include="chat_protobuf.pb.h" />
+    <ClInclude Include="chat_protocol.h" />
+    <ClInclude Include="chat_server.h" />
+    <ClInclude Include="chat_session.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

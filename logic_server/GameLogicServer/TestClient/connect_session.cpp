@@ -95,6 +95,18 @@ void connect_session::handle_read()
 		}
 		break;
 
+		case logic_server::PROCESS_TURN_NTF:
+		{
+			logic_server::packet_process_turn_ntf message;
+
+			if (false == message.ParseFromCodedStream(&payload_input_stream))
+				break;
+
+			process_packet_process_turn_ntf(message);
+
+			break;
+		}
+
 		case logic_server::GAME_STATE_NTF:
 		{
 			logic_server::packet_game_state_ntf message;
@@ -129,7 +141,7 @@ void connect_session::handle_send(logic_server::message_type msg_type, const pro
 void connect_session::handle_write()
 {
 	int player_key;
-	int room_key;
+	std::string room_key;
 	int money;
 	
 	wait_turn = false;
@@ -150,14 +162,20 @@ void connect_session::handle_write()
 	{
 		while (!wait_turn) {}
 
-		std::cout << "enter batting money key (give up - input 0) : " << std::endl;
-		std::cin >> money;
+		do {
+			std::cout << "enter batting money key (give up - input 0) : " << std::endl;
+			std::cin >> money;
+
+		} while (total_money_ < money);
+
+		batting_money_ += money;
 
 		logic_server::packet_process_turn_ans process_turn_packet;
 		process_turn_packet.set_money(money);
 		process_turn_packet.set_player_key(player_key);
 
 		wait_turn = false;
+        //system("cls");
 		this->handle_send(logic_server::PROCESS_TURN_ANS, process_turn_packet);
 	}
 }
