@@ -128,9 +128,10 @@ void protobuf_AssignDesc_packet_2eproto() {
       sizeof(logout_ntf),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(logout_ntf, _internal_metadata_));
   friends_req_descriptor_ = file->message_type(4);
-  static const int friends_req_offsets_[2] = {
+  static const int friends_req_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(friends_req, req_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(friends_req, user_id_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(friends_req, on_off_),
   };
   friends_req_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
@@ -329,27 +330,27 @@ void protobuf_AddDesc_packet_2eproto_impl() {
     "(\n\007my_info\030\001 \002(\0132\027.channel_serv.user_inf"
     "o\022\027\n\017friends_id_list\030\002 \003(\t\"\031\n\010join_req\022\r"
     "\n\005token\030\001 \002(\t\"\033\n\nlogout_ntf\022\r\n\005token\030\001 \002"
-    "(\t\"s\n\013friends_req\022,\n\003req\030\001 \002(\0162\037.channel"
-    "_serv.friends_req.F_REQ\022\017\n\007user_id\030\002 \002(\t"
-    "\"%\n\005F_REQ\022\007\n\003ADD\020\001\022\007\n\003DEL\020\002\022\n\n\006SEARCH\020\003\""
-    "P\n\013friends_ans\0221\n\020user_information\030\001 \002(\013"
-    "2\027.channel_serv.user_info\022\016\n\006online\030\002 \002("
-    "\010\">\n\022play_rank_game_req\022(\n\007my_info\030\001 \002(\013"
-    "2\027.channel_serv.user_info\"\235\001\n\025play_frien"
-    "ds_game_req\0229\n\007flag_id\030\001 \002(\0162(.channel_s"
-    "erv.play_friends_game_req.FLAG\022\017\n\007send_i"
-    "d\030\002 \002(\t\022\017\n\007recv_id\030\003 \002(\t\"\'\n\004FLAG\022\t\n\005APPL"
-    "Y\020\000\022\n\n\006ACCEPT\020\001\022\010\n\004DENY\020\002\"^\n\025matching_co"
-    "mplete_ans\022\023\n\013room_number\030\001 \002(\005\0220\n\017oppon"
-    "ent_player\030\002 \002(\0132\027.channel_serv.user_inf"
-    "o\"\"\n\terror_msg\022\025\n\rerror_message\030\001 \002(\t*\246\001"
-    "\n\nMESSAGE_ID\022\017\n\013FRIENDS_REQ\020\000\022\017\n\013FRIENDS"
-    "_ANS\020\001\022\021\n\rPLAY_RANK_REQ\020\002\022\024\n\020PLAY_FRIEND"
-    "S_REQ\020\003\022\022\n\016MATCH_COMPLETE\020\004\022\r\n\tERROR_MSG"
-    "\020\005\022\014\n\010JOIN_REQ\020\006\022\014\n\010JOIN_ANS\020\007\022\016\n\nLOGOUT"
-    "_NTF\020\010*[\n\006RATING\022\n\n\006BRONZE\020\000\022\n\n\006SLIVER\020\001"
-    "\022\010\n\004GOLD\020\002\022\014\n\010PLATINUM\020\003\022\013\n\007DIAMOND\020\004\022\n\n"
-    "\006MASTER\020\005\022\010\n\004CHAL\020\006", 1099);
+    "(\t\"\203\001\n\013friends_req\022,\n\003req\030\001 \002(\0162\037.channe"
+    "l_serv.friends_req.F_REQ\022\017\n\007user_id\030\002 \002("
+    "\t\022\016\n\006on_off\030\003 \001(\010\"%\n\005F_REQ\022\007\n\003ADD\020\001\022\007\n\003D"
+    "EL\020\002\022\n\n\006SEARCH\020\003\"P\n\013friends_ans\0221\n\020user_"
+    "information\030\001 \002(\0132\027.channel_serv.user_in"
+    "fo\022\016\n\006online\030\002 \002(\010\">\n\022play_rank_game_req"
+    "\022(\n\007my_info\030\001 \002(\0132\027.channel_serv.user_in"
+    "fo\"\235\001\n\025play_friends_game_req\0229\n\007flag_id\030"
+    "\001 \002(\0162(.channel_serv.play_friends_game_r"
+    "eq.FLAG\022\017\n\007send_id\030\002 \002(\t\022\017\n\007recv_id\030\003 \002("
+    "\t\"\'\n\004FLAG\022\t\n\005APPLY\020\000\022\n\n\006ACCEPT\020\001\022\010\n\004DENY"
+    "\020\002\"^\n\025matching_complete_ans\022\023\n\013room_numb"
+    "er\030\001 \002(\005\0220\n\017opponent_player\030\002 \002(\0132\027.chan"
+    "nel_serv.user_info\"\"\n\terror_msg\022\025\n\rerror"
+    "_message\030\001 \002(\t*\246\001\n\nMESSAGE_ID\022\017\n\013FRIENDS"
+    "_REQ\020\000\022\017\n\013FRIENDS_ANS\020\001\022\021\n\rPLAY_RANK_REQ"
+    "\020\002\022\024\n\020PLAY_FRIENDS_REQ\020\003\022\022\n\016MATCH_COMPLE"
+    "TE\020\004\022\r\n\tERROR_MSG\020\005\022\014\n\010JOIN_REQ\020\006\022\014\n\010JOI"
+    "N_ANS\020\007\022\016\n\nLOGOUT_NTF\020\010*[\n\006RATING\022\n\n\006BRO"
+    "NZE\020\000\022\n\n\006SILVER\020\001\022\010\n\004GOLD\020\002\022\014\n\010PLATINUM\020"
+    "\003\022\013\n\007DIAMOND\020\004\022\n\n\006MASTER\020\005\022\010\n\004CHAL\020\006", 1116);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "packet.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_packet_2eproto);
@@ -2151,6 +2152,7 @@ const int friends_req::F_REQ_ARRAYSIZE;
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int friends_req::kReqFieldNumber;
 const int friends_req::kUserIdFieldNumber;
+const int friends_req::kOnOffFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 friends_req::friends_req()
@@ -2174,6 +2176,7 @@ friends_req::friends_req(const friends_req& from)
 void friends_req::SharedCtor() {
   _cached_size_ = 0;
   user_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  on_off_ = false;
   req_ = 1;
 }
 
@@ -2213,11 +2216,12 @@ friends_req* friends_req::New(::google::protobuf::Arena* arena) const {
 
 void friends_req::Clear() {
 // @@protoc_insertion_point(message_clear_start:channel_serv.friends_req)
-  if (_has_bits_[0 / 32] & 3u) {
+  if (_has_bits_[0 / 32] & 7u) {
     req_ = 1;
     if (has_user_id()) {
       user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
+    on_off_ = false;
   }
   _has_bits_.Clear();
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2267,6 +2271,21 @@ bool friends_req::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(24)) goto parse_on_off;
+        break;
+      }
+
+      // optional bool on_off = 3;
+      case 3: {
+        if (tag == 24) {
+         parse_on_off:
+          set_has_on_off();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &on_off_)));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -2312,6 +2331,11 @@ void friends_req::SerializeWithCachedSizes(
       2, this->user_id(), output);
   }
 
+  // optional bool on_off = 3;
+  if (has_on_off()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->on_off(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2338,6 +2362,11 @@ void friends_req::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->user_id(), target);
+  }
+
+  // optional bool on_off = 3;
+  if (has_on_off()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->on_off(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2384,6 +2413,11 @@ size_t friends_req::ByteSizeLong() const {
   } else {
     total_size += RequiredFieldsByteSizeFallback();
   }
+  // optional bool on_off = 3;
+  if (has_on_off()) {
+    total_size += 1 + 1;
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -2430,6 +2464,9 @@ void friends_req::UnsafeMergeFrom(const friends_req& from) {
       set_has_user_id();
       user_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.user_id_);
     }
+    if (from.has_on_off()) {
+      set_on_off(from.on_off());
+    }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
@@ -2464,6 +2501,7 @@ void friends_req::Swap(friends_req* other) {
 void friends_req::InternalSwap(friends_req* other) {
   std::swap(req_, other->req_);
   user_id_.Swap(&other->user_id_);
+  std::swap(on_off_, other->on_off_);
   std::swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -2557,6 +2595,30 @@ void friends_req::set_allocated_user_id(::std::string* user_id) {
   }
   user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_id);
   // @@protoc_insertion_point(field_set_allocated:channel_serv.friends_req.user_id)
+}
+
+// optional bool on_off = 3;
+bool friends_req::has_on_off() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+void friends_req::set_has_on_off() {
+  _has_bits_[0] |= 0x00000004u;
+}
+void friends_req::clear_has_on_off() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+void friends_req::clear_on_off() {
+  on_off_ = false;
+  clear_has_on_off();
+}
+bool friends_req::on_off() const {
+  // @@protoc_insertion_point(field_get:channel_serv.friends_req.on_off)
+  return on_off_;
+}
+void friends_req::set_on_off(bool value) {
+  set_has_on_off();
+  on_off_ = value;
+  // @@protoc_insertion_point(field_set:channel_serv.friends_req.on_off)
 }
 
 inline const friends_req* friends_req::internal_default_instance() {

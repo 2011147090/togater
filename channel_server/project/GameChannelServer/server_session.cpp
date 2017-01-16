@@ -38,22 +38,21 @@ void session::post_receive()
     );
 }
 
-void session::post_send(const bool b_immediately, const int n_size, char * p_data)
+void session::post_send(const bool immediately, const int n_size, char * p_data)
 {
-    if (b_immediately == false)
+    if (immediately == false)
     {
-        char *send_data = p_data;
-        send_data_queue_.push_back(send_data);
+        send_data_queue_.push_back(p_data);
     }
 
 
-    if (b_immediately == false && send_data_queue_.size() > 1)
+    if (immediately == false && send_data_queue_.size() > 1)
     {
         return;
     }
 
     boost::asio::async_write(
-        socket_, boost::asio::buffer(p_data, n_size),
+        socket_, boost::asio::buffer(p_data, n_size),   
         boost::bind(
             &session::handle_write, this,
             boost::asio::placeholders::error,
@@ -88,7 +87,6 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
         {
             std::cout << "error No: " << error.value() << "error Message: " << error.message() << std::endl; //log
         }
-         //server 클래스 작성하고 주석 풀기
     }
     else
     {
