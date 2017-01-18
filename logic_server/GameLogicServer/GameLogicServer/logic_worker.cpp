@@ -188,6 +188,7 @@ void logic_worker::process_queue()
 
                     logic_server::packet_game_state_ntf start_ntf_packet;
 
+                    start_ntf_packet.set_win_player_key(0);
                     start_ntf_packet.set_state(1);
 
                     (*iter).player_[0].session_->handle_send(logic_server::GAME_STATE_NTF, start_ntf_packet);
@@ -198,7 +199,6 @@ void logic_worker::process_queue()
                         (*iter).player_[0].key_,
                         (*iter).player_[1].key_
                     );
-
 
                     logic_server::packet_process_turn_ntf turn_ntf_packet;
                     
@@ -372,7 +372,14 @@ void logic_worker::process_queue()
                             (*iter).player_[i].sum_money_ = 1;
 
                         (*iter).hide_card_ = true;
-                                               
+
+                        
+                        if ((*iter).player_[0].remain_money_ <= 0 || (*iter).player_[1].remain_money_ <= 0)
+                        {
+                            (*iter).state_ = ROOM_INFO::END;
+                            break;
+                        }
+
                         logic_server::packet_process_turn_ntf turn_ntf_packet;
 
                         (*iter).public_card_[0] = (*iter).get_card();
@@ -430,14 +437,12 @@ void logic_worker::process_queue()
                         );
 
                         log((*iter).room_key_)->info("-> player:{}, card_deck:{}, card_num:{}",
-                            turn_type,
                             (*iter).player_[0].key_,
                             player_1_result,
                             (*iter).player_[1].opponent_card_num_
                         );
 
                         log((*iter).room_key_)->info("-> player:{}, card_deck:{}, card_num:{}",
-                            turn_type,
                             (*iter).player_[1].key_,
                             player_2_result,
                             (*iter).player_[0].opponent_card_num_
@@ -515,6 +520,12 @@ void logic_worker::process_queue()
 
                         if (!completely_same)
                         {
+                            if ((*iter).player_[0].remain_money_ <= 0 || (*iter).player_[1].remain_money_ <= 0)
+                            {
+                                (*iter).state_ = ROOM_INFO::END;
+                                break;
+                            }
+
                             logic_server::packet_process_turn_ntf turn_ntf_packet;
 
                             (*iter).public_card_[0] = (*iter).get_card();
@@ -584,6 +595,47 @@ void logic_worker::process_queue()
 
             case ROOM_INFO::END:
             {
+                logic_server::packet_game_state_ntf game_state_packet;
+
+                game_state_packet.set_state(2);
+
+                if (iter->player_[0].remain_money_ != 0)
+                    game_state_packet.set_win_player_key(iter->player_[0].key_);
+                else
+                    game_state_packet.set_win_player_key(iter->player_[1].key_);
+
+                int disconnect_session = 0;
+
+                for (int i = 0; i < 2; i++)
+                {
+                    if (!iter->player_[i].session_->is_connected())
+                    {
+                        disconnect_session++;
+                        continue;
+                    }
+
+                    iter->player_[i].session_->handle_send(logic_server::GAME_STATE_NTF, game_state_packet);
+                
+                    iter->player_[i].session_->shut_down();
+                }
+
+                if (disconnect_session >= 2)
+                {
+                    if (iter->player_[0].remain_money_ != 0)
+                    {
+                        log((*iter).room_key_)->info("end_game, win_player_key:{}",
+                            iter->player_[0].key_
+                        );
+                    }
+                    else
+                    {
+                        log((*iter).room_key_)->info("end_game, win_player_key:{}",
+                            iter->player_[1].key_
+                        );
+                    }
+
+                    iter = room_list_.erase(iter);
+                }
             }
             break;
             }

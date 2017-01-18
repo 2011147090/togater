@@ -364,15 +364,28 @@ class packet_game_state_ntf : public ::google::protobuf::Message /* @@protoc_ins
   ::google::protobuf::int32 state() const;
   void set_state(::google::protobuf::int32 value);
 
+  // required int32 win_player_key = 2;
+  bool has_win_player_key() const;
+  void clear_win_player_key();
+  static const int kWinPlayerKeyFieldNumber = 2;
+  ::google::protobuf::int32 win_player_key() const;
+  void set_win_player_key(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:logic_server.packet_game_state_ntf)
  private:
   inline void set_has_state();
   inline void clear_has_state();
+  inline void set_has_win_player_key();
+  inline void clear_has_win_player_key();
+
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::int32 state_;
+  ::google::protobuf::int32 win_player_key_;
   friend void  protobuf_InitDefaults_logic_5fserver_2eproto_impl();
   friend void  protobuf_AddDesc_logic_5fserver_2eproto_impl();
   friend void protobuf_AssignDesc_logic_5fserver_2eproto();
@@ -999,6 +1012,30 @@ inline void packet_game_state_ntf::set_state(::google::protobuf::int32 value) {
   set_has_state();
   state_ = value;
   // @@protoc_insertion_point(field_set:logic_server.packet_game_state_ntf.state)
+}
+
+// required int32 win_player_key = 2;
+inline bool packet_game_state_ntf::has_win_player_key() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void packet_game_state_ntf::set_has_win_player_key() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void packet_game_state_ntf::clear_has_win_player_key() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void packet_game_state_ntf::clear_win_player_key() {
+  win_player_key_ = 0;
+  clear_has_win_player_key();
+}
+inline ::google::protobuf::int32 packet_game_state_ntf::win_player_key() const {
+  // @@protoc_insertion_point(field_get:logic_server.packet_game_state_ntf.win_player_key)
+  return win_player_key_;
+}
+inline void packet_game_state_ntf::set_win_player_key(::google::protobuf::int32 value) {
+  set_has_win_player_key();
+  win_player_key_ = value;
+  // @@protoc_insertion_point(field_set:logic_server.packet_game_state_ntf.win_player_key)
 }
 
 inline const packet_game_state_ntf* packet_game_state_ntf::internal_default_instance() {

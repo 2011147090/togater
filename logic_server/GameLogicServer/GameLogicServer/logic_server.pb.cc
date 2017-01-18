@@ -84,8 +84,9 @@ void protobuf_AssignDesc_logic_5fserver_2eproto() {
       sizeof(packet_enter_ans),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_enter_ans, _internal_metadata_));
   packet_game_state_ntf_descriptor_ = file->message_type(2);
-  static const int packet_game_state_ntf_offsets_[1] = {
+  static const int packet_game_state_ntf_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_game_state_ntf, state_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_game_state_ntf, win_player_key_),
   };
   packet_game_state_ntf_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
@@ -242,21 +243,21 @@ void protobuf_AddDesc_logic_5fserver_2eproto_impl() {
     "\n\022logic_server.proto\022\014logic_server\"8\n\020pa"
     "cket_enter_req\022\022\n\nplayer_key\030\001 \002(\005\022\020\n\010ro"
     "om_key\030\002 \002(\t\"\"\n\020packet_enter_ans\022\016\n\006resu"
-    "lt\030\001 \002(\005\"&\n\025packet_game_state_ntf\022\r\n\005sta"
-    "te\030\001 \002(\005\"C\n\027packet_process_turn_req\022\020\n\010m"
-    "y_money\030\001 \002(\005\022\026\n\016opponent_money\030\002 \002(\005\"<\n"
-    "\027packet_process_turn_ans\022\022\n\nplayer_key\030\001"
-    " \002(\005\022\r\n\005money\030\002 \002(\005\"\263\001\n\027packet_process_t"
-    "urn_ntf\022\034\n\024public_card_number_1\030\001 \002(\005\022\034\n"
-    "\024public_card_number_2\030\002 \002(\005\022\034\n\024opponent_"
-    "card_number\030\003 \002(\005\022\024\n\014remain_money\030\004 \002(\005\022"
-    "\020\n\010my_money\030\005 \002(\005\022\026\n\016opponent_money\030\006 \002("
-    "\005\"/\n\035packet_process_check_card_ntf\022\016\n\006re"
-    "sult\030\001 \002(\005*\236\001\n\014message_type\022\r\n\tENTER_REQ"
-    "\020\000\022\r\n\tENTER_ANS\020\001\022\022\n\016GAME_STATE_NTF\020\002\022\024\n"
-    "\020PROCESS_TURN_REQ\020\003\022\024\n\020PROCESS_TURN_ANS\020"
-    "\004\022\024\n\020PROCESS_TURN_NTF\020\005\022\032\n\026PROCESS_CHECK"
-    "_CARD_NTF\020\006", 691);
+    "lt\030\001 \002(\005\">\n\025packet_game_state_ntf\022\r\n\005sta"
+    "te\030\001 \002(\005\022\026\n\016win_player_key\030\002 \002(\005\"C\n\027pack"
+    "et_process_turn_req\022\020\n\010my_money\030\001 \002(\005\022\026\n"
+    "\016opponent_money\030\002 \002(\005\"<\n\027packet_process_"
+    "turn_ans\022\022\n\nplayer_key\030\001 \002(\005\022\r\n\005money\030\002 "
+    "\002(\005\"\263\001\n\027packet_process_turn_ntf\022\034\n\024publi"
+    "c_card_number_1\030\001 \002(\005\022\034\n\024public_card_num"
+    "ber_2\030\002 \002(\005\022\034\n\024opponent_card_number\030\003 \002("
+    "\005\022\024\n\014remain_money\030\004 \002(\005\022\020\n\010my_money\030\005 \002("
+    "\005\022\026\n\016opponent_money\030\006 \002(\005\"/\n\035packet_proc"
+    "ess_check_card_ntf\022\016\n\006result\030\001 \002(\005*\236\001\n\014m"
+    "essage_type\022\r\n\tENTER_REQ\020\000\022\r\n\tENTER_ANS\020"
+    "\001\022\022\n\016GAME_STATE_NTF\020\002\022\024\n\020PROCESS_TURN_RE"
+    "Q\020\003\022\024\n\020PROCESS_TURN_ANS\020\004\022\024\n\020PROCESS_TUR"
+    "N_NTF\020\005\022\032\n\026PROCESS_CHECK_CARD_NTF\020\006", 715);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "logic_server.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_logic_5fserver_2eproto);
@@ -998,6 +999,7 @@ inline const packet_enter_ans* packet_enter_ans::internal_default_instance() {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int packet_game_state_ntf::kStateFieldNumber;
+const int packet_game_state_ntf::kWinPlayerKeyFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_game_state_ntf::packet_game_state_ntf()
@@ -1020,7 +1022,8 @@ packet_game_state_ntf::packet_game_state_ntf(const packet_game_state_ntf& from)
 
 void packet_game_state_ntf::SharedCtor() {
   _cached_size_ = 0;
-  state_ = 0;
+  ::memset(&state_, 0, reinterpret_cast<char*>(&win_player_key_) -
+    reinterpret_cast<char*>(&state_) + sizeof(win_player_key_));
 }
 
 packet_game_state_ntf::~packet_game_state_ntf() {
@@ -1058,7 +1061,27 @@ packet_game_state_ntf* packet_game_state_ntf::New(::google::protobuf::Arena* are
 
 void packet_game_state_ntf::Clear() {
 // @@protoc_insertion_point(message_clear_start:logic_server.packet_game_state_ntf)
-  state_ = 0;
+#if defined(__clang__)
+#define ZR_HELPER_(f) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
+  __builtin_offsetof(packet_game_state_ntf, f) \
+  _Pragma("clang diagnostic pop")
+#else
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<packet_game_state_ntf*>(16)->f)
+#endif
+
+#define ZR_(first, last) do {\
+  ::memset(&(first), 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
+
+  ZR_(state_, win_player_key_);
+
+#undef ZR_HELPER_
+#undef ZR_
+
   _has_bits_.Clear();
   if (_internal_metadata_.have_unknown_fields()) {
     mutable_unknown_fields()->Clear();
@@ -1082,6 +1105,21 @@ bool packet_game_state_ntf::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &state_)));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_win_player_key;
+        break;
+      }
+
+      // required int32 win_player_key = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_win_player_key:
+          set_has_win_player_key();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &win_player_key_)));
         } else {
           goto handle_unusual;
         }
@@ -1119,6 +1157,11 @@ void packet_game_state_ntf::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->state(), output);
   }
 
+  // required int32 win_player_key = 2;
+  if (has_win_player_key()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->win_player_key(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1135,6 +1178,11 @@ void packet_game_state_ntf::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->state(), target);
   }
 
+  // required int32 win_player_key = 2;
+  if (has_win_player_key()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->win_player_key(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -1143,15 +1191,43 @@ void packet_game_state_ntf::SerializeWithCachedSizes(
   return target;
 }
 
+size_t packet_game_state_ntf::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:logic_server.packet_game_state_ntf)
+  size_t total_size = 0;
+
+  if (has_state()) {
+    // required int32 state = 1;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->state());
+  }
+
+  if (has_win_player_key()) {
+    // required int32 win_player_key = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->win_player_key());
+  }
+
+  return total_size;
+}
 size_t packet_game_state_ntf::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:logic_server.packet_game_state_ntf)
   size_t total_size = 0;
 
-  // required int32 state = 1;
-  if (has_state()) {
+  if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
+    // required int32 state = 1;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->state());
+
+    // required int32 win_player_key = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->win_player_key());
+
+  } else {
+    total_size += RequiredFieldsByteSizeFallback();
   }
   if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
@@ -1195,6 +1271,9 @@ void packet_game_state_ntf::UnsafeMergeFrom(const packet_game_state_ntf& from) {
     if (from.has_state()) {
       set_state(from.state());
     }
+    if (from.has_win_player_key()) {
+      set_win_player_key(from.win_player_key());
+    }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
@@ -1217,7 +1296,7 @@ void packet_game_state_ntf::CopyFrom(const packet_game_state_ntf& from) {
 }
 
 bool packet_game_state_ntf::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
 
   return true;
 }
@@ -1228,6 +1307,7 @@ void packet_game_state_ntf::Swap(packet_game_state_ntf* other) {
 }
 void packet_game_state_ntf::InternalSwap(packet_game_state_ntf* other) {
   std::swap(state_, other->state_);
+  std::swap(win_player_key_, other->win_player_key_);
   std::swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -1266,6 +1346,30 @@ void packet_game_state_ntf::set_state(::google::protobuf::int32 value) {
   set_has_state();
   state_ = value;
   // @@protoc_insertion_point(field_set:logic_server.packet_game_state_ntf.state)
+}
+
+// required int32 win_player_key = 2;
+bool packet_game_state_ntf::has_win_player_key() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+void packet_game_state_ntf::set_has_win_player_key() {
+  _has_bits_[0] |= 0x00000002u;
+}
+void packet_game_state_ntf::clear_has_win_player_key() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+void packet_game_state_ntf::clear_win_player_key() {
+  win_player_key_ = 0;
+  clear_has_win_player_key();
+}
+::google::protobuf::int32 packet_game_state_ntf::win_player_key() const {
+  // @@protoc_insertion_point(field_get:logic_server.packet_game_state_ntf.win_player_key)
+  return win_player_key_;
+}
+void packet_game_state_ntf::set_win_player_key(::google::protobuf::int32 value) {
+  set_has_win_player_key();
+  win_player_key_ = value;
+  // @@protoc_insertion_point(field_set:logic_server.packet_game_state_ntf.win_player_key)
 }
 
 inline const packet_game_state_ntf* packet_game_state_ntf::internal_default_instance() {
