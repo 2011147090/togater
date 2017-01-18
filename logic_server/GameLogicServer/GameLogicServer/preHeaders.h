@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <queue>
+#include <fstream>
 #include <random>
 
 // Boost
@@ -19,6 +20,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread.hpp>
 #include <boost/config.hpp>
+
 //#include <boost/random/random_device.hpp>
 //#include <boost/random/uniform_int_distribution.hpp>
 

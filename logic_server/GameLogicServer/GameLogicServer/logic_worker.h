@@ -16,7 +16,7 @@ typedef struct _PLAYER_INFO {
 
     int sum_money_;
     int remain_money_;
-    int money_;
+    int submit_money_;
 
     _PLAYER_INFO();
 
@@ -37,6 +37,7 @@ typedef struct _ROOM_INFO {
     GAME_STATE state_;
 
     int public_card_[2];
+    bool hide_card_;
 
     std::queue<int> card_list_;
 
@@ -54,6 +55,7 @@ public:
     
     bool enter_room_player(connected_session* session, std::string room_key, int player_key);
     bool process_turn(int player_key, int money);
+
     void process_queue();
 
     logic_worker();
@@ -65,9 +67,8 @@ private:
 
     bool end_server_;
 
-    enum HOLDEM_HANDS { NONE = 0, STRAIGHT = 1, PAIR = 2, TRIPLE = 3 };
+    enum HOLDEM_HANDS { NONE = 0, PAIR = 1, STRAIGHT = 2, TRIPLE = 3 };
     HOLDEM_HANDS check_card_mix(int i, int j, int k);
-    int get_top_card(int i, int k, int j);
-
+    
     bool create_room(connected_session* session, std::string room_key, int player_key);
 };

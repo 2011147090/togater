@@ -4,7 +4,7 @@
 void connected_session::process_packet_enter_req(logic_server::packet_enter_req packet)
 {
     logic_server::packet_enter_ans recevie_packet;
-
+    
     if (logic_worker::get_instance()
         ->enter_room_player(this, packet.room_key(), packet.player_key()))
         recevie_packet.set_result(1);

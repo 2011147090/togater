@@ -36,6 +36,9 @@
     <Filter Include="소스 파일\server\logic_worker">
       <UniqueIdentifier>{2d35dc8c-3e27-4dc1-afbf-4a4543208ae6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\system\configurator">
+      <UniqueIdentifier>{a32baa1e-6441-43ac-9c25-72e36aa3fcb6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -67,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="redis_connector.cpp">
       <Filter>소스 파일\server\redis_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="configurator.cpp">
+      <Filter>소스 파일\system\configurator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +108,9 @@
     </ClInclude>
     <ClInclude Include="redis_connector.h">
       <Filter>소스 파일\server\redis_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="configurator.h">
+      <Filter>소스 파일\system\configurator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

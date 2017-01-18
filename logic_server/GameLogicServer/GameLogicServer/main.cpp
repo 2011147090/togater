@@ -3,6 +3,7 @@
 #include "log_manager.h"
 #include "redis_connector.h"
 #include "logic_worker.h"
+#include "configurator.h"
 
 BOOL WINAPI ConsolHandler(DWORD handle)
 {
@@ -40,7 +41,7 @@ int main(int argc, char* argv[])
         {
             system_log->error("failed_init_log_manager");
 
-            return 0;
+            throw;
         }
         else
             system_log->info("init_log_manager");
@@ -49,7 +50,7 @@ int main(int argc, char* argv[])
         {
             system_log->error("failed_init_redis_manager");
 
-            return 0;
+            throw;
         }
         else
             system_log->info("init_redis_manager");
@@ -58,14 +59,22 @@ int main(int argc, char* argv[])
         {
             system_log->error("failed_init_logic_worker");
 
-            return 0;
+            throw;
         }
         else
             system_log->info("init_logic_manager");
 
         boost::asio::io_service io_Service;
         
-        tcp_server tcp_server(io_Service);
+        int port;
+
+        if (!configurator::get_value("port", port))
+        {
+            system_log->error("configurator_error, get_value:{}", port);
+            throw;
+        }
+
+        tcp_server tcp_server(io_Service, port);
                 
         boost::thread_group io_thread;
         io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
@@ -79,6 +88,14 @@ int main(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
+        if (logic_worker::get_instance()->release_singleton())
+            system_log->info("release_logic_manager");
+
+        if (redis_connector::get_instance()->release_singleton())
+            system_log->info("release_redis_manager");
+
+        log_manager::get_instance()->release_singleton();
+
         system_log->error("{}", e.what());
     }
 

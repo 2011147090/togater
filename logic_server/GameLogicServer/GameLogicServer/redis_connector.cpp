@@ -1,5 +1,6 @@
 #include "redis_connector.h"
 #include "log_manager.h"
+#include "configurator.h"
 
 redis_connector::redis_connector() {}
 redis_connector::~redis_connector() {}
@@ -8,8 +9,14 @@ bool redis_connector::init_singleton()
 {
     thread_sync sync;
 
-    system_log->info("redis_connector:connect, ip:{}, port:{}", "127.0.0.1", "6379");
-    conn = new redispp::Connection("127.0.0.1", "6379", "password", false);
+    std::string ip;
+    configurator::get_value("redis_server_ip", ip);
+
+    std::string port;
+    configurator::get_value("redis_server_port", port);
+
+    system_log->info("redis_connector:connect, ip:{}, port:{}", ip, port);
+    conn = new redispp::Connection(ip, port, "password", false);
 
     if (conn == NULL)
     {
