@@ -37,6 +37,12 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
         system_log->error(error.message());
 }
 
+void connected_session::shut_down()
+{
+    socket_.shutdown(boost::asio::socket_base::shutdown_receive);
+    socket_.close();
+}
+
 void connected_session::handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/)
 {
     if (!error)
@@ -89,6 +95,14 @@ void connected_session::handle_read(const boost::system::error_code& error, size
     }
     else
         system_log->error("handle_read_error:{}", error.message());
+}
+
+bool connected_session::is_connected()
+{
+    if (socket_.is_open())
+        return true;
+
+    return false;
 }
 
 connected_session::pointer connected_session::create(boost::asio::io_service& io_service)

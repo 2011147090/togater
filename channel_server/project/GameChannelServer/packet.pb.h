@@ -117,7 +117,7 @@ inline bool MESSAGE_ID_Parse(
 }
 enum RATING {
   BRONZE = 0,
-  SLIVER = 1,
+  SILVER = 1,
   GOLD = 2,
   PLATINUM = 3,
   DIAMOND = 4,
@@ -728,12 +728,21 @@ class friends_req : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::std::string* release_user_id();
   void set_allocated_user_id(::std::string* user_id);
 
+  // optional bool on_off = 3;
+  bool has_on_off() const;
+  void clear_on_off();
+  static const int kOnOffFieldNumber = 3;
+  bool on_off() const;
+  void set_on_off(bool value);
+
   // @@protoc_insertion_point(class_scope:channel_serv.friends_req)
  private:
   inline void set_has_req();
   inline void clear_has_req();
   inline void set_has_user_id();
   inline void clear_has_user_id();
+  inline void set_has_on_off();
+  inline void clear_has_on_off();
 
   // helper for ByteSizeLong()
   size_t RequiredFieldsByteSizeFallback() const;
@@ -742,6 +751,7 @@ class friends_req : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::internal::ArenaStringPtr user_id_;
+  bool on_off_;
   int req_;
   friend void  protobuf_InitDefaults_packet_2eproto_impl();
   friend void  protobuf_AddDesc_packet_2eproto_impl();
@@ -1812,6 +1822,30 @@ inline void friends_req::set_allocated_user_id(::std::string* user_id) {
   }
   user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_id);
   // @@protoc_insertion_point(field_set_allocated:channel_serv.friends_req.user_id)
+}
+
+// optional bool on_off = 3;
+inline bool friends_req::has_on_off() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void friends_req::set_has_on_off() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void friends_req::clear_has_on_off() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void friends_req::clear_on_off() {
+  on_off_ = false;
+  clear_has_on_off();
+}
+inline bool friends_req::on_off() const {
+  // @@protoc_insertion_point(field_get:channel_serv.friends_req.on_off)
+  return on_off_;
+}
+inline void friends_req::set_on_off(bool value) {
+  set_has_on_off();
+  on_off_ = value;
+  // @@protoc_insertion_point(field_set:channel_serv.friends_req.on_off)
 }
 
 inline const friends_req* friends_req::internal_default_instance() {

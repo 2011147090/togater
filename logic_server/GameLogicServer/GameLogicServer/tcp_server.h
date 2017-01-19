@@ -9,7 +9,7 @@ private:
     std::vector<connected_session::pointer> connected_session_list_;
 
 public:
-    tcp_server(boost::asio::io_service& io_service);
+    tcp_server(boost::asio::io_service& io_service, unsigned short port);
 
 private:
     void wait_accept();

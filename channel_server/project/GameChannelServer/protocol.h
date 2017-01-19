@@ -27,45 +27,117 @@ struct packet_header
 
 const int packet_header_size = sizeof(packet_header);
 
-class PacketHandler
+class packet_handler
 {
 public:
-    void Handle(const channel_serv::friends_req& message) const
+    char* incode_message(const channel_serv::friends_req& message)
     {
-        PrintMessage(message);
+        return incoding(channel_serv::MESSAGE_ID::FRIENDS_REQ, message);
     }
-    void Handle(const channel_serv::friends_ans& message) const
+
+    char* incode_message(const channel_serv::friends_ans& message)
     {
-        PrintMessage(message);
+        return incoding(channel_serv::MESSAGE_ID::FRIENDS_ANS, message);
     }
-    void Handle(const channel_serv::play_friends_game_req& message) const
+
+    char* incode_message(const channel_serv::play_friends_game_req& message)
     {
-        PrintMessage(message);
+        return incoding(channel_serv::MESSAGE_ID::PLAY_FRIENDS_REQ, message);
     }
-    void Handle(const channel_serv::play_rank_game_req& message) const
+
+    char* incode_message(const channel_serv::play_rank_game_req& message)
     {
-        PrintMessage(message);
+        return incoding(channel_serv::MESSAGE_ID::PLAY_RANK_REQ, message);
     }
-    void Handle(const channel_serv::join_req& message) const
+
+    char* incode_message(const channel_serv::join_req& message)
     {
-        PrintMessage(message);
+        return incoding(channel_serv::MESSAGE_ID::JOIN_REQ, message);
     }
-    void Handle(const channel_serv::join_ans& message) const
+
+    char* incode_message(const channel_serv::join_ans& message)
     {
-        PrintMessage(message);
+        return incoding(channel_serv::MESSAGE_ID::JOIN_ANS, message);
     }
-    void Handle(const channel_serv::matching_complete_ans& message) const
+
+    char* incode_message(const channel_serv::matching_complete_ans& message)
     {
-        PrintMessage(message);
+        return incoding(channel_serv::MESSAGE_ID::MATCH_COMPLETE, message);
     }
-    void Handle(const channel_serv::error_msg& message) const
+
+    char* incode_message(const channel_serv::error_msg& message)
     {
-        PrintMessage(message);
+        return incoding(channel_serv::MESSAGE_ID::ERROR_MSG, message);
     }
-    void Handle(const channel_serv::logout_ntf& message) const
+
+    char* incode_message(const channel_serv::logout_ntf& message)
     {
-        PrintMessage(message);
+        return incoding(channel_serv::MESSAGE_ID::LOGOUT_NTF, message);
     }
+
+    channel_serv::friends_req decode_friends_req_message(const char *decoding_data,const int data_size)
+    {
+        channel_serv::friends_req  message;
+        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
+        return message;
+    }
+
+    channel_serv::friends_ans decode_friends_ans_message(const char *decoding_data, const int data_size)
+    {
+        channel_serv::friends_ans  message;
+        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
+        return message;
+    }
+
+    channel_serv::play_friends_game_req decode_play_friends_game_req_message(const char *decoding_data, const int data_size)
+    {
+        channel_serv::play_friends_game_req  message;
+        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
+        return message;
+    }
+
+    channel_serv::play_rank_game_req decode_play_game_req_message(const char *decoding_data, const int data_size)
+    {
+        channel_serv::play_rank_game_req  message;
+        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
+        return message;
+    }
+
+    channel_serv::join_req decode_join_req_message(const char *decoding_data, const int data_size)
+    {
+        channel_serv::join_req  message;
+        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
+        return message;
+    }
+
+    channel_serv::join_ans decode_join_ans_message(const char *decoding_data, const int data_size)
+    {
+        channel_serv::join_ans  message;
+        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
+        return message;
+    }
+
+    channel_serv::matching_complete_ans decode_matching_complete_ans_message(const char *decoding_data, const int data_size)
+    {
+        channel_serv::matching_complete_ans  message;
+        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
+        return message;
+    }
+
+    channel_serv::error_msg decode_error_msg_message(const char *decoding_data, const int data_size)
+    {
+        channel_serv::error_msg  message;
+        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
+        return message;
+    }
+
+    channel_serv::logout_ntf decode_logout_nt_message(const char *decoding_data, const int data_size)
+    {
+        channel_serv::logout_ntf  message;
+        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
+        return message;
+    }
+
     channel_serv::RATING check_rating(const int rating)
     {
         if (rating < 100) return channel_serv::RATING::BRONZE;
@@ -76,7 +148,17 @@ public:
         else if (rating < 800) return channel_serv::RATING::MASTER;
         else return channel_serv::RATING::CHAL;
     }
-protected:
+private:
+    char *incoding(const channel_serv::MESSAGE_ID id, const protobuf::Message& message)
+    {
+        char *incoding_data = new char[packet_header_size + message.ByteSize()];
+        packet_header *header = (packet_header *)incoding_data;
+
+        header->ID = id;
+        header->size = message.ByteSize();
+        message.SerializePartialToArray(incoding_data, header->size);
+    }
+
     void PrintMessage(const protobuf::Message& message) const
     {
         string textFormatStr;

@@ -75,9 +75,6 @@
     <ClCompile Include="match_manager.cpp">
       <Filter>소스 파일\server feature</Filter>
     </ClCompile>
-    <ClCompile Include="user_manager.cpp">
-      <Filter>소스 파일\server feature</Filter>
-    </ClCompile>
     <ClCompile Include="db_connector.cpp">
       <Filter>소스 파일\DB</Filter>
     </ClCompile>
@@ -86,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="packet.pb.cc">
       <Filter>소스 파일\packet</Filter>
+    </ClCompile>
+    <ClCompile Include="friends_manager.cpp">
+      <Filter>소스 파일\server feature</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -104,9 +104,6 @@
     <ClInclude Include="redispp.h">
       <Filter>헤더 파일\DB\memcache</Filter>
     </ClInclude>
-    <ClInclude Include="user_manager.h">
-      <Filter>헤더 파일\server feature</Filter>
-    </ClInclude>
     <ClInclude Include="match_manager.h">
       <Filter>헤더 파일\server feature</Filter>
     </ClInclude>
@@ -118,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="packet.pb.h">
       <Filter>헤더 파일\packet</Filter>
+    </ClInclude>
+    <ClInclude Include="friends_manager.h">
+      <Filter>헤더 파일\server feature</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

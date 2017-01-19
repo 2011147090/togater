@@ -19,13 +19,27 @@
 int main()
 {
     boost::asio::io_service io_service;
-    redispp::Connection conn(REDIS_SERVER_IP, REDIS_PORT, REDIS_PWD, false); /* redis module */
+    /* redis connector module */
+    redispp::Connection redis_conn(REDIS_SERVER_IP, REDIS_PORT, REDIS_PWD, false); 
+    
+    /* pakcet handle module */
+    packet_handler packet_handler_main;
     
     /* user manager module */
+    friends_manager friends_manager_main(redis_conn, packet_handler_main);
+    match_manager match_manager_main(packet_handler_main,friends_manager_main,redis_conn);
+    
     /* log manager module */
+
+    
     /* db connector module */
+
+    
     /* config module */
-    tcp_server server(io_service, conn);
+
+    
+    /* main server */
+    tcp_server server(io_service, friends_manager_main, match_manager_main, packet_handler_main); // config module , log module , db connector
     server.init(MAX_SESSION_COUNT);
     server.start();
     

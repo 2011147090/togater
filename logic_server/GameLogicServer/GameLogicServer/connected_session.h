@@ -28,8 +28,11 @@ private:
     
     void process_packet_enter_req(logic_server::packet_enter_req packet);
     void process_packet_process_turn_ans(logic_server::packet_process_turn_ans packet);
-    
+        
 public:
+    void shut_down();
+    bool is_connected();
+
     typedef boost::shared_ptr<connected_session> pointer;
 
     static pointer create(boost::asio::io_service& io_service);

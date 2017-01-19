@@ -2,8 +2,8 @@
 #include "tcp_server.h"
 #include "log_manager.h"
 
-tcp_server::tcp_server(boost::asio::io_service& io_service)
-    : acceptor_(io_service, tcp::endpoint(tcp::v4(), 13))
+tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
+    : acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
 {
     wait_accept();
 }

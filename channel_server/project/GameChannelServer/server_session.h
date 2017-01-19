@@ -11,15 +11,15 @@ class user
 public:
     void set_user_info(int rating, std::string user_id)
     {
-        rating_ = rating;
+        rating_score = rating;
         user_id_ = user_id;
     }
         
-    int get_rating() { return rating_; }
+    int get_rating() { return rating_score; }
     const char* get_user_id() { return user_id_.c_str(); }
 
 private:
-    int rating_;
+    int rating_score;
     std::string user_id_;
 };
 
@@ -37,7 +37,7 @@ public:
 
     void post_receive();
 
-    void post_send(const bool b_immediately, const int n_size, char *p_data);
+    void post_send(const bool immediately, const int n_size, char *p_data);
 
     void set_token(const char* p_token) { memcpy(token_.data(), p_token, TOKEN_SIZE); }
     const char* get_token()            { return token_.data(); }

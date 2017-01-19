@@ -156,6 +156,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="configurator.cpp" />
     <ClCompile Include="connected_session.cpp" />
     <ClCompile Include="logic_server.pb.cc" />
     <ClCompile Include="logic_worker.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="tcp_server.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="configurator.h" />
     <ClInclude Include="connected_session.h" />
     <ClInclude Include="critical_section.h" />
     <ClInclude Include="logic_server.pb.h" />
