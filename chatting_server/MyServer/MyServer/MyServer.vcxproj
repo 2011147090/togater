@@ -151,16 +151,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="chat_protobuf.pb.cc" />
-    <ClCompile Include="chat_protocol.cpp" />
-    <ClCompile Include="chat_session.cpp" />
+    <ClCompile Include="log_manager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="TEST_server.cpp" />
+    <ClCompile Include="redispp.cpp" />
+    <ClCompile Include="redis_connector.cpp" />
+    <ClCompile Include="tcp_server.cpp" />
+    <ClCompile Include="tcp_session.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="chat_protobuf.pb.h" />
     <ClInclude Include="chat_protocol.h" />
-    <ClInclude Include="chat_server.h" />
-    <ClInclude Include="chat_session.h" />
+    <ClInclude Include="log_manager.h" />
+    <ClInclude Include="redispp.h" />
+    <ClInclude Include="redis_connector.h" />
+    <ClInclude Include="singleton.h" />
+    <ClInclude Include="tcp_server.h" />
+    <ClInclude Include="tcp_session.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
