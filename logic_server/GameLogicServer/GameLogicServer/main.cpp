@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
 {
     SetConsoleCtrlHandler(ConsolHandler, true);
 
+
     try
     {
         system_log->info("server_start");
