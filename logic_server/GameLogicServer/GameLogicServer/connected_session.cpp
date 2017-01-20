@@ -29,7 +29,6 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
-
     boost::system::error_code error;
     socket_.write_some(boost::asio::buffer(send_buf_), error);
 
@@ -43,6 +42,11 @@ void connected_session::shut_down()
     socket_.close();
 }
 
+std::string connected_session::get_player_key()
+{
+    return player_key_;
+}
+
 void connected_session::handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/)
 {
     if (!error)
@@ -52,21 +56,9 @@ void connected_session::handle_read(const boost::system::error_code& error, size
                 boost::asio::placeholders::error,
                 boost::asio::placeholders::bytes_transferred));
 
-        protobuf::io::ArrayInputStream input_array_stream(recv_buf_.c_array(), recv_buf_.size());
-        protobuf::io::CodedInputStream input_coded_stream(&input_array_stream);
-
         MESSAGE_HEADER message_header;
 
-        input_coded_stream.ReadRaw(&message_header, message_header_size);
-
-        const void* payload_ptr = NULL;
-        int remainSize = 0;
-        input_coded_stream.GetDirectBufferPointer(&payload_ptr, &remainSize);
-        
-        protobuf::io::ArrayInputStream payload_array_stream(payload_ptr, message_header.size);
-        protobuf::io::CodedInputStream payload_input_stream(&payload_array_stream);
-
-        input_coded_stream.Skip(message_header.size);
+        CopyMemory(&message_header, recv_buf_.begin(), message_header_size);
 
         switch (message_header.type)
         {
@@ -74,7 +66,7 @@ void connected_session::handle_read(const boost::system::error_code& error, size
             {
                 logic_server::packet_enter_req message;
 
-                if (!message.ParseFromCodedStream(&payload_input_stream))
+                if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                     break;
 
                 process_packet_enter_req(message);
@@ -85,7 +77,7 @@ void connected_session::handle_read(const boost::system::error_code& error, size
             {
                 logic_server::packet_process_turn_ans message;
 
-                if (!message.ParseFromCodedStream(&payload_input_stream))
+                if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                     break;
 
                 process_packet_process_turn_ans(message);

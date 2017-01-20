@@ -143,12 +143,17 @@ class packet_enter_req : public ::google::protobuf::Message /* @@protoc_insertio
 
   // accessors -------------------------------------------------------
 
-  // required int32 player_key = 1;
+  // required string player_key = 1;
   bool has_player_key() const;
   void clear_player_key();
   static const int kPlayerKeyFieldNumber = 1;
-  ::google::protobuf::int32 player_key() const;
-  void set_player_key(::google::protobuf::int32 value);
+  const ::std::string& player_key() const;
+  void set_player_key(const ::std::string& value);
+  void set_player_key(const char* value);
+  void set_player_key(const char* value, size_t size);
+  ::std::string* mutable_player_key();
+  ::std::string* release_player_key();
+  void set_allocated_player_key(::std::string* player_key);
 
   // required string room_key = 2;
   bool has_room_key() const;
@@ -175,8 +180,8 @@ class packet_enter_req : public ::google::protobuf::Message /* @@protoc_insertio
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
+  ::google::protobuf::internal::ArenaStringPtr player_key_;
   ::google::protobuf::internal::ArenaStringPtr room_key_;
-  ::google::protobuf::int32 player_key_;
   friend void  protobuf_InitDefaults_logic_5fserver_2eproto_impl();
   friend void  protobuf_AddDesc_logic_5fserver_2eproto_impl();
   friend void protobuf_AssignDesc_logic_5fserver_2eproto();
@@ -364,12 +369,17 @@ class packet_game_state_ntf : public ::google::protobuf::Message /* @@protoc_ins
   ::google::protobuf::int32 state() const;
   void set_state(::google::protobuf::int32 value);
 
-  // required int32 win_player_key = 2;
+  // required string win_player_key = 2;
   bool has_win_player_key() const;
   void clear_win_player_key();
   static const int kWinPlayerKeyFieldNumber = 2;
-  ::google::protobuf::int32 win_player_key() const;
-  void set_win_player_key(::google::protobuf::int32 value);
+  const ::std::string& win_player_key() const;
+  void set_win_player_key(const ::std::string& value);
+  void set_win_player_key(const char* value);
+  void set_win_player_key(const char* value, size_t size);
+  ::std::string* mutable_win_player_key();
+  ::std::string* release_win_player_key();
+  void set_allocated_win_player_key(::std::string* win_player_key);
 
   // @@protoc_insertion_point(class_scope:logic_server.packet_game_state_ntf)
  private:
@@ -384,8 +394,8 @@ class packet_game_state_ntf : public ::google::protobuf::Message /* @@protoc_ins
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
+  ::google::protobuf::internal::ArenaStringPtr win_player_key_;
   ::google::protobuf::int32 state_;
-  ::google::protobuf::int32 win_player_key_;
   friend void  protobuf_InitDefaults_logic_5fserver_2eproto_impl();
   friend void  protobuf_AddDesc_logic_5fserver_2eproto_impl();
   friend void protobuf_AssignDesc_logic_5fserver_2eproto();
@@ -579,34 +589,21 @@ class packet_process_turn_ans : public ::google::protobuf::Message /* @@protoc_i
 
   // accessors -------------------------------------------------------
 
-  // required int32 player_key = 1;
-  bool has_player_key() const;
-  void clear_player_key();
-  static const int kPlayerKeyFieldNumber = 1;
-  ::google::protobuf::int32 player_key() const;
-  void set_player_key(::google::protobuf::int32 value);
-
-  // required int32 money = 2;
+  // required int32 money = 1;
   bool has_money() const;
   void clear_money();
-  static const int kMoneyFieldNumber = 2;
+  static const int kMoneyFieldNumber = 1;
   ::google::protobuf::int32 money() const;
   void set_money(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:logic_server.packet_process_turn_ans)
  private:
-  inline void set_has_player_key();
-  inline void clear_has_player_key();
   inline void set_has_money();
   inline void clear_has_money();
-
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
-  ::google::protobuf::int32 player_key_;
   ::google::protobuf::int32 money_;
   friend void  protobuf_InitDefaults_logic_5fserver_2eproto_impl();
   friend void  protobuf_AddDesc_logic_5fserver_2eproto_impl();
@@ -874,7 +871,7 @@ extern ::google::protobuf::internal::ExplicitlyConstructed<packet_process_check_
 #if !PROTOBUF_INLINE_NOT_IN_HEADERS
 // packet_enter_req
 
-// required int32 player_key = 1;
+// required string player_key = 1;
 inline bool packet_enter_req::has_player_key() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -885,17 +882,47 @@ inline void packet_enter_req::clear_has_player_key() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void packet_enter_req::clear_player_key() {
-  player_key_ = 0;
+  player_key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_player_key();
 }
-inline ::google::protobuf::int32 packet_enter_req::player_key() const {
+inline const ::std::string& packet_enter_req::player_key() const {
   // @@protoc_insertion_point(field_get:logic_server.packet_enter_req.player_key)
-  return player_key_;
+  return player_key_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_enter_req::set_player_key(::google::protobuf::int32 value) {
+inline void packet_enter_req::set_player_key(const ::std::string& value) {
   set_has_player_key();
-  player_key_ = value;
+  player_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:logic_server.packet_enter_req.player_key)
+}
+inline void packet_enter_req::set_player_key(const char* value) {
+  set_has_player_key();
+  player_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:logic_server.packet_enter_req.player_key)
+}
+inline void packet_enter_req::set_player_key(const char* value, size_t size) {
+  set_has_player_key();
+  player_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:logic_server.packet_enter_req.player_key)
+}
+inline ::std::string* packet_enter_req::mutable_player_key() {
+  set_has_player_key();
+  // @@protoc_insertion_point(field_mutable:logic_server.packet_enter_req.player_key)
+  return player_key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* packet_enter_req::release_player_key() {
+  // @@protoc_insertion_point(field_release:logic_server.packet_enter_req.player_key)
+  clear_has_player_key();
+  return player_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_enter_req::set_allocated_player_key(::std::string* player_key) {
+  if (player_key != NULL) {
+    set_has_player_key();
+  } else {
+    clear_has_player_key();
+  }
+  player_key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), player_key);
+  // @@protoc_insertion_point(field_set_allocated:logic_server.packet_enter_req.player_key)
 }
 
 // required string room_key = 2;
@@ -1014,7 +1041,7 @@ inline void packet_game_state_ntf::set_state(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:logic_server.packet_game_state_ntf.state)
 }
 
-// required int32 win_player_key = 2;
+// required string win_player_key = 2;
 inline bool packet_game_state_ntf::has_win_player_key() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -1025,17 +1052,47 @@ inline void packet_game_state_ntf::clear_has_win_player_key() {
   _has_bits_[0] &= ~0x00000002u;
 }
 inline void packet_game_state_ntf::clear_win_player_key() {
-  win_player_key_ = 0;
+  win_player_key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_win_player_key();
 }
-inline ::google::protobuf::int32 packet_game_state_ntf::win_player_key() const {
+inline const ::std::string& packet_game_state_ntf::win_player_key() const {
   // @@protoc_insertion_point(field_get:logic_server.packet_game_state_ntf.win_player_key)
-  return win_player_key_;
+  return win_player_key_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_game_state_ntf::set_win_player_key(::google::protobuf::int32 value) {
+inline void packet_game_state_ntf::set_win_player_key(const ::std::string& value) {
   set_has_win_player_key();
-  win_player_key_ = value;
+  win_player_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:logic_server.packet_game_state_ntf.win_player_key)
+}
+inline void packet_game_state_ntf::set_win_player_key(const char* value) {
+  set_has_win_player_key();
+  win_player_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:logic_server.packet_game_state_ntf.win_player_key)
+}
+inline void packet_game_state_ntf::set_win_player_key(const char* value, size_t size) {
+  set_has_win_player_key();
+  win_player_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:logic_server.packet_game_state_ntf.win_player_key)
+}
+inline ::std::string* packet_game_state_ntf::mutable_win_player_key() {
+  set_has_win_player_key();
+  // @@protoc_insertion_point(field_mutable:logic_server.packet_game_state_ntf.win_player_key)
+  return win_player_key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* packet_game_state_ntf::release_win_player_key() {
+  // @@protoc_insertion_point(field_release:logic_server.packet_game_state_ntf.win_player_key)
+  clear_has_win_player_key();
+  return win_player_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_game_state_ntf::set_allocated_win_player_key(::std::string* win_player_key) {
+  if (win_player_key != NULL) {
+    set_has_win_player_key();
+  } else {
+    clear_has_win_player_key();
+  }
+  win_player_key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), win_player_key);
+  // @@protoc_insertion_point(field_set_allocated:logic_server.packet_game_state_ntf.win_player_key)
 }
 
 inline const packet_game_state_ntf* packet_game_state_ntf::internal_default_instance() {
@@ -1100,39 +1157,15 @@ inline const packet_process_turn_req* packet_process_turn_req::internal_default_
 
 // packet_process_turn_ans
 
-// required int32 player_key = 1;
-inline bool packet_process_turn_ans::has_player_key() const {
+// required int32 money = 1;
+inline bool packet_process_turn_ans::has_money() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void packet_process_turn_ans::set_has_player_key() {
+inline void packet_process_turn_ans::set_has_money() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void packet_process_turn_ans::clear_has_player_key() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void packet_process_turn_ans::clear_player_key() {
-  player_key_ = 0;
-  clear_has_player_key();
-}
-inline ::google::protobuf::int32 packet_process_turn_ans::player_key() const {
-  // @@protoc_insertion_point(field_get:logic_server.packet_process_turn_ans.player_key)
-  return player_key_;
-}
-inline void packet_process_turn_ans::set_player_key(::google::protobuf::int32 value) {
-  set_has_player_key();
-  player_key_ = value;
-  // @@protoc_insertion_point(field_set:logic_server.packet_process_turn_ans.player_key)
-}
-
-// required int32 money = 2;
-inline bool packet_process_turn_ans::has_money() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void packet_process_turn_ans::set_has_money() {
-  _has_bits_[0] |= 0x00000002u;
-}
 inline void packet_process_turn_ans::clear_has_money() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline void packet_process_turn_ans::clear_money() {
   money_ = 0;
