@@ -20,7 +20,7 @@ static bool setSocketFlag(SOCKET sock, int level, int optname, bool value)
 
 static const char* getLastErrorMessage()
 {
-    return gai_strerror(WSAGetLastError());
+    return gai_strerrorA(WSAGetLastError());
 }
 
 #else

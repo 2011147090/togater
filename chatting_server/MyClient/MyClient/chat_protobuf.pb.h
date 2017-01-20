@@ -42,15 +42,17 @@ class packet_chat_normal;
 class packet_chat_notice;
 class packet_chat_room;
 class packet_chat_whisper;
+class packet_verify_user;
 
 enum message_type {
-  NORMAL = 0,
-  WHISPER = 1,
-  ROOM = 2,
-  NOTICE = 3
+  VERIFY = 0,
+  NORMAL = 1,
+  WHISPER = 2,
+  ROOM = 3,
+  NOTICE = 4
 };
 bool message_type_IsValid(int value);
-const message_type message_type_MIN = NORMAL;
+const message_type message_type_MIN = VERIFY;
 const message_type message_type_MAX = NOTICE;
 const int message_type_ARRAYSIZE = message_type_MAX + 1;
 
@@ -65,6 +67,127 @@ inline bool message_type_Parse(
     message_type_descriptor(), name, value);
 }
 // ===================================================================
+
+class packet_verify_user : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_verify_user) */ {
+ public:
+  packet_verify_user();
+  virtual ~packet_verify_user();
+
+  packet_verify_user(const packet_verify_user& from);
+
+  inline packet_verify_user& operator=(const packet_verify_user& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const packet_verify_user& default_instance();
+
+  static const packet_verify_user* internal_default_instance();
+
+  void Swap(packet_verify_user* other);
+
+  // implements Message ----------------------------------------------
+
+  inline packet_verify_user* New() const { return New(NULL); }
+
+  packet_verify_user* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const packet_verify_user& from);
+  void MergeFrom(const packet_verify_user& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  size_t ByteSizeLong() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(packet_verify_user* other);
+  void UnsafeMergeFrom(const packet_verify_user& from);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string key_string = 1;
+  bool has_key_string() const;
+  void clear_key_string();
+  static const int kKeyStringFieldNumber = 1;
+  const ::std::string& key_string() const;
+  void set_key_string(const ::std::string& value);
+  void set_key_string(const char* value);
+  void set_key_string(const char* value, size_t size);
+  ::std::string* mutable_key_string();
+  ::std::string* release_key_string();
+  void set_allocated_key_string(::std::string* key_string);
+
+  // required string value_user_id = 2;
+  bool has_value_user_id() const;
+  void clear_value_user_id();
+  static const int kValueUserIdFieldNumber = 2;
+  const ::std::string& value_user_id() const;
+  void set_value_user_id(const ::std::string& value);
+  void set_value_user_id(const char* value);
+  void set_value_user_id(const char* value, size_t size);
+  ::std::string* mutable_value_user_id();
+  ::std::string* release_value_user_id();
+  void set_allocated_value_user_id(::std::string* value_user_id);
+
+  // @@protoc_insertion_point(class_scope:chat_server.packet_verify_user)
+ private:
+  inline void set_has_key_string();
+  inline void clear_has_key_string();
+  inline void set_has_value_user_id();
+  inline void clear_has_value_user_id();
+
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  ::google::protobuf::internal::ArenaStringPtr key_string_;
+  ::google::protobuf::internal::ArenaStringPtr value_user_id_;
+  friend void  protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl();
+  friend void  protobuf_AddDesc_chat_5fprotobuf_2eproto_impl();
+  friend void protobuf_AssignDesc_chat_5fprotobuf_2eproto();
+  friend void protobuf_ShutdownFile_chat_5fprotobuf_2eproto();
+
+  void InitAsDefaultInstance();
+};
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_verify_user> packet_verify_user_default_instance_;
+
+// -------------------------------------------------------------------
 
 class packet_chat_normal : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_chat_normal) */ {
  public:
@@ -569,6 +692,121 @@ extern ::google::protobuf::internal::ExplicitlyConstructed<packet_chat_notice> p
 // ===================================================================
 
 #if !PROTOBUF_INLINE_NOT_IN_HEADERS
+// packet_verify_user
+
+// required string key_string = 1;
+inline bool packet_verify_user::has_key_string() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void packet_verify_user::set_has_key_string() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void packet_verify_user::clear_has_key_string() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_verify_user::clear_key_string() {
+  key_string_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_key_string();
+}
+inline const ::std::string& packet_verify_user::key_string() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_verify_user.key_string)
+  return key_string_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_verify_user::set_key_string(const ::std::string& value) {
+  set_has_key_string();
+  key_string_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:chat_server.packet_verify_user.key_string)
+}
+inline void packet_verify_user::set_key_string(const char* value) {
+  set_has_key_string();
+  key_string_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_user.key_string)
+}
+inline void packet_verify_user::set_key_string(const char* value, size_t size) {
+  set_has_key_string();
+  key_string_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_user.key_string)
+}
+inline ::std::string* packet_verify_user::mutable_key_string() {
+  set_has_key_string();
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_user.key_string)
+  return key_string_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* packet_verify_user::release_key_string() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_verify_user.key_string)
+  clear_has_key_string();
+  return key_string_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_verify_user::set_allocated_key_string(::std::string* key_string) {
+  if (key_string != NULL) {
+    set_has_key_string();
+  } else {
+    clear_has_key_string();
+  }
+  key_string_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key_string);
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_user.key_string)
+}
+
+// required string value_user_id = 2;
+inline bool packet_verify_user::has_value_user_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void packet_verify_user::set_has_value_user_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void packet_verify_user::clear_has_value_user_id() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void packet_verify_user::clear_value_user_id() {
+  value_user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_value_user_id();
+}
+inline const ::std::string& packet_verify_user::value_user_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_verify_user.value_user_id)
+  return value_user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_verify_user::set_value_user_id(const ::std::string& value) {
+  set_has_value_user_id();
+  value_user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:chat_server.packet_verify_user.value_user_id)
+}
+inline void packet_verify_user::set_value_user_id(const char* value) {
+  set_has_value_user_id();
+  value_user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_user.value_user_id)
+}
+inline void packet_verify_user::set_value_user_id(const char* value, size_t size) {
+  set_has_value_user_id();
+  value_user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_user.value_user_id)
+}
+inline ::std::string* packet_verify_user::mutable_value_user_id() {
+  set_has_value_user_id();
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_user.value_user_id)
+  return value_user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* packet_verify_user::release_value_user_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_verify_user.value_user_id)
+  clear_has_value_user_id();
+  return value_user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_verify_user::set_allocated_value_user_id(::std::string* value_user_id) {
+  if (value_user_id != NULL) {
+    set_has_value_user_id();
+  } else {
+    clear_has_value_user_id();
+  }
+  value_user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value_user_id);
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_user.value_user_id)
+}
+
+inline const packet_verify_user* packet_verify_user::internal_default_instance() {
+  return &packet_verify_user_default_instance_.get();
+}
+// -------------------------------------------------------------------
+
 // packet_chat_normal
 
 // required string user_id = 1;
@@ -1082,6 +1320,8 @@ inline const packet_chat_notice* packet_chat_notice::internal_default_instance()
   return &packet_chat_notice_default_instance_.get();
 }
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

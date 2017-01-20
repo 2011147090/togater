@@ -20,6 +20,7 @@
 class tcp_client
 {
 private:
+
     boost::asio::io_service& io_service_;
     boost::asio::ip::tcp::socket socket_;
 
@@ -39,10 +40,14 @@ private:
     void handle_connect(const boost::system::error_code& error);
     void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
+    void handle_verify(const boost::system::error_code& error, size_t bytes_transferred);
 
     void process_packet(const int size);
 
 public:
+    std::string user_id_;
+    std::string key_;
+
     tcp_client(boost::asio::io_service& io_service);
     ~tcp_client();
     
@@ -51,6 +56,7 @@ public:
     void connect(boost::asio::ip::tcp::endpoint endpoint);
     void close();
 
+    void post_verify();
     void post_send(const bool immediate, std::string message);
     void post_send(const bool immediate, const int size, BYTE* data);
 };

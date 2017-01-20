@@ -7,7 +7,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/container/vector.hpp>
-#include <boost/container/map.hpp>
+#include <boost/unordered_map.hpp>
 
 #include "tcp_session.h"
 
@@ -22,7 +22,7 @@ private:
     boost::container::vector<tcp_session*> session_list_;
     
     boost::container::deque<int> session_queue_;
-    boost::container::map<std::string, tcp_session*> connected_session_map_;
+    boost::unordered_map<std::string, tcp_session*> connected_session_map_;
 
     bool post_accept();
     void handle_accept(tcp_session* session, const boost::system::error_code& error);

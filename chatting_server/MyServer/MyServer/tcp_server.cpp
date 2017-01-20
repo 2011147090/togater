@@ -1,4 +1,5 @@
 #include "tcp_server.h"
+#include "redis_connector.h"
 
 
 // ---------- public ----------
@@ -13,10 +14,8 @@ tcp_server::~tcp_server()
     for (int i = 0; i < session_list_.size(); i++)
     {
         if (session_list_[i]->get_socket().is_open())
-        {
             session_list_[i]->get_socket().close();
-        }
-
+        
         delete session_list_[i];
     }
 }
@@ -40,9 +39,9 @@ void tcp_server::start()
 
 void tcp_server::close_session(const int session_id)
 {
-    // ¸Ê<user_id, session*>¿¡¼­ Á¦°Å
-    std::string session_user_id = session_list_[session_id]->get_user_id();
-    connected_session_map_.erase(connected_session_map_.find(session_user_id));
+    std::string user_id = session_list_[session_id]->get_user_id();
+    if (connected_session_map_.find(user_id) != connected_session_map_.end())
+        connected_session_map_.erase(user_id);
 
     std::cout << "Client connection closed. session_id: " << session_id << std::endl;
 
@@ -62,17 +61,39 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
     boost::array<BYTE, 1024>* send_data = new boost::array<BYTE, 1024>;
     CopyMemory(send_data, packet, size);
 
+
     switch (message_header->type)
     {
-    case chat_server::NORMAL:
-        for (int i = 0; i < session_list_.size(); i++)
+    case chat_server::VERIFY:
+    {
+        chat_server::packet_verify_user verify_message;
+        verify_message.ParseFromArray(packet + message_header_size, message_header->size);
+        
+        std::string redis_key = verify_message.key_string();
+        std::string redis_value = verify_message.value_user_id();
+
+        if (redis_connector::get_instance()->get(redis_key) == redis_value)
         {
-            if (session_list_[i]->get_socket().is_open())
-            {
-                session_list_[i]->post_send(false, size, send_data->begin());
-            }
+            session_list_[session_id]->set_user_id(redis_value);
+            session_list_[session_id]->set_status(lobby);
+
+            connected_session_map_.insert(std::pair<std::string, tcp_session*>(redis_value, session_list_[session_id]));
+        }
+        else
+            close_session(session_id);
+    }
+        break;
+    case chat_server::NORMAL:
+    {
+        auto iter = connected_session_map_.begin();
+
+        for (iter = connected_session_map_.begin(); iter != connected_session_map_.end(); ++iter)
+        {
+            if (iter->second->get_socket().is_open() && iter->second->get_status() == lobby)
+                iter->second->post_send(false, size, send_data->begin());
         }
         delete[] send_data;
+    }
         break;
     case chat_server::WHISPER:
         break;
@@ -111,8 +132,6 @@ void tcp_server::handle_accept(tcp_session* session, const boost::system::error_
 {
     if (!error)
     {
-        // ¸Ê<user_id, session*>¿¡ Ãß°¡
-        connected_session_map_.insert(std::pair<std::string, tcp_session*>(session->get_user_id(), session));
         std::cout << "Client connection successed. session_id: " << session->get_session_id() << std::endl;
 
         session->post_receive();

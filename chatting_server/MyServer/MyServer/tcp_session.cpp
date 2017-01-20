@@ -4,7 +4,7 @@
 
 // ---------- public ----------
 tcp_session::tcp_session(int session_id, boost::asio::io_service& io_service, tcp_server* server)
-    :socket_(io_service), session_id_(session_id), server_(server)
+    :socket_(io_service), session_id_(session_id), server_(server), user_id_("")
 {
 }
 
@@ -66,7 +66,6 @@ void tcp_session::handle_receive(const boost::system::error_code& error, size_t 
         {
             std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
         }
-
     }
     else
     {

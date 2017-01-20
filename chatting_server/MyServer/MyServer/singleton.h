@@ -8,6 +8,8 @@ protected:
     static T* instance;
 
     singleton() {}
+    singleton(const singleton&) {}
+    void operator=(const singleton&) {}
 
 public:
     virtual ~singleton() {}

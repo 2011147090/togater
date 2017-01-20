@@ -41,10 +41,31 @@ void tcp_client::close()
     }
 }
 
-void tcp_client::post_send(const bool bImmediately, std::string message)
+void tcp_client::post_verify()
+{
+    chat_server::packet_verify_user verify_message;
+    verify_message.set_key_string(key_);
+    verify_message.set_value_user_id(user_id_);
+
+    MESSAGE_HEADER header;
+
+    header.size = verify_message.ByteSize();
+    header.type = chat_server::VERIFY;
+
+    CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
+    verify_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
+
+    boost::asio::async_write(socket_, boost::asio::buffer(send_buffer_.begin(), message_header_size + header.size),
+        boost::bind(&tcp_client::handle_verify, this,
+            boost::asio::placeholders::error,
+            boost::asio::placeholders::bytes_transferred)
+    );
+}
+
+void tcp_client::post_send(const bool immediate, std::string message)
 {
     chat_server::packet_chat_normal normal_message;
-    normal_message.set_user_id("User_ID");
+    normal_message.set_user_id(user_id_);
     normal_message.set_chat_message(message);
 
     MESSAGE_HEADER header;
@@ -60,7 +81,7 @@ void tcp_client::post_send(const bool bImmediately, std::string message)
 
     EnterCriticalSection(&lock_);
 
-    if (bImmediately == false)
+    if (immediate == false)
     {
         send_data = send_buffer_.begin();
         send_data_queue_.push_back(send_data);
@@ -70,7 +91,7 @@ void tcp_client::post_send(const bool bImmediately, std::string message)
         send_data = send_buffer_.begin();
     }
 
-    if (bImmediately || send_data_queue_.size() < 2)
+    if (immediate || send_data_queue_.size() < 2)
     {
         boost::asio::async_write(socket_, boost::asio::buffer(send_data, message_header_size + header.size),
             boost::bind(&tcp_client::handle_write, this,
@@ -82,13 +103,13 @@ void tcp_client::post_send(const bool bImmediately, std::string message)
     LeaveCriticalSection(&lock_);
 }
 
-void tcp_client::post_send(const bool bImmediately, const int size, BYTE* data)
+void tcp_client::post_send(const bool immediate, const int size, BYTE* data)
 {
     BYTE* send_data = nullptr;
 
     EnterCriticalSection(&lock_);		// ¶ô ½ÃÀÛ
 
-    if (bImmediately == false)
+    if (immediate == false)
     {
         send_data = data;
         send_data_queue_.push_back(send_data);
@@ -98,7 +119,7 @@ void tcp_client::post_send(const bool bImmediately, const int size, BYTE* data)
         send_data = data;
     }
 
-    if (bImmediately || send_data_queue_.size() < 2)
+    if (immediate || send_data_queue_.size() < 2)
     {
         boost::asio::async_write(socket_, boost::asio::buffer(send_data, size),
             boost::bind(&tcp_client::handle_write, this,
@@ -181,32 +202,26 @@ void tcp_client::handle_receive(const boost::system::error_code& error, size_t b
     }
 }
 
+void tcp_client::handle_verify(const boost::system::error_code& error, size_t bytes_transferred)
+{
+}
+
 void tcp_client::process_packet(const int size)
 {
     CopyMemory(&packet_buffer_, receive_buffer_.data(), size);
 
-    protobuf::io::ArrayInputStream input_array_stream(packet_buffer_.c_array(), packet_buffer_.size());
-    protobuf::io::CodedInputStream input_coded_stream(&input_array_stream);
+    MESSAGE_HEADER* message_header = (MESSAGE_HEADER*)packet_buffer_.begin();
 
-    MESSAGE_HEADER message_header;
-    input_coded_stream.ReadRaw(&message_header, message_header_size);
-
-    const void* payload_ptr = NULL;
-    int remainSize = 0;
-    input_coded_stream.GetDirectBufferPointer(&payload_ptr, &remainSize);
-
-    protobuf::io::ArrayInputStream payload_array_stream(payload_ptr, message_header.size);
-    protobuf::io::CodedInputStream payload_input_stream(&payload_array_stream);
-
-    input_coded_stream.Skip(message_header.size);
-
-    switch (message_header.type)
+    switch (message_header->type)
     {
+    case chat_server::VERIFY:
+        break;
     case chat_server::NORMAL:
     {
         chat_server::packet_chat_normal normal_message;
+        
+        normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
 
-        normal_message.ParseFromCodedStream(&payload_input_stream);
         std::cout << normal_message.user_id() << "> ";
         std::cout << normal_message.chat_message() << std::endl;
     }

@@ -30,25 +30,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="chat_protobuf.pb.cc">
-      <Filter>소스 파일\protocol</Filter>
-    </ClCompile>
     <ClCompile Include="tcp_client.cpp">
       <Filter>소스 파일\client</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일\main</Filter>
     </ClCompile>
+    <ClCompile Include="chat_protobuf.pb.cc">
+      <Filter>소스 파일\protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="chat_protocol.h">
       <Filter>헤더 파일\protocol</Filter>
     </ClInclude>
-    <ClInclude Include="chat_protobuf.pb.h">
-      <Filter>헤더 파일\protocol</Filter>
-    </ClInclude>
     <ClInclude Include="tcp_client.h">
       <Filter>헤더 파일\client</Filter>
+    </ClInclude>
+    <ClInclude Include="chat_protobuf.pb.h">
+      <Filter>헤더 파일\protocol</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
