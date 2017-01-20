@@ -15,6 +15,9 @@ class connected_session : public boost::enable_shared_from_this<connected_sessio
 {
 private:
     tcp::socket socket_;
+    
+    std::string room_key_;
+    std::string player_key_;
 
     boost::array<BYTE, BUFSIZE> recv_buf_;
     boost::array<BYTE, BUFSIZE> send_buf_;
@@ -25,13 +28,15 @@ private:
     //void handle_accept(const boost::system::error_code& /*error*/, size_t /*bytes_transferred*/);
     void handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/);
     bool handle_check_keep_alive();
-    
+        
     void process_packet_enter_req(logic_server::packet_enter_req packet);
     void process_packet_process_turn_ans(logic_server::packet_process_turn_ans packet);
         
 public:
     void shut_down();
+    
     bool is_connected();
+    std::string get_player_key();
 
     typedef boost::shared_ptr<connected_session> pointer;
 

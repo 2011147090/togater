@@ -6,7 +6,6 @@
 #include "critical_section.h"
 
 typedef struct _PLAYER_INFO {
-    int key_;
     std::string id_;
 
     bool submit_card_;
@@ -27,7 +26,7 @@ typedef struct _ROOM_INFO {
 
     PLAYER_INFO* turn_player_;
     
-    std::string room_key_;
+    //std::string room_key_;
     int time_;
     int turn_count_;
 
@@ -41,7 +40,7 @@ typedef struct _ROOM_INFO {
 
     std::queue<int> card_list_;
 
-    _ROOM_INFO();
+    _ROOM_INFO(PLAYER_INFO player_info);
 
     void generate_card_queue();
     int get_card();
@@ -53,8 +52,8 @@ public:
     virtual bool init_singleton();
     virtual bool release_singleton();
     
-    bool enter_room_player(connected_session* session, std::string room_key, int player_key);
-    bool process_turn(int player_key, int money);
+    bool enter_room_player(connected_session* session, std::string room_key);
+    bool process_turn(std::string room_key, std::string player_key, int money);
 
     void process_queue();
 
@@ -62,7 +61,8 @@ public:
     virtual ~logic_worker();
     
 private:
-    std::vector<ROOM_INFO> room_list_;
+    boost::unordered_map<std::string, ROOM_INFO> room_hashs_;
+    //std::vector<ROOM_INFO> room_list_;
     boost::thread* logic_thread_;
 
     bool end_server_;
@@ -70,5 +70,5 @@ private:
     enum HOLDEM_HANDS { NONE = 0, PAIR = 1, STRAIGHT = 2, TRIPLE = 3 };
     HOLDEM_HANDS check_card_mix(int i, int j, int k);
     
-    bool create_room(connected_session* session, std::string room_key, int player_key);
+    bool create_room(connected_session* session, std::string room_key);
 };

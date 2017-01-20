@@ -6,6 +6,8 @@ tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
     : acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
 {
     wait_accept();
+
+    connected_session_list_.reserve(1000);
 }
 
 void tcp_server::wait_accept()
@@ -16,7 +18,7 @@ void tcp_server::wait_accept()
     acceptor_.async_accept(new_connection->get_socket(),
         boost::bind(&tcp_server::handle_accept, this, new_connection, boost::asio::placeholders::error));
 
-    connected_session_list_.push_back(new_connection);
+    connected_session_list_.emplace_back(new_connection);
 }
 
 void tcp_server::handle_accept(connected_session::pointer new_connection, const boost::system::error_code& error)
