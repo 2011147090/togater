@@ -1,0 +1,29 @@
+#ifndef __MAIN_SCENE_H__
+#define __MAIN_SCENE_H__
+
+#include "cocos2d.h"
+#include "player.h"
+
+class main_scene : public cocos2d::Layer
+{
+public:
+    static cocos2d::Scene* createScene();
+
+    virtual bool init();
+
+    void setup_scene();
+    void end();
+
+    void menu_close_callback(cocos2d::Ref* sender);
+
+    bool on_touch_begin(cocos2d::Touch *touch, cocos2d::Event *unused_event);
+    void on_touch_moved(cocos2d::Touch *touch, cocos2d::Event *unused_event);
+    void on_touch_cancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event);
+    void on_touch_ended(cocos2d::Touch *touch, cocos2d::Event *unused_event);
+
+    void on_key_released(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+
+    CREATE_FUNC(main_scene);
+};
+
+#endif // __MAIN_SCENE_H__
