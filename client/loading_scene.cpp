@@ -6,6 +6,7 @@
 #include "loading_scene.h"
 #include "network_manager.h"
 #include "game_manager.h"
+#include "logic_session.h"
 
 using namespace cocos2d;
 
@@ -66,7 +67,9 @@ void loading_scene::update(float delta)
     {
         this->getScheduler()->performFunctionInCocosThread(
             CC_CALLBACK_0(
-                network_manager::connect, network_mgr, LOGIC_SERVER_IP, "8600"
+                logic_session::connect, 
+                (logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)), 
+                LOGIC_SERVER_IP, "8600"
             )
         );
     }
@@ -78,11 +81,11 @@ void loading_scene::update(float delta)
     {
         timer = 3;
 
-        if (network_mgr->is_run())
+        if (((logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)))->is_run())
         {
-            network_mgr->send_packet_enter_req(
+            ((logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)))->send_packet_enter_req(
                 "temp",
-                game_mgr->get_player_key()
+                network_mgr->get_player_key()
             );
         }
     }

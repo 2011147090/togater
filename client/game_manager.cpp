@@ -1,6 +1,8 @@
 #include "game_manager.h"
 #include "network_manager.h"
 #include "main_scene.h"
+#include "logic_session.h"
+#include "ui\UIText.h"
 
 bool game_manager::init_singleton()
 {
@@ -86,7 +88,7 @@ void game_manager::betting(int player_key)
     if (user_->get_bet_coin_size() >= opponent_->get_bet_coin_size()
         || user_->get_bet_coin_size() - user_->get_lock_bet_size() == 0 || user_->get_coin_size() == 0)
     {
-        network_mgr->send_packet_process_turn_ans(user_->get_bet_coin_size() - user_->get_lock_bet_size());
+        ((logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)))->send_packet_process_turn_ans(user_->get_bet_coin_size() - user_->get_lock_bet_size());
 
         user_->set_lock_bet_size(user_->get_bet_coin_size());
 
@@ -111,16 +113,6 @@ void game_manager::check_public_card()
     public_card_[0].show();
 }
 
-void game_manager::set_player_key(std::string key)
-{
-    player_key_ = key;
-}
-
-std::string game_manager::get_player_key()
-{
-    return player_key_;
-}
-
 void game_manager::start_game()
 {
     auto scene = main_scene::createScene();
@@ -128,4 +120,16 @@ void game_manager::start_game()
     ((main_scene*)scene)->setup_scene();
     
     cocos2d::Director::getInstance()->pushScene(cocos2d::TransitionFade::create(1, scene));
+}
+
+void game_manager::add_lobby_chat(std::string id, std::string str)
+{
+    std::string message = id;
+    message += " : ";
+    message += str;
+    
+    auto label = cocos2d::ui::Text::create(message, "fonts/D2Coding.ttf", 15);
+    label->setTextColor(cocos2d::Color4B::BLACK);
+    label->setTouchEnabled(true);
+    this->lobby_chat_list_->pushBackCustomItem(label);
 }

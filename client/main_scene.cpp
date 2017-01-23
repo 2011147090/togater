@@ -6,6 +6,7 @@
 #include "holdem_card.h"
 #include "game_manager.h"
 #include "network_manager.h"
+#include "logic_session.h"
 
 USING_NS_CC;
 
@@ -59,10 +60,12 @@ void main_scene::setup_scene()
         switch (type)
         {
         case ui::Widget::TouchEventType::ENDED:
-            network_mgr->send_packet_disconnect_room_ntf();
+            ((logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)))->
+                send_packet_disconnect_room_ntf();
             break;
         }
     });
+
 
     this->addChild(back, 1);
 

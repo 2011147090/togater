@@ -5,6 +5,9 @@
 #include <array>
 #include "main_scene.h"
 #include "loading_scene.h"
+#include "game_manager.h"
+#include "network_manager.h"
+#include "chat_session.h"
 
 using namespace cocos2d;
 
@@ -209,10 +212,30 @@ bool lobby_scene::init()
         label->setTouchEnabled(true);
         chat_list->pushBackCustomItem(label);
     }
-
+        
     chat_list->addEventListener((ui::ListView::ccListViewCallback)CC_CALLBACK_2(lobby_scene::chat_event_listener, this));
     this->addChild(chat_list, 2);
 
+    game_mgr->scheduler_ = this->getScheduler();
+    game_mgr->lobby_chat_list_ = chat_list;
+    
+    this->getScheduler()->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            chat_session::connect,
+            (chat_session*)(network_mgr->get_session(network_manager::CHAT_SESSION)),
+            CHAT_SERVER_IP, "8700"
+        )
+    );
+
+    this->getScheduler()->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            chat_session::send_packet_verify_req,
+            (chat_session*)(network_mgr->get_session(network_manager::CHAT_SESSION)),
+            network_mgr->get_player_key(),
+            network_mgr->get_player_id()
+        )
+    );
+    
     auto chat_button = ui::Button::create("button3_normal.png", "button3_pressed.png");
 
     chat_button->setTitleText("");
@@ -226,10 +249,10 @@ bool lobby_scene::init()
         switch (type)
         {
         case ui::Widget::TouchEventType::ENDED:
-            auto label = ui::Text::create("I : " + chat_field->getString(), "fonts/D2Coding.ttf", 15);
-            label->setTextColor(Color4B::BLACK);
-            label->setTouchEnabled(true);
-            chat_list->pushBackCustomItem(label);
+            ((chat_session*)network_mgr->get_session(network_manager::CHAT_SESSION))->send_packet_chat_normal(
+                network_mgr->get_player_id(),
+                chat_field->getString()
+            );
 
             chat_field->setText("");
             break;
@@ -270,10 +293,10 @@ void lobby_scene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
     {
         if (chat_field->isFocused())
         {
-            auto label = ui::Text::create("I : " + chat_field->getString(), "fonts/D2Coding.ttf", 15);
-            label->setTextColor(Color4B::BLACK);
-            label->setTouchEnabled(true);
-            chat_list->pushBackCustomItem(label);
+            ((chat_session*)network_mgr->get_session(network_manager::CHAT_SESSION))->send_packet_chat_normal(
+                network_mgr->get_player_id(),
+                chat_field->getString()
+            );
 
             chat_field->setText("");
         }

@@ -8,6 +8,7 @@
 #include "holdem_card.h"
 #include "ui\UIButton.h"
 #include "ui\UITextField.h"
+#include "ui\UIListView.h"
 
 class game_manager : public singleton<game_manager>
 {
@@ -32,6 +33,9 @@ public:
     cocos2d::ui::Button* bet_button_;
     cocos2d::ui::TextField* text_field_;
 
+    cocos2d::ui::ListView* lobby_chat_list_;
+    void add_lobby_chat(std::string id, std::string str);
+
     main_scene* scene_;
     
     bool hide_card_;
@@ -41,14 +45,7 @@ public:
     void betting(int player_key);
 
     void check_public_card();
-
-    void set_player_key(std::string key);
-    std::string get_player_key();
-
     void start_game();
-
-private:
-    std::string player_key_;
 };
 
 

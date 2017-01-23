@@ -4,6 +4,7 @@
 #include <network\HttpRequest.h>
 #include <network\HttpClient.h>
 #include <ui\UITextField.h>
+#include "network_manager.h"
 #include "game_manager.h"
 
 using namespace cocos2d;
@@ -76,7 +77,7 @@ bool login_scene::init()
 
 void login_scene::login_game()
 {
-    game_mgr->set_player_key(id_field->getString());
+    network_mgr->set_player_id(id_field->getString());
 
     cocos2d::network::HttpRequest* request = new cocos2d::network::HttpRequest();
     request->setUrl("http://192.168.1.18:3000/login");
@@ -100,16 +101,32 @@ void login_scene::http_request_complete(cocos2d::network::HttpClient *sender, co
         return;
 
     std::vector<char> *buffer = response->getResponseData();
-
+    
     std::string data;
-
+    
     for (int i = 0; i < buffer->size(); i++)
         data.push_back((*buffer)[i]);
 
-    if (data == "login ok")
+    data.push_back('\0');
+    std::string sub2;
+
+    for (int i = 0; i < 3; i++)
+        sub2.push_back(data[i]);
+
+    sub2.push_back('\0');
+
+    if (strcmp(sub2.c_str(), "ok:") == 0)
     {
+        std::string sub;
+
+        for (int i = 3; i < data.size(); i++)
+            sub.push_back(data[i]);
+
+        sub.push_back('\0');
+
+        network_mgr->set_player_key(sub);
+
         auto scene = lobby_scene::createScene();
-        
         Director::getInstance()->pushScene(TransitionSlideInR::create(1, scene));
     }
     else
