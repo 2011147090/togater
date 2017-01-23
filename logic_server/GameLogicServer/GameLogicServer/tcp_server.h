@@ -7,6 +7,7 @@ class tcp_server {
 private:
     tcp::acceptor acceptor_;
     std::vector<connected_session::pointer> connected_session_list_;
+    int count;
 
 public:
     tcp_server(boost::asio::io_service& io_service, unsigned short port);

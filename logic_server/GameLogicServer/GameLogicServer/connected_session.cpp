@@ -8,7 +8,6 @@ connected_session::connected_session(boost::asio::io_service& io_service) : sock
 bool connected_session::handle_check_keep_alive()
 {
     boost::system::error_code error;
-    //boost::asio::async_write(socket_, boost::asio::buffer(send_buf_), error);
 
     if (error)
         return false;
@@ -63,26 +62,37 @@ void connected_session::handle_read(const boost::system::error_code& error, size
         switch (message_header.type)
         {
         case logic_server::ENTER_REQ:
-            {
-                logic_server::packet_enter_req message;
+        {
+            logic_server::packet_enter_req message;
 
-                if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
-                    break;
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
 
-                process_packet_enter_req(message);
-            }
-            break;
+            process_packet_enter_req(message);
+        }
+        break;
 
         case logic_server::PROCESS_TURN_ANS:
-            {
-                logic_server::packet_process_turn_ans message;
+        {
+            logic_server::packet_process_turn_ans message;
 
-                if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
-                    break;
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
 
-                process_packet_process_turn_ans(message);
-            }
-            break;
+            process_packet_process_turn_ans(message);
+        }
+        break;
+
+        case logic_server::DISCONNECT_ROOM:
+        {
+            logic_server::packet_disconnect_room_ntf message;
+
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
+
+            process_packet_disconnect_room_ntf(message);
+        }
+        break;
         }
     }
     else

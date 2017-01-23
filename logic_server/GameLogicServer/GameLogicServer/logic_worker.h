@@ -54,6 +54,7 @@ public:
     
     bool enter_room_player(connected_session* session, std::string room_key);
     bool process_turn(std::string room_key, std::string player_key, int money);
+    bool disconnect_room(std::string room_key, std::string player_key);
 
     void process_queue();
 

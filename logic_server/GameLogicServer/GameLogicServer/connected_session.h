@@ -31,7 +31,8 @@ private:
         
     void process_packet_enter_req(logic_server::packet_enter_req packet);
     void process_packet_process_turn_ans(logic_server::packet_process_turn_ans packet);
-        
+    void process_packet_disconnect_room_ntf(logic_server::packet_disconnect_room_ntf packet);
+
 public:
     void shut_down();
     

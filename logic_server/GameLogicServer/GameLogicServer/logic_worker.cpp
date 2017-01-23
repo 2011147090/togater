@@ -649,3 +649,51 @@ void logic_worker::process_queue()
         }
     }
 }
+
+bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
+{
+    thread_sync sync;
+
+    auto iter = room_hashs_.find(room_key);
+
+    if (iter == room_hashs_.end())
+        return false;
+
+    logic_server::packet_game_state_ntf game_state_packet;
+
+    game_state_packet.set_state(2);
+    game_state_packet.set_win_player_key(player_key);
+
+    int disconnect_session = 0;
+
+    for (int i = 0; i < 2; i++)
+    {
+        iter->second.player_[i].session_->handle_send(logic_server::GAME_STATE_NTF, game_state_packet);
+        iter->second.player_[i].session_->shut_down();
+    
+        if (!iter->second.player_[i].session_->is_connected())
+            disconnect_session++;
+    }
+
+    if (disconnect_session >= 2)
+    {
+        if (iter->second.player_[0].remain_money_ != 0)
+        {
+            log(iter->first)->info("end_game, win_player_key:{}",
+                iter->second.player_[0].session_->get_player_key()
+            );
+        }
+        else
+        {
+            log(iter->first)->info("end_game, win_player_key:{}",
+                iter->second.player_[1].session_->get_player_key()
+            );
+        }
+
+        iter = room_hashs_.erase(iter);
+
+        return true;
+    }
+
+    return false;
+}
