@@ -18,7 +18,7 @@ bool redis_connector::init_singleton()
     system_log->info("redis_connector:connect, ip:{}, port:{}", ip, port);
     conn = new redispp::Connection(ip, port, "password", false);
 
-    if (conn == NULL)
+    if (conn == nullptr)
     {
         system_log->error("redis_connector:conn_is_null");
         return false;
@@ -42,7 +42,7 @@ bool redis_connector::check_room(std::string room_key)
         system_log->error("redis_connector:check_room, room_key_is_null");
         return false;
     }
-
+    
     int i = atoi(value.result().get().c_str());
     i++;
 

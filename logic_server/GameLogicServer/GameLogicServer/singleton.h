@@ -13,7 +13,7 @@ public:
 
     static T* get_instance()
     {
-        if (instance == NULL)
+        if (instance == nullptr)
             instance = new T();
 
         return instance;
@@ -24,4 +24,4 @@ public:
 };
 
 template<typename T>
-T* singleton<T>::instance = NULL;
+T* singleton<T>::instance = nullptr;

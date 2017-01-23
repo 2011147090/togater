@@ -32,7 +32,7 @@ void _ROOM_INFO::generate_card_queue()
         for (int j = 1; j <= 10; j++)
             d.push_back(j);
 
-    srand((unsigned int)time(NULL));
+    srand((unsigned int)time(nullptr));
     std::random_shuffle(d.begin(), d.end());
     card_list_ = std::queue<int>(d);
 }
@@ -48,7 +48,7 @@ int _ROOM_INFO::get_card()
     return num;
 }
 
-logic_worker::logic_worker() : logic_thread_(NULL)
+logic_worker::logic_worker() : logic_thread_(nullptr)
 {}
 
 logic_worker::~logic_worker() 
@@ -58,7 +58,7 @@ bool logic_worker::init_singleton()
 {
     thread_sync sync;
 
-    if (logic_thread_ == NULL)
+    if (logic_thread_ == nullptr)
         logic_thread_ = new boost::thread(&logic_worker::process_queue, this);
 
     end_server_ = true;

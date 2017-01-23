@@ -62,7 +62,7 @@ public:
     : sockFd(-1), streamBuf(this)
     {
         struct addrinfo hints;
-        struct addrinfo* res = NULL;
+        struct addrinfo* res = nullptr;
 
         memset(&hints, 0, sizeof(hints));
         hints.ai_family = AF_UNSPEC;// use IPv4 or IPv6, whichever
@@ -467,7 +467,7 @@ BaseReply::BaseReply(Connection* conn)
 BaseReply::BaseReply(const BaseReply& other)
 : conn(other.conn)
 {
-    other.conn = NULL;
+    other.conn = nullptr;
     if(conn)
         conn->outstandingReplies.insert(conn->outstandingReplies.iterator_to(other), *this);
     const_cast<BaseReply&>(other).unlink();
@@ -479,7 +479,7 @@ BaseReply& BaseReply::operator=(const BaseReply& other)
     conn = other.conn;
     if(conn)
         conn->outstandingReplies.insert(conn->outstandingReplies.iterator_to(other), *this);
-    other.conn = NULL;
+    other.conn = nullptr;
     const_cast<BaseReply&>(other).unlink();
     return *this;
 }
@@ -516,7 +516,7 @@ bool VoidReply::result()
     {
         clearPendingResults();
         Connection* const tmp = conn;
-        conn = NULL;
+        conn = nullptr;
         tmp->readStatusCodeReply();
         storedResult = true;
         unlink();
@@ -544,7 +544,7 @@ bool BoolReply::result()
     {
         clearPendingResults();
         Connection* const tmp = conn;
-        conn = NULL;
+        conn = nullptr;
         storedResult = tmp->readIntegerReply() > 0;
         unlink();
     }
@@ -571,7 +571,7 @@ int64_t IntReply::result()
     {
         clearPendingResults();
         Connection* const tmp = conn;
-        conn = NULL;
+        conn = nullptr;
         storedResult = tmp->readIntegerReply();
         unlink();
     }
@@ -598,7 +598,7 @@ const boost::optional<std::string>& StringReply::result()
     {
         clearPendingResults();
         Connection* const tmp = conn;
-        conn = NULL;
+        conn = nullptr;
         tmp->readBulkReply(storedResult);
         unlink();
     }
@@ -655,7 +655,7 @@ bool MultiBulkEnumerator::nextOptional(boost::optional<std::string> &out)
     }
     if(count <= 0)
     {
-        conn = NULL;
+        conn = nullptr;
         unlink();
         return false;
     }
@@ -680,7 +680,7 @@ bool MultiBulkEnumerator::next(std::string *out) {
 
 Connection::Connection(const std::string& host, const std::string& port, const std::string& password, bool noDelay, size_t bufferSize)
 : connection(new ClientSocket(host.c_str(), port.c_str())), ioStream(new std::iostream(connection->getStreamBuf())),
-  buffer(new Buffer(bufferSize)), transaction(NULL)
+  buffer(new Buffer(bufferSize)), transaction(nullptr)
 {
     if(noDelay)
     {
@@ -696,7 +696,7 @@ Connection::Connection(const std::string& host, const std::string& port, const s
 #ifndef _WIN32
 Connection::Connection(const std::string& unixDomainSocket, const std::string& password, size_t bufferSize)
 : connection(new ClientSocket(unixDomainSocket.c_str())), ioStream(new std::iostream(connection->getStreamBuf())),
-  buffer(new Buffer(bufferSize)), transaction(NULL)
+  buffer(new Buffer(bufferSize)), transaction(nullptr)
 {
     if(!password.empty())
     {
@@ -1251,7 +1251,7 @@ Transaction::~Transaction()
     }
     catch(...)
     {}
-    conn->transaction = NULL;
+    conn->transaction = nullptr;
 }
 
 void Transaction::commit()
@@ -1280,7 +1280,7 @@ void QueuedReply::readResult()
         return;
 
     Connection* const tmp = conn;
-    conn = NULL;
+    conn = nullptr;
     tmp->readStatusCodeReply();//one +OK for the MULTI
     //one +QUEUED per queued request (including this QueuedReply)
     for(size_t i = 0; i < count; ++i)

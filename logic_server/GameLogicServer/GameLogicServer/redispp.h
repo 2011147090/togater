@@ -87,7 +87,7 @@ class BaseReply : public auto_unlink_hook
     friend class Connection;
 public:
     BaseReply()
-    : conn(NULL)
+    : conn(nullptr)
     {}
 
     BaseReply(const BaseReply& other);
