@@ -20,6 +20,8 @@
 class tcp_client
 {
 private:
+    std::string user_id_;
+    std::string key_;
 
     boost::asio::io_service& io_service_;
     boost::asio::ip::tcp::socket socket_;
@@ -37,17 +39,14 @@ private:
 
     
     void post_receive();
+
     void handle_connect(const boost::system::error_code& error);
     void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
-    void handle_verify(const boost::system::error_code& error, size_t bytes_transferred);
-
+    
     void process_packet(const int size);
-
+    
 public:
-    std::string user_id_;
-    std::string key_;
-
     tcp_client(boost::asio::io_service& io_service);
     ~tcp_client();
     
@@ -56,7 +55,17 @@ public:
     void connect(boost::asio::ip::tcp::endpoint endpoint);
     void close();
 
-    void post_verify();
-    void post_send(const bool immediate, std::string message);
+    void set_id(std::string user_id) { user_id_ = user_id; }
+    void set_key(std::string key) { key_ = key; }
+
+
     void post_send(const bool immediate, const int size, BYTE* data);
+
+    void post_verify();
+    void post_match(std::string opponent_id);
+
+    void post_normal(std::string message);
+    void post_whisper(std::string target_id, std::string message);
+    void post_room(std::string message);
+    void post_notice(std::string message);
 };

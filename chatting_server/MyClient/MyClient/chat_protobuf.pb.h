@@ -42,17 +42,23 @@ class packet_chat_normal;
 class packet_chat_notice;
 class packet_chat_room;
 class packet_chat_whisper;
-class packet_verify_user;
+class packet_match_req;
+class packet_match_res;
+class packet_verify_req;
+class packet_verify_res;
 
 enum message_type {
-  VERIFY = 0,
-  NORMAL = 1,
-  WHISPER = 2,
-  ROOM = 3,
-  NOTICE = 4
+  VERIFY_REQ = 0,
+  VERIFY_RES = 1,
+  MATCH_REQ = 2,
+  MATCH_RES = 3,
+  NORMAL = 10,
+  WHISPER = 11,
+  ROOM = 12,
+  NOTICE = 13
 };
 bool message_type_IsValid(int value);
-const message_type message_type_MIN = VERIFY;
+const message_type message_type_MIN = VERIFY_REQ;
 const message_type message_type_MAX = NOTICE;
 const int message_type_ARRAYSIZE = message_type_MAX + 1;
 
@@ -68,14 +74,14 @@ inline bool message_type_Parse(
 }
 // ===================================================================
 
-class packet_verify_user : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_verify_user) */ {
+class packet_verify_req : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_verify_req) */ {
  public:
-  packet_verify_user();
-  virtual ~packet_verify_user();
+  packet_verify_req();
+  virtual ~packet_verify_req();
 
-  packet_verify_user(const packet_verify_user& from);
+  packet_verify_req(const packet_verify_req& from);
 
-  inline packet_verify_user& operator=(const packet_verify_user& from) {
+  inline packet_verify_req& operator=(const packet_verify_req& from) {
     CopyFrom(from);
     return *this;
   }
@@ -89,21 +95,21 @@ class packet_verify_user : public ::google::protobuf::Message /* @@protoc_insert
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const packet_verify_user& default_instance();
+  static const packet_verify_req& default_instance();
 
-  static const packet_verify_user* internal_default_instance();
+  static const packet_verify_req* internal_default_instance();
 
-  void Swap(packet_verify_user* other);
+  void Swap(packet_verify_req* other);
 
   // implements Message ----------------------------------------------
 
-  inline packet_verify_user* New() const { return New(NULL); }
+  inline packet_verify_req* New() const { return New(NULL); }
 
-  packet_verify_user* New(::google::protobuf::Arena* arena) const;
+  packet_verify_req* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const packet_verify_user& from);
-  void MergeFrom(const packet_verify_user& from);
+  void CopyFrom(const packet_verify_req& from);
+  void MergeFrom(const packet_verify_req& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -122,8 +128,8 @@ class packet_verify_user : public ::google::protobuf::Message /* @@protoc_insert
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(packet_verify_user* other);
-  void UnsafeMergeFrom(const packet_verify_user& from);
+  void InternalSwap(packet_verify_req* other);
+  void UnsafeMergeFrom(const packet_verify_req& from);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return _internal_metadata_.arena();
@@ -163,7 +169,7 @@ class packet_verify_user : public ::google::protobuf::Message /* @@protoc_insert
   ::std::string* release_value_user_id();
   void set_allocated_value_user_id(::std::string* value_user_id);
 
-  // @@protoc_insertion_point(class_scope:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(class_scope:chat_server.packet_verify_req)
  private:
   inline void set_has_key_string();
   inline void clear_has_key_string();
@@ -185,7 +191,324 @@ class packet_verify_user : public ::google::protobuf::Message /* @@protoc_insert
 
   void InitAsDefaultInstance();
 };
-extern ::google::protobuf::internal::ExplicitlyConstructed<packet_verify_user> packet_verify_user_default_instance_;
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_verify_req> packet_verify_req_default_instance_;
+
+// -------------------------------------------------------------------
+
+class packet_verify_res : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_verify_res) */ {
+ public:
+  packet_verify_res();
+  virtual ~packet_verify_res();
+
+  packet_verify_res(const packet_verify_res& from);
+
+  inline packet_verify_res& operator=(const packet_verify_res& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const packet_verify_res& default_instance();
+
+  static const packet_verify_res* internal_default_instance();
+
+  void Swap(packet_verify_res* other);
+
+  // implements Message ----------------------------------------------
+
+  inline packet_verify_res* New() const { return New(NULL); }
+
+  packet_verify_res* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const packet_verify_res& from);
+  void MergeFrom(const packet_verify_res& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  size_t ByteSizeLong() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(packet_verify_res* other);
+  void UnsafeMergeFrom(const packet_verify_res& from);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required bool is_successful = 1;
+  bool has_is_successful() const;
+  void clear_is_successful();
+  static const int kIsSuccessfulFieldNumber = 1;
+  bool is_successful() const;
+  void set_is_successful(bool value);
+
+  // @@protoc_insertion_point(class_scope:chat_server.packet_verify_res)
+ private:
+  inline void set_has_is_successful();
+  inline void clear_has_is_successful();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  bool is_successful_;
+  friend void  protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl();
+  friend void  protobuf_AddDesc_chat_5fprotobuf_2eproto_impl();
+  friend void protobuf_AssignDesc_chat_5fprotobuf_2eproto();
+  friend void protobuf_ShutdownFile_chat_5fprotobuf_2eproto();
+
+  void InitAsDefaultInstance();
+};
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_verify_res> packet_verify_res_default_instance_;
+
+// -------------------------------------------------------------------
+
+class packet_match_req : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_match_req) */ {
+ public:
+  packet_match_req();
+  virtual ~packet_match_req();
+
+  packet_match_req(const packet_match_req& from);
+
+  inline packet_match_req& operator=(const packet_match_req& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const packet_match_req& default_instance();
+
+  static const packet_match_req* internal_default_instance();
+
+  void Swap(packet_match_req* other);
+
+  // implements Message ----------------------------------------------
+
+  inline packet_match_req* New() const { return New(NULL); }
+
+  packet_match_req* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const packet_match_req& from);
+  void MergeFrom(const packet_match_req& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  size_t ByteSizeLong() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(packet_match_req* other);
+  void UnsafeMergeFrom(const packet_match_req& from);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string user_id = 1;
+  bool has_user_id() const;
+  void clear_user_id();
+  static const int kUserIdFieldNumber = 1;
+  const ::std::string& user_id() const;
+  void set_user_id(const ::std::string& value);
+  void set_user_id(const char* value);
+  void set_user_id(const char* value, size_t size);
+  ::std::string* mutable_user_id();
+  ::std::string* release_user_id();
+  void set_allocated_user_id(::std::string* user_id);
+
+  // required string opponent_id = 2;
+  bool has_opponent_id() const;
+  void clear_opponent_id();
+  static const int kOpponentIdFieldNumber = 2;
+  const ::std::string& opponent_id() const;
+  void set_opponent_id(const ::std::string& value);
+  void set_opponent_id(const char* value);
+  void set_opponent_id(const char* value, size_t size);
+  ::std::string* mutable_opponent_id();
+  ::std::string* release_opponent_id();
+  void set_allocated_opponent_id(::std::string* opponent_id);
+
+  // @@protoc_insertion_point(class_scope:chat_server.packet_match_req)
+ private:
+  inline void set_has_user_id();
+  inline void clear_has_user_id();
+  inline void set_has_opponent_id();
+  inline void clear_has_opponent_id();
+
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  ::google::protobuf::internal::ArenaStringPtr user_id_;
+  ::google::protobuf::internal::ArenaStringPtr opponent_id_;
+  friend void  protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl();
+  friend void  protobuf_AddDesc_chat_5fprotobuf_2eproto_impl();
+  friend void protobuf_AssignDesc_chat_5fprotobuf_2eproto();
+  friend void protobuf_ShutdownFile_chat_5fprotobuf_2eproto();
+
+  void InitAsDefaultInstance();
+};
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_match_req> packet_match_req_default_instance_;
+
+// -------------------------------------------------------------------
+
+class packet_match_res : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_match_res) */ {
+ public:
+  packet_match_res();
+  virtual ~packet_match_res();
+
+  packet_match_res(const packet_match_res& from);
+
+  inline packet_match_res& operator=(const packet_match_res& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const packet_match_res& default_instance();
+
+  static const packet_match_res* internal_default_instance();
+
+  void Swap(packet_match_res* other);
+
+  // implements Message ----------------------------------------------
+
+  inline packet_match_res* New() const { return New(NULL); }
+
+  packet_match_res* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const packet_match_res& from);
+  void MergeFrom(const packet_match_res& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  size_t ByteSizeLong() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(packet_match_res* other);
+  void UnsafeMergeFrom(const packet_match_res& from);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required bool is_successful = 1;
+  bool has_is_successful() const;
+  void clear_is_successful();
+  static const int kIsSuccessfulFieldNumber = 1;
+  bool is_successful() const;
+  void set_is_successful(bool value);
+
+  // @@protoc_insertion_point(class_scope:chat_server.packet_match_res)
+ private:
+  inline void set_has_is_successful();
+  inline void clear_has_is_successful();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  bool is_successful_;
+  friend void  protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl();
+  friend void  protobuf_AddDesc_chat_5fprotobuf_2eproto_impl();
+  friend void protobuf_AssignDesc_chat_5fprotobuf_2eproto();
+  friend void protobuf_ShutdownFile_chat_5fprotobuf_2eproto();
+
+  void InitAsDefaultInstance();
+};
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_match_res> packet_match_res_default_instance_;
 
 // -------------------------------------------------------------------
 
@@ -692,118 +1015,295 @@ extern ::google::protobuf::internal::ExplicitlyConstructed<packet_chat_notice> p
 // ===================================================================
 
 #if !PROTOBUF_INLINE_NOT_IN_HEADERS
-// packet_verify_user
+// packet_verify_req
 
 // required string key_string = 1;
-inline bool packet_verify_user::has_key_string() const {
+inline bool packet_verify_req::has_key_string() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void packet_verify_user::set_has_key_string() {
+inline void packet_verify_req::set_has_key_string() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void packet_verify_user::clear_has_key_string() {
+inline void packet_verify_req::clear_has_key_string() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void packet_verify_user::clear_key_string() {
+inline void packet_verify_req::clear_key_string() {
   key_string_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_key_string();
 }
-inline const ::std::string& packet_verify_user::key_string() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_verify_user.key_string)
+inline const ::std::string& packet_verify_req::key_string() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_verify_req.key_string)
   return key_string_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_verify_user::set_key_string(const ::std::string& value) {
+inline void packet_verify_req::set_key_string(const ::std::string& value) {
   set_has_key_string();
   key_string_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_set:chat_server.packet_verify_req.key_string)
 }
-inline void packet_verify_user::set_key_string(const char* value) {
+inline void packet_verify_req::set_key_string(const char* value) {
   set_has_key_string();
   key_string_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_req.key_string)
 }
-inline void packet_verify_user::set_key_string(const char* value, size_t size) {
+inline void packet_verify_req::set_key_string(const char* value, size_t size) {
   set_has_key_string();
   key_string_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_req.key_string)
 }
-inline ::std::string* packet_verify_user::mutable_key_string() {
+inline ::std::string* packet_verify_req::mutable_key_string() {
   set_has_key_string();
-  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_req.key_string)
   return key_string_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* packet_verify_user::release_key_string() {
-  // @@protoc_insertion_point(field_release:chat_server.packet_verify_user.key_string)
+inline ::std::string* packet_verify_req::release_key_string() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_verify_req.key_string)
   clear_has_key_string();
   return key_string_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_verify_user::set_allocated_key_string(::std::string* key_string) {
+inline void packet_verify_req::set_allocated_key_string(::std::string* key_string) {
   if (key_string != NULL) {
     set_has_key_string();
   } else {
     clear_has_key_string();
   }
   key_string_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key_string);
-  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_req.key_string)
 }
 
 // required string value_user_id = 2;
-inline bool packet_verify_user::has_value_user_id() const {
+inline bool packet_verify_req::has_value_user_id() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void packet_verify_user::set_has_value_user_id() {
+inline void packet_verify_req::set_has_value_user_id() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void packet_verify_user::clear_has_value_user_id() {
+inline void packet_verify_req::clear_has_value_user_id() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void packet_verify_user::clear_value_user_id() {
+inline void packet_verify_req::clear_value_user_id() {
   value_user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_value_user_id();
 }
-inline const ::std::string& packet_verify_user::value_user_id() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_verify_user.value_user_id)
+inline const ::std::string& packet_verify_req::value_user_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_verify_req.value_user_id)
   return value_user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_verify_user::set_value_user_id(const ::std::string& value) {
+inline void packet_verify_req::set_value_user_id(const ::std::string& value) {
   set_has_value_user_id();
   value_user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_set:chat_server.packet_verify_req.value_user_id)
 }
-inline void packet_verify_user::set_value_user_id(const char* value) {
+inline void packet_verify_req::set_value_user_id(const char* value) {
   set_has_value_user_id();
   value_user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_req.value_user_id)
 }
-inline void packet_verify_user::set_value_user_id(const char* value, size_t size) {
+inline void packet_verify_req::set_value_user_id(const char* value, size_t size) {
   set_has_value_user_id();
   value_user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_req.value_user_id)
 }
-inline ::std::string* packet_verify_user::mutable_value_user_id() {
+inline ::std::string* packet_verify_req::mutable_value_user_id() {
   set_has_value_user_id();
-  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_req.value_user_id)
   return value_user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* packet_verify_user::release_value_user_id() {
-  // @@protoc_insertion_point(field_release:chat_server.packet_verify_user.value_user_id)
+inline ::std::string* packet_verify_req::release_value_user_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_verify_req.value_user_id)
   clear_has_value_user_id();
   return value_user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_verify_user::set_allocated_value_user_id(::std::string* value_user_id) {
+inline void packet_verify_req::set_allocated_value_user_id(::std::string* value_user_id) {
   if (value_user_id != NULL) {
     set_has_value_user_id();
   } else {
     clear_has_value_user_id();
   }
   value_user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value_user_id);
-  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_req.value_user_id)
 }
 
-inline const packet_verify_user* packet_verify_user::internal_default_instance() {
-  return &packet_verify_user_default_instance_.get();
+inline const packet_verify_req* packet_verify_req::internal_default_instance() {
+  return &packet_verify_req_default_instance_.get();
+}
+// -------------------------------------------------------------------
+
+// packet_verify_res
+
+// required bool is_successful = 1;
+inline bool packet_verify_res::has_is_successful() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void packet_verify_res::set_has_is_successful() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void packet_verify_res::clear_has_is_successful() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_verify_res::clear_is_successful() {
+  is_successful_ = false;
+  clear_has_is_successful();
+}
+inline bool packet_verify_res::is_successful() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_verify_res.is_successful)
+  return is_successful_;
+}
+inline void packet_verify_res::set_is_successful(bool value) {
+  set_has_is_successful();
+  is_successful_ = value;
+  // @@protoc_insertion_point(field_set:chat_server.packet_verify_res.is_successful)
+}
+
+inline const packet_verify_res* packet_verify_res::internal_default_instance() {
+  return &packet_verify_res_default_instance_.get();
+}
+// -------------------------------------------------------------------
+
+// packet_match_req
+
+// required string user_id = 1;
+inline bool packet_match_req::has_user_id() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void packet_match_req::set_has_user_id() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void packet_match_req::clear_has_user_id() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_match_req::clear_user_id() {
+  user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_user_id();
+}
+inline const ::std::string& packet_match_req::user_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_match_req.user_id)
+  return user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_match_req::set_user_id(const ::std::string& value) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:chat_server.packet_match_req.user_id)
+}
+inline void packet_match_req::set_user_id(const char* value) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_match_req.user_id)
+}
+inline void packet_match_req::set_user_id(const char* value, size_t size) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_match_req.user_id)
+}
+inline ::std::string* packet_match_req::mutable_user_id() {
+  set_has_user_id();
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_match_req.user_id)
+  return user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* packet_match_req::release_user_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_match_req.user_id)
+  clear_has_user_id();
+  return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_match_req::set_allocated_user_id(::std::string* user_id) {
+  if (user_id != NULL) {
+    set_has_user_id();
+  } else {
+    clear_has_user_id();
+  }
+  user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_id);
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_match_req.user_id)
+}
+
+// required string opponent_id = 2;
+inline bool packet_match_req::has_opponent_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void packet_match_req::set_has_opponent_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void packet_match_req::clear_has_opponent_id() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void packet_match_req::clear_opponent_id() {
+  opponent_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_opponent_id();
+}
+inline const ::std::string& packet_match_req::opponent_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_match_req.opponent_id)
+  return opponent_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_match_req::set_opponent_id(const ::std::string& value) {
+  set_has_opponent_id();
+  opponent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:chat_server.packet_match_req.opponent_id)
+}
+inline void packet_match_req::set_opponent_id(const char* value) {
+  set_has_opponent_id();
+  opponent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_match_req.opponent_id)
+}
+inline void packet_match_req::set_opponent_id(const char* value, size_t size) {
+  set_has_opponent_id();
+  opponent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_match_req.opponent_id)
+}
+inline ::std::string* packet_match_req::mutable_opponent_id() {
+  set_has_opponent_id();
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_match_req.opponent_id)
+  return opponent_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* packet_match_req::release_opponent_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_match_req.opponent_id)
+  clear_has_opponent_id();
+  return opponent_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_match_req::set_allocated_opponent_id(::std::string* opponent_id) {
+  if (opponent_id != NULL) {
+    set_has_opponent_id();
+  } else {
+    clear_has_opponent_id();
+  }
+  opponent_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), opponent_id);
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_match_req.opponent_id)
+}
+
+inline const packet_match_req* packet_match_req::internal_default_instance() {
+  return &packet_match_req_default_instance_.get();
+}
+// -------------------------------------------------------------------
+
+// packet_match_res
+
+// required bool is_successful = 1;
+inline bool packet_match_res::has_is_successful() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void packet_match_res::set_has_is_successful() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void packet_match_res::clear_has_is_successful() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_match_res::clear_is_successful() {
+  is_successful_ = false;
+  clear_has_is_successful();
+}
+inline bool packet_match_res::is_successful() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_match_res.is_successful)
+  return is_successful_;
+}
+inline void packet_match_res::set_is_successful(bool value) {
+  set_has_is_successful();
+  is_successful_ = value;
+  // @@protoc_insertion_point(field_set:chat_server.packet_match_res.is_successful)
+}
+
+inline const packet_match_res* packet_match_res::internal_default_instance() {
+  return &packet_match_res_default_instance_.get();
 }
 // -------------------------------------------------------------------
 
@@ -1320,6 +1820,12 @@ inline const packet_chat_notice* packet_chat_notice::internal_default_instance()
   return &packet_chat_notice_default_instance_.get();
 }
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

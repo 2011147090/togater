@@ -15,14 +15,10 @@ tcp_session::~tcp_session()
 void tcp_session::post_send(const bool immediate, const int size, BYTE* data)
 {
     if (immediate == false)
-    {
         send_data_queue_.push_back(data);
-    }
     
     if (immediate == false && send_data_queue_.size() > 1)
-    {
         return;
-    }
 
     boost::asio::async_write(socket_, boost::asio::buffer(data, size),
         boost::bind(&tcp_session::handle_write, this,
@@ -59,13 +55,11 @@ void tcp_session::handle_receive(const boost::system::error_code& error, size_t 
     if (error)
     {
         if (error == boost::asio::error::eof)
-        {
             std::cout << "Disconnected with client" << std::endl;
-        }
         else
-        {
             std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
-        }
+        
+        server_->close_session(session_id_);
     }
     else
     {
@@ -74,3 +68,4 @@ void tcp_session::handle_receive(const boost::system::error_code& error, size_t 
         post_receive();
     }
 }
+

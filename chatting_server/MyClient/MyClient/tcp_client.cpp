@@ -10,6 +10,7 @@ tcp_client::tcp_client(boost::asio::io_service& io_service)
 
 tcp_client::~tcp_client()
 {
+    // CRITICAL SECTION START
     EnterCriticalSection(&lock_);
 
     while (send_data_queue_.empty() == false)
@@ -19,6 +20,7 @@ tcp_client::~tcp_client()
     }
 
     LeaveCriticalSection(&lock_);
+    // CRITICAL SECTION END
 
     DeleteCriticalSection(&lock_);
 }
@@ -36,33 +38,74 @@ void tcp_client::connect(boost::asio::ip::tcp::endpoint endpoint)
 void tcp_client::close()
 {
     if (socket_.is_open())
-    {
         socket_.close();
+}
+
+
+void tcp_client::post_send(const bool immediate, const int size, BYTE* data)
+{
+    BYTE* send_data = nullptr;
+
+    // CRITICAL SECTION START
+    EnterCriticalSection(&lock_);
+
+    if (immediate == false)
+    {
+        send_data = data;
+        send_data_queue_.push_back(send_data);
     }
+    else
+        send_data = data;
+
+    if (immediate || send_data_queue_.size() < 2)
+    {
+        boost::asio::async_write(socket_, boost::asio::buffer(send_data, size),
+            boost::bind(&tcp_client::handle_write, this,
+                boost::asio::placeholders::error,
+                boost::asio::placeholders::bytes_transferred)
+        );
+    }
+
+    LeaveCriticalSection(&lock_);
+    // CRITICAL SECTION END
 }
 
 void tcp_client::post_verify()
 {
-    chat_server::packet_verify_user verify_message;
+    chat_server::packet_verify_req verify_message;
     verify_message.set_key_string(key_);
     verify_message.set_value_user_id(user_id_);
 
     MESSAGE_HEADER header;
 
     header.size = verify_message.ByteSize();
-    header.type = chat_server::VERIFY;
+    header.type = chat_server::VERIFY_REQ;
 
     CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
     verify_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
 
-    boost::asio::async_write(socket_, boost::asio::buffer(send_buffer_.begin(), message_header_size + header.size),
-        boost::bind(&tcp_client::handle_verify, this,
-            boost::asio::placeholders::error,
-            boost::asio::placeholders::bytes_transferred)
-    );
+    post_send(false, message_header_size + header.size, send_buffer_.begin());
 }
 
-void tcp_client::post_send(const bool immediate, std::string message)
+void tcp_client::post_match(std::string opponent_id)
+{
+    chat_server::packet_match_req match_message;
+    match_message.set_user_id(user_id_);
+    match_message.set_opponent_id(opponent_id);
+
+    MESSAGE_HEADER header;
+
+    header.size = match_message.ByteSize();
+    header.type = chat_server::MATCH_REQ;
+
+    CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
+    match_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer_.begin());
+}
+
+
+void tcp_client::post_normal(std::string message)
 {
     chat_server::packet_chat_normal normal_message;
     normal_message.set_user_id(user_id_);
@@ -76,59 +119,59 @@ void tcp_client::post_send(const bool immediate, std::string message)
     CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
     normal_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
 
-
-    BYTE* send_data;
-
-    EnterCriticalSection(&lock_);
-
-    if (immediate == false)
-    {
-        send_data = send_buffer_.begin();
-        send_data_queue_.push_back(send_data);
-    }
-    else
-    {
-        send_data = send_buffer_.begin();
-    }
-
-    if (immediate || send_data_queue_.size() < 2)
-    {
-        boost::asio::async_write(socket_, boost::asio::buffer(send_data, message_header_size + header.size),
-            boost::bind(&tcp_client::handle_write, this,
-                boost::asio::placeholders::error,
-                boost::asio::placeholders::bytes_transferred)
-        );
-    }
-
-    LeaveCriticalSection(&lock_);
+    post_send(false, message_header_size + header.size, send_buffer_.begin());
 }
 
-void tcp_client::post_send(const bool immediate, const int size, BYTE* data)
+void tcp_client::post_whisper(std::string target_id, std::string message)
 {
-    BYTE* send_data = nullptr;
+    chat_server::packet_chat_whisper whisper_message;
+    whisper_message.set_user_id(user_id_);
+    whisper_message.set_target_id(target_id);
+    whisper_message.set_chat_message(message);
 
-    EnterCriticalSection(&lock_);		// 락 시작
+    MESSAGE_HEADER header;
 
-    if (immediate == false)
-    {
-        send_data = data;
-        send_data_queue_.push_back(send_data);
-    }
-    else
-    {
-        send_data = data;
-    }
+    header.size = whisper_message.ByteSize();
+    header.type = chat_server::WHISPER;
 
-    if (immediate || send_data_queue_.size() < 2)
-    {
-        boost::asio::async_write(socket_, boost::asio::buffer(send_data, size),
-            boost::bind(&tcp_client::handle_write, this,
-                boost::asio::placeholders::error,
-                boost::asio::placeholders::bytes_transferred)
-        );
-    }
+    CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
+    whisper_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
 
-    LeaveCriticalSection(&lock_);		// 락 완료
+    post_send(false, message_header_size + header.size, send_buffer_.begin());
+}
+
+void tcp_client::post_room(std::string message)
+{
+    chat_server::packet_chat_room room_message;
+    room_message.set_user_id(user_id_);
+    room_message.set_chat_message(message);
+
+    MESSAGE_HEADER header;
+
+    header.size = room_message.ByteSize();
+    header.type = chat_server::ROOM;
+
+    CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
+    room_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer_.begin());
+}
+
+void tcp_client::post_notice(std::string message)
+{
+    chat_server::packet_chat_notice notice_message;
+    notice_message.set_user_id(user_id_);
+    notice_message.set_chat_message(message);
+
+    MESSAGE_HEADER header;
+
+    header.size = notice_message.ByteSize();
+    header.type = chat_server::NOTICE;
+
+    CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
+    notice_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer_.begin());
 }
 
 
@@ -153,24 +196,23 @@ void tcp_client::handle_connect(const boost::system::error_code& error)
         post_receive();
     }
     else
-    {
         std::cout << "서버 접속 실패. error No: " << error.value() << " error Message: " << error.message() << std::endl;
-    }
 }
 
 void tcp_client::handle_write(const boost::system::error_code& error, size_t bytes_transferred)
 {
-    EnterCriticalSection(&lock_);            // 락 시작
+    // CRITICAL SECTION START
+    EnterCriticalSection(&lock_);
+
     send_data_queue_.pop_front();
 
     BYTE* data = nullptr;
 
     if (send_data_queue_.empty() == false)
-    {
         data = send_data_queue_.front();
-    }
-
-    LeaveCriticalSection(&lock_);            // 락 완료
+    
+    LeaveCriticalSection(&lock_);
+    // CRITICAL SECTION END
 
 
     if (data != nullptr)
@@ -185,13 +227,9 @@ void tcp_client::handle_receive(const boost::system::error_code& error, size_t b
     if (error)
     {
         if (error == boost::asio::error::eof)
-        {
             std::cout << "클라이언트와 연결이 끊어졌습니다" << std::endl;
-        }
         else
-        {
             std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
-        }
 
         close();
     }
@@ -202,10 +240,6 @@ void tcp_client::handle_receive(const boost::system::error_code& error, size_t b
     }
 }
 
-void tcp_client::handle_verify(const boost::system::error_code& error, size_t bytes_transferred)
-{
-}
-
 void tcp_client::process_packet(const int size)
 {
     CopyMemory(&packet_buffer_, receive_buffer_.data(), size);
@@ -214,8 +248,11 @@ void tcp_client::process_packet(const int size)
 
     switch (message_header->type)
     {
-    case chat_server::VERIFY:
+    case chat_server::VERIFY_RES:
         break;
+    case chat_server::MATCH_RES:
+        break;
+
     case chat_server::NORMAL:
     {
         chat_server::packet_chat_normal normal_message;

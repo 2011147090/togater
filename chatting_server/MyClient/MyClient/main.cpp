@@ -9,28 +9,57 @@ int main()
         boost::asio::ip::address::from_string("127.0.0.1"), PORT_NUMBER);
 
     tcp_client chat_client(io_service);
-    // -----temporary-----
-    std::cout << "이름? (user1, user2, user3)" << std::endl;
-    std::cin >> chat_client.user_id_;
-    if (chat_client.user_id_ == "user1")
-        chat_client.key_ = "qwerty";
-    else if (chat_client.user_id_ == "user2")
-        chat_client.key_ = "asdfgh";
-    else if (chat_client.user_id_ == "user3")
-        chat_client.key_ = "zxcvbn";
+    
+
+    // -----temporary start-----
+    std::string id;
+    std::cout << "이름? (user1 ~ user12)" << std::endl;
+    std::cin >> id;
+    
+    chat_client.set_id(id);
+    if (id == "user1")
+        chat_client.set_key("qwerty");
+    else if (id == "user2")
+        chat_client.set_key("asdfgh");
+    else if (id == "user3")
+        chat_client.set_key("zxcvbn");
+    else if (id == "user4")
+        chat_client.set_key("wertyu");
+    else if (id == "user5")
+        chat_client.set_key("sdfghj");
+    else if (id == "user6")
+        chat_client.set_key("xcvbnm");
+    else if (id == "user7")
+        chat_client.set_key("ertyui");
+    else if (id == "user8")
+        chat_client.set_key("dfghjk");
+    else if (id == "user9")
+        chat_client.set_key("cvbnm,");
+    else if (id == "user10")
+        chat_client.set_key("rtyuio");
+    else if (id == "user11")
+        chat_client.set_key("fghjkl");
+    else if (id == "user12")
+        chat_client.set_key("vbnm,.");
     else
         return 0;
-    // -----temporary-----
+    // ------temporary end------
+    
+
     chat_client.connect(endpoint);
     
     boost::thread thread(boost::bind(&boost::asio::io_service::run, &io_service));
     
+
+    // -----temporary start-----
     chat_client.post_verify();
+    // ------temporary end------
+
 
     std::string message;
     while (std::getline(std::cin, message))
     {
-        chat_client.post_send(false, message);
+        chat_client.post_normal(message);
     }
     
     io_service.stop();

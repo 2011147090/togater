@@ -13,6 +13,7 @@ tcp_server::~tcp_server()
 {
     for (int i = 0; i < session_list_.size(); i++)
     {
+
         if (session_list_[i]->get_socket().is_open())
             session_list_[i]->get_socket().close();
         
@@ -49,9 +50,7 @@ void tcp_server::close_session(const int session_id)
     session_queue_.push_back(session_id);
 
     if (is_accepting_ == false)
-    {
         post_accept();
-    }
 }
 
 void tcp_server::process_packet(const int session_id, const int size, BYTE* packet)
@@ -64,9 +63,9 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
     switch (message_header->type)
     {
-    case chat_server::VERIFY:
+    case chat_server::VERIFY_REQ:
     {
-        chat_server::packet_verify_user verify_message;
+        chat_server::packet_verify_req verify_message;
         verify_message.ParseFromArray(packet + message_header_size, message_header->size);
         
         std::string redis_key = verify_message.key_string();
@@ -83,6 +82,9 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             close_session(session_id);
     }
         break;
+    case chat_server::MATCH_REQ:
+        break;
+
     case chat_server::NORMAL:
     {
         auto iter = connected_session_map_.begin();
@@ -138,7 +140,5 @@ void tcp_server::handle_accept(tcp_session* session, const boost::system::error_
         post_accept();
     }
     else
-    {
         std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
-    }
 }

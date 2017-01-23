@@ -21,9 +21,18 @@ namespace chat_server {
 
 namespace {
 
-const ::google::protobuf::Descriptor* packet_verify_user_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* packet_verify_req_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_verify_user_reflection_ = NULL;
+  packet_verify_req_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_verify_res_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  packet_verify_res_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_match_req_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  packet_match_req_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_match_res_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  packet_match_res_reflection_ = NULL;
 const ::google::protobuf::Descriptor* packet_chat_normal_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   packet_chat_normal_reflection_ = NULL;
@@ -48,22 +57,65 @@ void protobuf_AssignDesc_chat_5fprotobuf_2eproto() {
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "chat_protobuf.proto");
   GOOGLE_CHECK(file != NULL);
-  packet_verify_user_descriptor_ = file->message_type(0);
-  static const int packet_verify_user_offsets_[2] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_user, key_string_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_user, value_user_id_),
+  packet_verify_req_descriptor_ = file->message_type(0);
+  static const int packet_verify_req_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_req, key_string_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_req, value_user_id_),
   };
-  packet_verify_user_reflection_ =
+  packet_verify_req_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
-      packet_verify_user_descriptor_,
-      packet_verify_user::internal_default_instance(),
-      packet_verify_user_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_user, _has_bits_),
+      packet_verify_req_descriptor_,
+      packet_verify_req::internal_default_instance(),
+      packet_verify_req_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_req, _has_bits_),
       -1,
       -1,
-      sizeof(packet_verify_user),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_user, _internal_metadata_));
-  packet_chat_normal_descriptor_ = file->message_type(1);
+      sizeof(packet_verify_req),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_req, _internal_metadata_));
+  packet_verify_res_descriptor_ = file->message_type(1);
+  static const int packet_verify_res_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_res, is_successful_),
+  };
+  packet_verify_res_reflection_ =
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+      packet_verify_res_descriptor_,
+      packet_verify_res::internal_default_instance(),
+      packet_verify_res_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_res, _has_bits_),
+      -1,
+      -1,
+      sizeof(packet_verify_res),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_res, _internal_metadata_));
+  packet_match_req_descriptor_ = file->message_type(2);
+  static const int packet_match_req_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_match_req, user_id_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_match_req, opponent_id_),
+  };
+  packet_match_req_reflection_ =
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+      packet_match_req_descriptor_,
+      packet_match_req::internal_default_instance(),
+      packet_match_req_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_match_req, _has_bits_),
+      -1,
+      -1,
+      sizeof(packet_match_req),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_match_req, _internal_metadata_));
+  packet_match_res_descriptor_ = file->message_type(3);
+  static const int packet_match_res_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_match_res, is_successful_),
+  };
+  packet_match_res_reflection_ =
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+      packet_match_res_descriptor_,
+      packet_match_res::internal_default_instance(),
+      packet_match_res_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_match_res, _has_bits_),
+      -1,
+      -1,
+      sizeof(packet_match_res),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_match_res, _internal_metadata_));
+  packet_chat_normal_descriptor_ = file->message_type(4);
   static const int packet_chat_normal_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_normal, user_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_normal, chat_message_),
@@ -78,7 +130,7 @@ void protobuf_AssignDesc_chat_5fprotobuf_2eproto() {
       -1,
       sizeof(packet_chat_normal),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_normal, _internal_metadata_));
-  packet_chat_whisper_descriptor_ = file->message_type(2);
+  packet_chat_whisper_descriptor_ = file->message_type(5);
   static const int packet_chat_whisper_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_whisper, user_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_whisper, target_id_),
@@ -94,7 +146,7 @@ void protobuf_AssignDesc_chat_5fprotobuf_2eproto() {
       -1,
       sizeof(packet_chat_whisper),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_whisper, _internal_metadata_));
-  packet_chat_room_descriptor_ = file->message_type(3);
+  packet_chat_room_descriptor_ = file->message_type(6);
   static const int packet_chat_room_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_room, user_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_room, chat_message_),
@@ -109,7 +161,7 @@ void protobuf_AssignDesc_chat_5fprotobuf_2eproto() {
       -1,
       sizeof(packet_chat_room),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_room, _internal_metadata_));
-  packet_chat_notice_descriptor_ = file->message_type(4);
+  packet_chat_notice_descriptor_ = file->message_type(7);
   static const int packet_chat_notice_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_notice, user_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_chat_notice, chat_message_),
@@ -139,7 +191,13 @@ void protobuf_RegisterTypes(const ::std::string&) GOOGLE_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      packet_verify_user_descriptor_, packet_verify_user::internal_default_instance());
+      packet_verify_req_descriptor_, packet_verify_req::internal_default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+      packet_verify_res_descriptor_, packet_verify_res::internal_default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+      packet_match_req_descriptor_, packet_match_req::internal_default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+      packet_match_res_descriptor_, packet_match_res::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       packet_chat_normal_descriptor_, packet_chat_normal::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -153,8 +211,14 @@ void protobuf_RegisterTypes(const ::std::string&) {
 }  // namespace
 
 void protobuf_ShutdownFile_chat_5fprotobuf_2eproto() {
-  packet_verify_user_default_instance_.Shutdown();
-  delete packet_verify_user_reflection_;
+  packet_verify_req_default_instance_.Shutdown();
+  delete packet_verify_req_reflection_;
+  packet_verify_res_default_instance_.Shutdown();
+  delete packet_verify_res_reflection_;
+  packet_match_req_default_instance_.Shutdown();
+  delete packet_match_req_reflection_;
+  packet_match_res_default_instance_.Shutdown();
+  delete packet_match_res_reflection_;
   packet_chat_normal_default_instance_.Shutdown();
   delete packet_chat_normal_reflection_;
   packet_chat_whisper_default_instance_.Shutdown();
@@ -169,7 +233,11 @@ void protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::internal::GetEmptyString();
-  packet_verify_user_default_instance_.DefaultConstruct();
+  packet_verify_req_default_instance_.DefaultConstruct();
+  packet_verify_res_default_instance_.DefaultConstruct();
+  ::google::protobuf::internal::GetEmptyString();
+  packet_match_req_default_instance_.DefaultConstruct();
+  packet_match_res_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::GetEmptyString();
   packet_chat_normal_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::GetEmptyString();
@@ -178,7 +246,10 @@ void protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl() {
   packet_chat_room_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::GetEmptyString();
   packet_chat_notice_default_instance_.DefaultConstruct();
-  packet_verify_user_default_instance_.get_mutable()->InitAsDefaultInstance();
+  packet_verify_req_default_instance_.get_mutable()->InitAsDefaultInstance();
+  packet_verify_res_default_instance_.get_mutable()->InitAsDefaultInstance();
+  packet_match_req_default_instance_.get_mutable()->InitAsDefaultInstance();
+  packet_match_res_default_instance_.get_mutable()->InitAsDefaultInstance();
   packet_chat_normal_default_instance_.get_mutable()->InitAsDefaultInstance();
   packet_chat_whisper_default_instance_.get_mutable()->InitAsDefaultInstance();
   packet_chat_room_default_instance_.get_mutable()->InitAsDefaultInstance();
@@ -195,17 +266,22 @@ void protobuf_AddDesc_chat_5fprotobuf_2eproto_impl() {
 
   protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\023chat_protobuf.proto\022\013chat_server\"\?\n\022pa"
-    "cket_verify_user\022\022\n\nkey_string\030\001 \002(\t\022\025\n\r"
-    "value_user_id\030\002 \002(\t\";\n\022packet_chat_norma"
-    "l\022\017\n\007user_id\030\001 \002(\t\022\024\n\014chat_message\030\002 \002(\t"
-    "\"O\n\023packet_chat_whisper\022\017\n\007user_id\030\001 \002(\t"
-    "\022\021\n\ttarget_id\030\002 \002(\t\022\024\n\014chat_message\030\003 \002("
-    "\t\"9\n\020packet_chat_room\022\017\n\007user_id\030\001 \002(\t\022\024"
-    "\n\014chat_message\030\002 \002(\t\";\n\022packet_chat_noti"
-    "ce\022\017\n\007user_id\030\001 \002(\t\022\024\n\014chat_message\030\002 \002("
-    "\t*I\n\014message_type\022\n\n\006VERIFY\020\000\022\n\n\006NORMAL\020"
-    "\001\022\013\n\007WHISPER\020\002\022\010\n\004ROOM\020\003\022\n\n\006NOTICE\020\004", 436);
+    "\n\023chat_protobuf.proto\022\013chat_server\">\n\021pa"
+    "cket_verify_req\022\022\n\nkey_string\030\001 \002(\t\022\025\n\rv"
+    "alue_user_id\030\002 \002(\t\"*\n\021packet_verify_res\022"
+    "\025\n\ris_successful\030\001 \002(\010\"8\n\020packet_match_r"
+    "eq\022\017\n\007user_id\030\001 \002(\t\022\023\n\013opponent_id\030\002 \002(\t"
+    "\")\n\020packet_match_res\022\025\n\ris_successful\030\001 "
+    "\002(\010\";\n\022packet_chat_normal\022\017\n\007user_id\030\001 \002"
+    "(\t\022\024\n\014chat_message\030\002 \002(\t\"O\n\023packet_chat_"
+    "whisper\022\017\n\007user_id\030\001 \002(\t\022\021\n\ttarget_id\030\002 "
+    "\002(\t\022\024\n\014chat_message\030\003 \002(\t\"9\n\020packet_chat"
+    "_room\022\017\n\007user_id\030\001 \002(\t\022\024\n\014chat_message\030\002"
+    " \002(\t\";\n\022packet_chat_notice\022\017\n\007user_id\030\001 "
+    "\002(\t\022\024\n\014chat_message\030\002 \002(\t*{\n\014message_typ"
+    "e\022\016\n\nVERIFY_REQ\020\000\022\016\n\nVERIFY_RES\020\001\022\r\n\tMAT"
+    "CH_REQ\020\002\022\r\n\tMATCH_RES\020\003\022\n\n\006NORMAL\020\n\022\013\n\007W"
+    "HISPER\020\013\022\010\n\004ROOM\020\014\022\n\n\006NOTICE\020\r", 630);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "chat_protobuf.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_chat_5fprotobuf_2eproto);
@@ -232,7 +308,10 @@ bool message_type_IsValid(int value) {
     case 1:
     case 2:
     case 3:
-    case 4:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
       return true;
     default:
       return false;
@@ -253,71 +332,71 @@ static void MergeFromFail(int line) {
 // ===================================================================
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int packet_verify_user::kKeyStringFieldNumber;
-const int packet_verify_user::kValueUserIdFieldNumber;
+const int packet_verify_req::kKeyStringFieldNumber;
+const int packet_verify_req::kValueUserIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-packet_verify_user::packet_verify_user()
+packet_verify_req::packet_verify_req()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   SharedCtor();
-  // @@protoc_insertion_point(constructor:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(constructor:chat_server.packet_verify_req)
 }
 
-void packet_verify_user::InitAsDefaultInstance() {
+void packet_verify_req::InitAsDefaultInstance() {
 }
 
-packet_verify_user::packet_verify_user(const packet_verify_user& from)
+packet_verify_req::packet_verify_req(const packet_verify_req& from)
   : ::google::protobuf::Message(),
     _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
-  // @@protoc_insertion_point(copy_constructor:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(copy_constructor:chat_server.packet_verify_req)
 }
 
-void packet_verify_user::SharedCtor() {
+void packet_verify_req::SharedCtor() {
   _cached_size_ = 0;
   key_string_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   value_user_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-packet_verify_user::~packet_verify_user() {
-  // @@protoc_insertion_point(destructor:chat_server.packet_verify_user)
+packet_verify_req::~packet_verify_req() {
+  // @@protoc_insertion_point(destructor:chat_server.packet_verify_req)
   SharedDtor();
 }
 
-void packet_verify_user::SharedDtor() {
+void packet_verify_req::SharedDtor() {
   key_string_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   value_user_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-void packet_verify_user::SetCachedSize(int size) const {
+void packet_verify_req::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* packet_verify_user::descriptor() {
+const ::google::protobuf::Descriptor* packet_verify_req::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return packet_verify_user_descriptor_;
+  return packet_verify_req_descriptor_;
 }
 
-const packet_verify_user& packet_verify_user::default_instance() {
+const packet_verify_req& packet_verify_req::default_instance() {
   protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   return *internal_default_instance();
 }
 
-::google::protobuf::internal::ExplicitlyConstructed<packet_verify_user> packet_verify_user_default_instance_;
+::google::protobuf::internal::ExplicitlyConstructed<packet_verify_req> packet_verify_req_default_instance_;
 
-packet_verify_user* packet_verify_user::New(::google::protobuf::Arena* arena) const {
-  packet_verify_user* n = new packet_verify_user;
+packet_verify_req* packet_verify_req::New(::google::protobuf::Arena* arena) const {
+  packet_verify_req* n = new packet_verify_req;
   if (arena != NULL) {
     arena->Own(n);
   }
   return n;
 }
 
-void packet_verify_user::Clear() {
-// @@protoc_insertion_point(message_clear_start:chat_server.packet_verify_user)
+void packet_verify_req::Clear() {
+// @@protoc_insertion_point(message_clear_start:chat_server.packet_verify_req)
   if (_has_bits_[0 / 32] & 3u) {
     if (has_key_string()) {
       key_string_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -332,11 +411,11 @@ void packet_verify_user::Clear() {
   }
 }
 
-bool packet_verify_user::MergePartialFromCodedStream(
+bool packet_verify_req::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(parse_start:chat_server.packet_verify_req)
   for (;;) {
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
     tag = p.first;
@@ -350,7 +429,7 @@ bool packet_verify_user::MergePartialFromCodedStream(
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
             this->key_string().data(), this->key_string().length(),
             ::google::protobuf::internal::WireFormat::PARSE,
-            "chat_server.packet_verify_user.key_string");
+            "chat_server.packet_verify_req.key_string");
         } else {
           goto handle_unusual;
         }
@@ -367,7 +446,7 @@ bool packet_verify_user::MergePartialFromCodedStream(
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
             this->value_user_id().data(), this->value_user_id().length(),
             ::google::protobuf::internal::WireFormat::PARSE,
-            "chat_server.packet_verify_user.value_user_id");
+            "chat_server.packet_verify_req.value_user_id");
         } else {
           goto handle_unusual;
         }
@@ -389,23 +468,23 @@ bool packet_verify_user::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(parse_success:chat_server.packet_verify_req)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(parse_failure:chat_server.packet_verify_req)
   return false;
 #undef DO_
 }
 
-void packet_verify_user::SerializeWithCachedSizes(
+void packet_verify_req::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(serialize_start:chat_server.packet_verify_req)
   // required string key_string = 1;
   if (has_key_string()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->key_string().data(), this->key_string().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "chat_server.packet_verify_user.key_string");
+      "chat_server.packet_verify_req.key_string");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       1, this->key_string(), output);
   }
@@ -415,7 +494,7 @@ void packet_verify_user::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->value_user_id().data(), this->value_user_id().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "chat_server.packet_verify_user.value_user_id");
+      "chat_server.packet_verify_req.value_user_id");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       2, this->value_user_id(), output);
   }
@@ -424,19 +503,19 @@ void packet_verify_user::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(serialize_end:chat_server.packet_verify_req)
 }
 
-::google::protobuf::uint8* packet_verify_user::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* packet_verify_req::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
   (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(serialize_to_array_start:chat_server.packet_verify_req)
   // required string key_string = 1;
   if (has_key_string()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->key_string().data(), this->key_string().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "chat_server.packet_verify_user.key_string");
+      "chat_server.packet_verify_req.key_string");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         1, this->key_string(), target);
@@ -447,7 +526,7 @@ void packet_verify_user::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->value_user_id().data(), this->value_user_id().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "chat_server.packet_verify_user.value_user_id");
+      "chat_server.packet_verify_req.value_user_id");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->value_user_id(), target);
@@ -457,12 +536,12 @@ void packet_verify_user::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(serialize_to_array_end:chat_server.packet_verify_req)
   return target;
 }
 
-size_t packet_verify_user::RequiredFieldsByteSizeFallback() const {
-// @@protoc_insertion_point(required_fields_byte_size_fallback_start:chat_server.packet_verify_user)
+size_t packet_verify_req::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:chat_server.packet_verify_req)
   size_t total_size = 0;
 
   if (has_key_string()) {
@@ -481,8 +560,8 @@ size_t packet_verify_user::RequiredFieldsByteSizeFallback() const {
 
   return total_size;
 }
-size_t packet_verify_user::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:chat_server.packet_verify_user)
+size_t packet_verify_req::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:chat_server.packet_verify_req)
   size_t total_size = 0;
 
   if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
@@ -511,23 +590,23 @@ size_t packet_verify_user::ByteSizeLong() const {
   return total_size;
 }
 
-void packet_verify_user::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:chat_server.packet_verify_user)
+void packet_verify_req::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:chat_server.packet_verify_req)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const packet_verify_user* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const packet_verify_user>(
+  const packet_verify_req* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const packet_verify_req>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_verify_req)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:chat_server.packet_verify_user)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:chat_server.packet_verify_req)
     UnsafeMergeFrom(*source);
   }
 }
 
-void packet_verify_user::MergeFrom(const packet_verify_user& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:chat_server.packet_verify_user)
+void packet_verify_req::MergeFrom(const packet_verify_req& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:chat_server.packet_verify_req)
   if (GOOGLE_PREDICT_TRUE(&from != this)) {
     UnsafeMergeFrom(from);
   } else {
@@ -535,7 +614,7 @@ void packet_verify_user::MergeFrom(const packet_verify_user& from) {
   }
 }
 
-void packet_verify_user::UnsafeMergeFrom(const packet_verify_user& from) {
+void packet_verify_req::UnsafeMergeFrom(const packet_verify_req& from) {
   GOOGLE_DCHECK(&from != this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_key_string()) {
@@ -553,31 +632,31 @@ void packet_verify_user::UnsafeMergeFrom(const packet_verify_user& from) {
   }
 }
 
-void packet_verify_user::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:chat_server.packet_verify_user)
+void packet_verify_req::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:chat_server.packet_verify_req)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void packet_verify_user::CopyFrom(const packet_verify_user& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:chat_server.packet_verify_user)
+void packet_verify_req::CopyFrom(const packet_verify_req& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:chat_server.packet_verify_req)
   if (&from == this) return;
   Clear();
   UnsafeMergeFrom(from);
 }
 
-bool packet_verify_user::IsInitialized() const {
+bool packet_verify_req::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
 
   return true;
 }
 
-void packet_verify_user::Swap(packet_verify_user* other) {
+void packet_verify_req::Swap(packet_verify_req* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void packet_verify_user::InternalSwap(packet_verify_user* other) {
+void packet_verify_req::InternalSwap(packet_verify_req* other) {
   key_string_.Swap(&other->key_string_);
   value_user_id_.Swap(&other->value_user_id_);
   std::swap(_has_bits_[0], other->_has_bits_[0]);
@@ -585,127 +664,1140 @@ void packet_verify_user::InternalSwap(packet_verify_user* other) {
   std::swap(_cached_size_, other->_cached_size_);
 }
 
-::google::protobuf::Metadata packet_verify_user::GetMetadata() const {
+::google::protobuf::Metadata packet_verify_req::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = packet_verify_user_descriptor_;
-  metadata.reflection = packet_verify_user_reflection_;
+  metadata.descriptor = packet_verify_req_descriptor_;
+  metadata.reflection = packet_verify_req_reflection_;
   return metadata;
 }
 
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
-// packet_verify_user
+// packet_verify_req
 
 // required string key_string = 1;
-bool packet_verify_user::has_key_string() const {
+bool packet_verify_req::has_key_string() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-void packet_verify_user::set_has_key_string() {
+void packet_verify_req::set_has_key_string() {
   _has_bits_[0] |= 0x00000001u;
 }
-void packet_verify_user::clear_has_key_string() {
+void packet_verify_req::clear_has_key_string() {
   _has_bits_[0] &= ~0x00000001u;
 }
-void packet_verify_user::clear_key_string() {
+void packet_verify_req::clear_key_string() {
   key_string_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_key_string();
 }
-const ::std::string& packet_verify_user::key_string() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_verify_user.key_string)
+const ::std::string& packet_verify_req::key_string() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_verify_req.key_string)
   return key_string_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-void packet_verify_user::set_key_string(const ::std::string& value) {
+void packet_verify_req::set_key_string(const ::std::string& value) {
   set_has_key_string();
   key_string_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_set:chat_server.packet_verify_req.key_string)
 }
-void packet_verify_user::set_key_string(const char* value) {
+void packet_verify_req::set_key_string(const char* value) {
   set_has_key_string();
   key_string_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_req.key_string)
 }
-void packet_verify_user::set_key_string(const char* value, size_t size) {
+void packet_verify_req::set_key_string(const char* value, size_t size) {
   set_has_key_string();
   key_string_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_req.key_string)
 }
-::std::string* packet_verify_user::mutable_key_string() {
+::std::string* packet_verify_req::mutable_key_string() {
   set_has_key_string();
-  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_req.key_string)
   return key_string_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-::std::string* packet_verify_user::release_key_string() {
-  // @@protoc_insertion_point(field_release:chat_server.packet_verify_user.key_string)
+::std::string* packet_verify_req::release_key_string() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_verify_req.key_string)
   clear_has_key_string();
   return key_string_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-void packet_verify_user::set_allocated_key_string(::std::string* key_string) {
+void packet_verify_req::set_allocated_key_string(::std::string* key_string) {
   if (key_string != NULL) {
     set_has_key_string();
   } else {
     clear_has_key_string();
   }
   key_string_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key_string);
-  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_user.key_string)
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_req.key_string)
 }
 
 // required string value_user_id = 2;
-bool packet_verify_user::has_value_user_id() const {
+bool packet_verify_req::has_value_user_id() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-void packet_verify_user::set_has_value_user_id() {
+void packet_verify_req::set_has_value_user_id() {
   _has_bits_[0] |= 0x00000002u;
 }
-void packet_verify_user::clear_has_value_user_id() {
+void packet_verify_req::clear_has_value_user_id() {
   _has_bits_[0] &= ~0x00000002u;
 }
-void packet_verify_user::clear_value_user_id() {
+void packet_verify_req::clear_value_user_id() {
   value_user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_value_user_id();
 }
-const ::std::string& packet_verify_user::value_user_id() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_verify_user.value_user_id)
+const ::std::string& packet_verify_req::value_user_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_verify_req.value_user_id)
   return value_user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-void packet_verify_user::set_value_user_id(const ::std::string& value) {
+void packet_verify_req::set_value_user_id(const ::std::string& value) {
   set_has_value_user_id();
   value_user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_set:chat_server.packet_verify_req.value_user_id)
 }
-void packet_verify_user::set_value_user_id(const char* value) {
+void packet_verify_req::set_value_user_id(const char* value) {
   set_has_value_user_id();
   value_user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_verify_req.value_user_id)
 }
-void packet_verify_user::set_value_user_id(const char* value, size_t size) {
+void packet_verify_req::set_value_user_id(const char* value, size_t size) {
   set_has_value_user_id();
   value_user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_verify_req.value_user_id)
 }
-::std::string* packet_verify_user::mutable_value_user_id() {
+::std::string* packet_verify_req::mutable_value_user_id() {
   set_has_value_user_id();
-  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_verify_req.value_user_id)
   return value_user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-::std::string* packet_verify_user::release_value_user_id() {
-  // @@protoc_insertion_point(field_release:chat_server.packet_verify_user.value_user_id)
+::std::string* packet_verify_req::release_value_user_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_verify_req.value_user_id)
   clear_has_value_user_id();
   return value_user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-void packet_verify_user::set_allocated_value_user_id(::std::string* value_user_id) {
+void packet_verify_req::set_allocated_value_user_id(::std::string* value_user_id) {
   if (value_user_id != NULL) {
     set_has_value_user_id();
   } else {
     clear_has_value_user_id();
   }
   value_user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value_user_id);
-  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_user.value_user_id)
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_verify_req.value_user_id)
 }
 
-inline const packet_verify_user* packet_verify_user::internal_default_instance() {
-  return &packet_verify_user_default_instance_.get();
+inline const packet_verify_req* packet_verify_req::internal_default_instance() {
+  return &packet_verify_req_default_instance_.get();
+}
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int packet_verify_res::kIsSuccessfulFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+packet_verify_res::packet_verify_res()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:chat_server.packet_verify_res)
+}
+
+void packet_verify_res::InitAsDefaultInstance() {
+}
+
+packet_verify_res::packet_verify_res(const packet_verify_res& from)
+  : ::google::protobuf::Message(),
+    _internal_metadata_(NULL) {
+  SharedCtor();
+  UnsafeMergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:chat_server.packet_verify_res)
+}
+
+void packet_verify_res::SharedCtor() {
+  _cached_size_ = 0;
+  is_successful_ = false;
+}
+
+packet_verify_res::~packet_verify_res() {
+  // @@protoc_insertion_point(destructor:chat_server.packet_verify_res)
+  SharedDtor();
+}
+
+void packet_verify_res::SharedDtor() {
+}
+
+void packet_verify_res::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* packet_verify_res::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return packet_verify_res_descriptor_;
+}
+
+const packet_verify_res& packet_verify_res::default_instance() {
+  protobuf_InitDefaults_chat_5fprotobuf_2eproto();
+  return *internal_default_instance();
+}
+
+::google::protobuf::internal::ExplicitlyConstructed<packet_verify_res> packet_verify_res_default_instance_;
+
+packet_verify_res* packet_verify_res::New(::google::protobuf::Arena* arena) const {
+  packet_verify_res* n = new packet_verify_res;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void packet_verify_res::Clear() {
+// @@protoc_insertion_point(message_clear_start:chat_server.packet_verify_res)
+  is_successful_ = false;
+  _has_bits_.Clear();
+  if (_internal_metadata_.have_unknown_fields()) {
+    mutable_unknown_fields()->Clear();
+  }
+}
+
+bool packet_verify_res::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:chat_server.packet_verify_res)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required bool is_successful = 1;
+      case 1: {
+        if (tag == 8) {
+          set_has_is_successful();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &is_successful_)));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:chat_server.packet_verify_res)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:chat_server.packet_verify_res)
+  return false;
+#undef DO_
+}
+
+void packet_verify_res::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:chat_server.packet_verify_res)
+  // required bool is_successful = 1;
+  if (has_is_successful()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->is_successful(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:chat_server.packet_verify_res)
+}
+
+::google::protobuf::uint8* packet_verify_res::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:chat_server.packet_verify_res)
+  // required bool is_successful = 1;
+  if (has_is_successful()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->is_successful(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:chat_server.packet_verify_res)
+  return target;
+}
+
+size_t packet_verify_res::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:chat_server.packet_verify_res)
+  size_t total_size = 0;
+
+  // required bool is_successful = 1;
+  if (has_is_successful()) {
+    total_size += 1 + 1;
+  }
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void packet_verify_res::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:chat_server.packet_verify_res)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const packet_verify_res* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const packet_verify_res>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_verify_res)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:chat_server.packet_verify_res)
+    UnsafeMergeFrom(*source);
+  }
+}
+
+void packet_verify_res::MergeFrom(const packet_verify_res& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:chat_server.packet_verify_res)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void packet_verify_res::UnsafeMergeFrom(const packet_verify_res& from) {
+  GOOGLE_DCHECK(&from != this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_is_successful()) {
+      set_is_successful(from.is_successful());
+    }
+  }
+  if (from._internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
+  }
+}
+
+void packet_verify_res::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:chat_server.packet_verify_res)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void packet_verify_res::CopyFrom(const packet_verify_res& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:chat_server.packet_verify_res)
+  if (&from == this) return;
+  Clear();
+  UnsafeMergeFrom(from);
+}
+
+bool packet_verify_res::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+
+  return true;
+}
+
+void packet_verify_res::Swap(packet_verify_res* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void packet_verify_res::InternalSwap(packet_verify_res* other) {
+  std::swap(is_successful_, other->is_successful_);
+  std::swap(_has_bits_[0], other->_has_bits_[0]);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata packet_verify_res::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = packet_verify_res_descriptor_;
+  metadata.reflection = packet_verify_res_reflection_;
+  return metadata;
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// packet_verify_res
+
+// required bool is_successful = 1;
+bool packet_verify_res::has_is_successful() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void packet_verify_res::set_has_is_successful() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void packet_verify_res::clear_has_is_successful() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void packet_verify_res::clear_is_successful() {
+  is_successful_ = false;
+  clear_has_is_successful();
+}
+bool packet_verify_res::is_successful() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_verify_res.is_successful)
+  return is_successful_;
+}
+void packet_verify_res::set_is_successful(bool value) {
+  set_has_is_successful();
+  is_successful_ = value;
+  // @@protoc_insertion_point(field_set:chat_server.packet_verify_res.is_successful)
+}
+
+inline const packet_verify_res* packet_verify_res::internal_default_instance() {
+  return &packet_verify_res_default_instance_.get();
+}
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int packet_match_req::kUserIdFieldNumber;
+const int packet_match_req::kOpponentIdFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+packet_match_req::packet_match_req()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:chat_server.packet_match_req)
+}
+
+void packet_match_req::InitAsDefaultInstance() {
+}
+
+packet_match_req::packet_match_req(const packet_match_req& from)
+  : ::google::protobuf::Message(),
+    _internal_metadata_(NULL) {
+  SharedCtor();
+  UnsafeMergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:chat_server.packet_match_req)
+}
+
+void packet_match_req::SharedCtor() {
+  _cached_size_ = 0;
+  user_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  opponent_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+packet_match_req::~packet_match_req() {
+  // @@protoc_insertion_point(destructor:chat_server.packet_match_req)
+  SharedDtor();
+}
+
+void packet_match_req::SharedDtor() {
+  user_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  opponent_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void packet_match_req::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* packet_match_req::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return packet_match_req_descriptor_;
+}
+
+const packet_match_req& packet_match_req::default_instance() {
+  protobuf_InitDefaults_chat_5fprotobuf_2eproto();
+  return *internal_default_instance();
+}
+
+::google::protobuf::internal::ExplicitlyConstructed<packet_match_req> packet_match_req_default_instance_;
+
+packet_match_req* packet_match_req::New(::google::protobuf::Arena* arena) const {
+  packet_match_req* n = new packet_match_req;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void packet_match_req::Clear() {
+// @@protoc_insertion_point(message_clear_start:chat_server.packet_match_req)
+  if (_has_bits_[0 / 32] & 3u) {
+    if (has_user_id()) {
+      user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    }
+    if (has_opponent_id()) {
+      opponent_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    }
+  }
+  _has_bits_.Clear();
+  if (_internal_metadata_.have_unknown_fields()) {
+    mutable_unknown_fields()->Clear();
+  }
+}
+
+bool packet_match_req::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:chat_server.packet_match_req)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required string user_id = 1;
+      case 1: {
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_user_id()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->user_id().data(), this->user_id().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "chat_server.packet_match_req.user_id");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(18)) goto parse_opponent_id;
+        break;
+      }
+
+      // required string opponent_id = 2;
+      case 2: {
+        if (tag == 18) {
+         parse_opponent_id:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_opponent_id()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->opponent_id().data(), this->opponent_id().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "chat_server.packet_match_req.opponent_id");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:chat_server.packet_match_req)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:chat_server.packet_match_req)
+  return false;
+#undef DO_
+}
+
+void packet_match_req::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:chat_server.packet_match_req)
+  // required string user_id = 1;
+  if (has_user_id()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->user_id().data(), this->user_id().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "chat_server.packet_match_req.user_id");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->user_id(), output);
+  }
+
+  // required string opponent_id = 2;
+  if (has_opponent_id()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->opponent_id().data(), this->opponent_id().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "chat_server.packet_match_req.opponent_id");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->opponent_id(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:chat_server.packet_match_req)
+}
+
+::google::protobuf::uint8* packet_match_req::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:chat_server.packet_match_req)
+  // required string user_id = 1;
+  if (has_user_id()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->user_id().data(), this->user_id().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "chat_server.packet_match_req.user_id");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->user_id(), target);
+  }
+
+  // required string opponent_id = 2;
+  if (has_opponent_id()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->opponent_id().data(), this->opponent_id().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "chat_server.packet_match_req.opponent_id");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->opponent_id(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:chat_server.packet_match_req)
+  return target;
+}
+
+size_t packet_match_req::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:chat_server.packet_match_req)
+  size_t total_size = 0;
+
+  if (has_user_id()) {
+    // required string user_id = 1;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->user_id());
+  }
+
+  if (has_opponent_id()) {
+    // required string opponent_id = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->opponent_id());
+  }
+
+  return total_size;
+}
+size_t packet_match_req::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:chat_server.packet_match_req)
+  size_t total_size = 0;
+
+  if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
+    // required string user_id = 1;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->user_id());
+
+    // required string opponent_id = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->opponent_id());
+
+  } else {
+    total_size += RequiredFieldsByteSizeFallback();
+  }
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void packet_match_req::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:chat_server.packet_match_req)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const packet_match_req* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const packet_match_req>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_match_req)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:chat_server.packet_match_req)
+    UnsafeMergeFrom(*source);
+  }
+}
+
+void packet_match_req::MergeFrom(const packet_match_req& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:chat_server.packet_match_req)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void packet_match_req::UnsafeMergeFrom(const packet_match_req& from) {
+  GOOGLE_DCHECK(&from != this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_user_id()) {
+      set_has_user_id();
+      user_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.user_id_);
+    }
+    if (from.has_opponent_id()) {
+      set_has_opponent_id();
+      opponent_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.opponent_id_);
+    }
+  }
+  if (from._internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
+  }
+}
+
+void packet_match_req::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:chat_server.packet_match_req)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void packet_match_req::CopyFrom(const packet_match_req& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:chat_server.packet_match_req)
+  if (&from == this) return;
+  Clear();
+  UnsafeMergeFrom(from);
+}
+
+bool packet_match_req::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  return true;
+}
+
+void packet_match_req::Swap(packet_match_req* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void packet_match_req::InternalSwap(packet_match_req* other) {
+  user_id_.Swap(&other->user_id_);
+  opponent_id_.Swap(&other->opponent_id_);
+  std::swap(_has_bits_[0], other->_has_bits_[0]);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata packet_match_req::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = packet_match_req_descriptor_;
+  metadata.reflection = packet_match_req_reflection_;
+  return metadata;
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// packet_match_req
+
+// required string user_id = 1;
+bool packet_match_req::has_user_id() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void packet_match_req::set_has_user_id() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void packet_match_req::clear_has_user_id() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void packet_match_req::clear_user_id() {
+  user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_user_id();
+}
+const ::std::string& packet_match_req::user_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_match_req.user_id)
+  return user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void packet_match_req::set_user_id(const ::std::string& value) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:chat_server.packet_match_req.user_id)
+}
+void packet_match_req::set_user_id(const char* value) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_match_req.user_id)
+}
+void packet_match_req::set_user_id(const char* value, size_t size) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_match_req.user_id)
+}
+::std::string* packet_match_req::mutable_user_id() {
+  set_has_user_id();
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_match_req.user_id)
+  return user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+::std::string* packet_match_req::release_user_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_match_req.user_id)
+  clear_has_user_id();
+  return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void packet_match_req::set_allocated_user_id(::std::string* user_id) {
+  if (user_id != NULL) {
+    set_has_user_id();
+  } else {
+    clear_has_user_id();
+  }
+  user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_id);
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_match_req.user_id)
+}
+
+// required string opponent_id = 2;
+bool packet_match_req::has_opponent_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+void packet_match_req::set_has_opponent_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+void packet_match_req::clear_has_opponent_id() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+void packet_match_req::clear_opponent_id() {
+  opponent_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_opponent_id();
+}
+const ::std::string& packet_match_req::opponent_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_match_req.opponent_id)
+  return opponent_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void packet_match_req::set_opponent_id(const ::std::string& value) {
+  set_has_opponent_id();
+  opponent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:chat_server.packet_match_req.opponent_id)
+}
+void packet_match_req::set_opponent_id(const char* value) {
+  set_has_opponent_id();
+  opponent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_match_req.opponent_id)
+}
+void packet_match_req::set_opponent_id(const char* value, size_t size) {
+  set_has_opponent_id();
+  opponent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_match_req.opponent_id)
+}
+::std::string* packet_match_req::mutable_opponent_id() {
+  set_has_opponent_id();
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_match_req.opponent_id)
+  return opponent_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+::std::string* packet_match_req::release_opponent_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_match_req.opponent_id)
+  clear_has_opponent_id();
+  return opponent_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void packet_match_req::set_allocated_opponent_id(::std::string* opponent_id) {
+  if (opponent_id != NULL) {
+    set_has_opponent_id();
+  } else {
+    clear_has_opponent_id();
+  }
+  opponent_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), opponent_id);
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_match_req.opponent_id)
+}
+
+inline const packet_match_req* packet_match_req::internal_default_instance() {
+  return &packet_match_req_default_instance_.get();
+}
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int packet_match_res::kIsSuccessfulFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+packet_match_res::packet_match_res()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:chat_server.packet_match_res)
+}
+
+void packet_match_res::InitAsDefaultInstance() {
+}
+
+packet_match_res::packet_match_res(const packet_match_res& from)
+  : ::google::protobuf::Message(),
+    _internal_metadata_(NULL) {
+  SharedCtor();
+  UnsafeMergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:chat_server.packet_match_res)
+}
+
+void packet_match_res::SharedCtor() {
+  _cached_size_ = 0;
+  is_successful_ = false;
+}
+
+packet_match_res::~packet_match_res() {
+  // @@protoc_insertion_point(destructor:chat_server.packet_match_res)
+  SharedDtor();
+}
+
+void packet_match_res::SharedDtor() {
+}
+
+void packet_match_res::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* packet_match_res::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return packet_match_res_descriptor_;
+}
+
+const packet_match_res& packet_match_res::default_instance() {
+  protobuf_InitDefaults_chat_5fprotobuf_2eproto();
+  return *internal_default_instance();
+}
+
+::google::protobuf::internal::ExplicitlyConstructed<packet_match_res> packet_match_res_default_instance_;
+
+packet_match_res* packet_match_res::New(::google::protobuf::Arena* arena) const {
+  packet_match_res* n = new packet_match_res;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void packet_match_res::Clear() {
+// @@protoc_insertion_point(message_clear_start:chat_server.packet_match_res)
+  is_successful_ = false;
+  _has_bits_.Clear();
+  if (_internal_metadata_.have_unknown_fields()) {
+    mutable_unknown_fields()->Clear();
+  }
+}
+
+bool packet_match_res::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:chat_server.packet_match_res)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required bool is_successful = 1;
+      case 1: {
+        if (tag == 8) {
+          set_has_is_successful();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &is_successful_)));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:chat_server.packet_match_res)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:chat_server.packet_match_res)
+  return false;
+#undef DO_
+}
+
+void packet_match_res::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:chat_server.packet_match_res)
+  // required bool is_successful = 1;
+  if (has_is_successful()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->is_successful(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:chat_server.packet_match_res)
+}
+
+::google::protobuf::uint8* packet_match_res::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:chat_server.packet_match_res)
+  // required bool is_successful = 1;
+  if (has_is_successful()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->is_successful(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:chat_server.packet_match_res)
+  return target;
+}
+
+size_t packet_match_res::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:chat_server.packet_match_res)
+  size_t total_size = 0;
+
+  // required bool is_successful = 1;
+  if (has_is_successful()) {
+    total_size += 1 + 1;
+  }
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void packet_match_res::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:chat_server.packet_match_res)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const packet_match_res* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const packet_match_res>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_match_res)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:chat_server.packet_match_res)
+    UnsafeMergeFrom(*source);
+  }
+}
+
+void packet_match_res::MergeFrom(const packet_match_res& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:chat_server.packet_match_res)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void packet_match_res::UnsafeMergeFrom(const packet_match_res& from) {
+  GOOGLE_DCHECK(&from != this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_is_successful()) {
+      set_is_successful(from.is_successful());
+    }
+  }
+  if (from._internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
+  }
+}
+
+void packet_match_res::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:chat_server.packet_match_res)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void packet_match_res::CopyFrom(const packet_match_res& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:chat_server.packet_match_res)
+  if (&from == this) return;
+  Clear();
+  UnsafeMergeFrom(from);
+}
+
+bool packet_match_res::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+
+  return true;
+}
+
+void packet_match_res::Swap(packet_match_res* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void packet_match_res::InternalSwap(packet_match_res* other) {
+  std::swap(is_successful_, other->is_successful_);
+  std::swap(_has_bits_[0], other->_has_bits_[0]);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata packet_match_res::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = packet_match_res_descriptor_;
+  metadata.reflection = packet_match_res_reflection_;
+  return metadata;
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// packet_match_res
+
+// required bool is_successful = 1;
+bool packet_match_res::has_is_successful() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void packet_match_res::set_has_is_successful() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void packet_match_res::clear_has_is_successful() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void packet_match_res::clear_is_successful() {
+  is_successful_ = false;
+  clear_has_is_successful();
+}
+bool packet_match_res::is_successful() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_match_res.is_successful)
+  return is_successful_;
+}
+void packet_match_res::set_is_successful(bool value) {
+  set_has_is_successful();
+  is_successful_ = value;
+  // @@protoc_insertion_point(field_set:chat_server.packet_match_res.is_successful)
+}
+
+inline const packet_match_res* packet_match_res::internal_default_instance() {
+  return &packet_match_res_default_instance_.get();
 }
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
