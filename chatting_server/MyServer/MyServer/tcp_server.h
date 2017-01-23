@@ -10,11 +10,13 @@
 #include <boost/unordered_map.hpp>
 
 #include "tcp_session.h"
-
+#include <Windows.h>
 
 class tcp_server
 {
 private:
+    CRITICAL_SECTION ct;
+
     bool is_accepting_;
 
     boost::asio::ip::tcp::acceptor acceptor_;

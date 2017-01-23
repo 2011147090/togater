@@ -6,7 +6,7 @@ int main()
     boost::asio::io_service io_service;
 
     auto endpoint = boost::asio::ip::tcp::endpoint(
-        boost::asio::ip::address::from_string("127.0.0.1"), PORT_NUMBER);
+        boost::asio::ip::address::from_string("192.168.1.8"), PORT_NUMBER);
 
     tcp_client chat_client(io_service);
     
@@ -41,6 +41,8 @@ int main()
         chat_client.set_key("fghjkl");
     else if (id == "user12")
         chat_client.set_key("vbnm,.");
+    else if (id == "qwer")
+        chat_client.set_key("mG2n9Z_y7K7ik_4ZXKpwoPzP-p6SAlKW");
     else
         return 0;
     // ------temporary end------
