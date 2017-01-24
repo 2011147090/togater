@@ -181,8 +181,10 @@ void logic_worker::process_queue()
 
         if (room_hashs_.empty())
             continue;
+        
+        auto iter = room_hashs_.begin();
 
-        for (auto iter = room_hashs_.begin(); iter != room_hashs_.end(); iter++)
+        while (iter != room_hashs_.end())
         {
             switch (iter->second.state_)
             {
@@ -606,7 +608,7 @@ void logic_worker::process_queue()
 
                 game_state_packet.set_state(2);
 
-                if (iter->second.player_[0].remain_money_ != 0)
+                if (iter->second.player_[0].remain_money_ >= iter->second.player_[1].remain_money_)
                     game_state_packet.set_win_player_key(iter->second.player_[0].session_->get_player_key());
                 else
                     game_state_packet.set_win_player_key(iter->second.player_[1].session_->get_player_key());
@@ -646,6 +648,8 @@ void logic_worker::process_queue()
             }
             break;
             }
+
+            iter++;
         }
     }
 }
@@ -690,7 +694,7 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
             );
         }
 
-        iter = room_hashs_.erase(iter);
+        room_hashs_.erase(iter);
 
         return true;
     }

@@ -62,3 +62,11 @@ void redis_connector::remove_room_info(std::string room_key)
     if (!conn->del(room_key).result())
         system_log->error("redis_connector:remove_room_info, room_key_is_null");
 }
+
+void redis_connector::remove_player_info(std::string player_key)
+{
+    thread_sync sync;
+
+    if (!conn->del(player_key).result())
+        system_log->error("redis_connector:remove_player_info, player_key_is_null");
+}
