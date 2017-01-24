@@ -1,13 +1,13 @@
 #include "client.h"
 #include "protocol.h"
 
-using namespace channel_serv;
 
-client::client(boost::asio::io_service & io_service)
+client::client(boost::asio::io_service & io_service, packet_handler& handler)
     : io_service_(io_service)
     , socket_(io_service)
     , seq_number(0)
     , token_flag(true)
+    , packet_handler_(handler)
 {
 
 }
@@ -25,37 +25,76 @@ void client::client_connect(boost::asio::ip::tcp::endpoint &endpoint)
 
 void client::post_join_message(const char *token)
 {
-    packet_header header;
-    join_req pay_load;
-    pay_load.set_token(token);
-
-    header.ID = MESSAGE_ID::JOIN_REQ;
-    header.size = pay_load.ByteSize();    
-    char *send_msg_buffer = new char[header.size + packet_header_size];
-    memcpy(send_msg_buffer, &header, packet_header_size);
-    
-    pay_load.SerializeToArray(&send_msg_buffer[packet_header_size], header.size);
-    post_send(false, send_msg_buffer,header.size + packet_header_size);
-    token_flag = false;
+    channel_serv::join_req message;
+    message.set_token(token);
+    post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_logout_message(const char * token)
 {
-    logout_ntf pay_load;
-    pay_load.set_token(token);
-
-    char *send_msg_buffer = new char[packet_header_size + pay_load.ByteSize()];
-    packet_header *header = (packet_header *)send_msg_buffer;
-    header->ID = MESSAGE_ID::LOGOUT_NTF;
-    header->size = pay_load.ByteSize();
-
-    pay_load.SerializeToArray(&send_msg_buffer[packet_header_size], header->size);
-    post_send(false, send_msg_buffer, header->size + packet_header_size);
+    channel_serv::logout_ntf message;
+    message.set_token(token);
+    post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_play_message()
 {
+    channel_serv::play_rank_game_req message;
+    channel_serv::user_info *my_info = message.mutable_my_info();
+    my_info->set_battle_history(get_battle_history());
+    my_info->set_win(get_win());
+    my_info->set_lose(get_lose());
+    my_info->set_rating(packet_handler_.check_rating(get_rating()));
+    my_info->set_user_id(get_user_id());
+    post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
+}
 
+void client::post_play_with_friends_message(const char *user_id)
+{
+    channel_serv::play_friends_game_req message;
+    message.set_flag_id(channel_serv::play_friends_game_req::APPLY);
+    message.set_recv_id(user_id);
+    post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
+}
+
+void client::post_search_message(const char *user_id)
+{
+    channel_serv::friends_req message;
+    message.set_req(channel_serv::friends_req::SEARCH);
+    message.set_user_id(user_id);
+    post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
+}
+
+void client::post_add_message(const char *user_id)
+{
+    channel_serv::friends_req message;
+    message.set_req(channel_serv::friends_req::ADD);
+    message.set_user_id(user_id);
+    post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
+}
+
+void client::post_del_message(const char *user_id)
+{
+    channel_serv::friends_req message;
+    message.set_req(channel_serv::friends_req::DEL);
+    message.set_user_id(user_id);
+    post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
+}
+
+void client::post_accept_message()
+{
+    channel_serv::play_friends_game_req message;
+    message.set_flag_id(channel_serv::play_friends_game_req::ACCEPT);
+    message.set_recv_id(target_id);
+    post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
+}
+
+void client::post_deny_message()
+{
+    channel_serv::play_friends_game_req message;
+    message.set_flag_id(channel_serv::play_friends_game_req::DENY);
+    message.set_recv_id(target_id);
+    post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_send(const bool que_flag, char * send_message, int n_size)
@@ -130,7 +169,6 @@ void client::connect_handle(const boost::system::error_code &error)
     {
         std::cout << "접속 하였습니다" << std::endl;
         post_recv();
-        post_join_message("200");
     }
 }
 
@@ -139,20 +177,19 @@ void client::process_packet(char * data, int nsize)
     packet_header *header = (packet_header *)data;
     switch (header->ID)
     {
-    case MESSAGE_ID::JOIN_ANS:
+    case channel_serv::MESSAGE_ID::JOIN_ANS:
         process_join(&data[packet_header_size],header->size);
-        post_logout_message("200");
         break;
-    case MESSAGE_ID::FRIENDS_ANS:
+    case channel_serv::MESSAGE_ID::FRIENDS_ANS:
         process_friends(&data[packet_header_size], header->size);
         break;
-    case MESSAGE_ID::MATCH_COMPLETE:
+    case channel_serv::MESSAGE_ID::MATCH_COMPLETE:
         process_game(&data[packet_header_size], header->size);
         break;
-    case MESSAGE_ID::PLAY_FRIENDS_REQ:
+    case channel_serv::MESSAGE_ID::PLAY_FRIENDS_REQ:
         process_game_with_friends(&data[packet_header_size], header->size);
         break;
-    case MESSAGE_ID::ERROR_MSG:
+    case channel_serv::MESSAGE_ID::ERROR_MSG:
         process_error(&data[packet_header_size], header->size);
         break;
     default:
@@ -162,38 +199,61 @@ void client::process_packet(char * data, int nsize)
 
 void client::process_friends(char * data, int nsize)
 {
-    friends_ans ans;
+    channel_serv::friends_ans ans;
     ans.ParseFromArray(data, nsize);
+    std::cout << "\n\n친구 찾음 : " << (ans.mutable_user_information())->user_id() << std::endl;
 }
 
 void client::process_join(char * data, int nsize)
 {
-    join_ans ans;
-    ans.ParseFromArray(data, nsize);
+    channel_serv::join_ans ans;
+    channel_serv::user_info *info;
+    ans = packet_handler_.decode_join_ans_message(data, nsize);
+    info = ans.mutable_my_info();
     if (ans.friends_id_list_size() > 0)
     {
 
     }
-    cout << "My ID : " << ans.my_info().user_id() << endl;
-    cout << "My battle history : " << ans.my_info().battle_history() << endl;
-    cout << "Win : " << ans.my_info().win() << " Lose : " << ans.my_info().lose() << endl;
+    battle_history = info->battle_history();
+    win = info->win();
+    lose = info->lose();
+    rating = info->rating();
+    user_id = info->user_id();
+    std::cout << " 내 아이디 : " << user_id << std::endl;
     token_flag = true;
 }
 
 void client::process_game(char * data, int nsize)
 {
-    matching_complete_ans ans;
+    channel_serv::matching_complete_ans ans;
+    channel_serv::user_info *op_player;
     ans.ParseFromArray(data, nsize);
+    op_player = ans.mutable_opponent_player();
+    std::cout << "\n\n 방정보 : " << ans.room_number();
+    std::cout << "\n상대방 아이디 : "<<op_player->user_id()<<"\n";
 }
 
 void client::process_game_with_friends(char * data, int size)
 {
-    play_friends_game_req ans;
+    channel_serv::play_friends_game_req ans;
     ans.ParseFromArray(data, size);
+    target_id.clear();
+    target_id = ans.recv_id();
+    switch (ans.flag_id())
+    {
+    case channel_serv::play_friends_game_req::APPLY:
+        std::cout<<ans.recv_id() << "가 게임신청하심" << std::endl;
+        return;
+    case channel_serv::play_friends_game_req::DENY:
+        std::cout << ans.recv_id() << "가 거절하심" << std::endl;
+        return;
+    }
 }
 
 void client::process_error(char * data, int nsize)
 {
-    error_msg ans;
+    channel_serv::error_msg ans;
     ans.ParseFromArray(data, nsize);
+    std::cout << "error : " << ans.error_message() << "\n";
 }
+

@@ -11,14 +11,13 @@ class match_manager
 public:
     match_manager(packet_handler &packet_handler, friends_manager &friends_manager, redispp::Connection &redis_connection);
     ~match_manager();
-    void process_matching(session *p_session);
-    void process_matching_with_friends();
+    void process_matching(session *request_session, const char *packet, const int data_size);
+    void process_matching_with_friends(session *request_session, const char *packet, const int data_size);
 private:
-    int make_room_number() { return (room_number + 1) % 5000; }
-    void set_matching_que(session *p_session);
+    void set_matching_que(session *request_session, channel_serv::RATING request_rating);
     void get_matching_que(std::deque<session *> &target_que);
-    void make_matching_complete_message();
-    void post_matching_complete_message();
+
+    inline unsigned int generate_room_info() { return room_number = (room_number + 1) % 5000; }; //shared resource
 
     unsigned int room_number;
     packet_handler &packet_handler_;

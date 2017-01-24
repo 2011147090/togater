@@ -3,6 +3,8 @@
 #include <google/protobuf/text_format.h>
 #include <packet.pb.h>
 
+using namespace std;
+using namespace google;
 
 /* redis */
 #define REDIS_SERVER_IP "127.0.0.1"
@@ -12,12 +14,20 @@
 /* server */
 #define MAX_RECEIVE_BUFFER_LEN 256
 #define TOKEN_SIZE 32
-
-using namespace std;
-using namespace google;
-
 const unsigned short PORT_NUMBER = 31400;
 const unsigned short MAX_SESSION_COUNT = 5000;
+
+/* session status */
+
+typedef enum session_status  
+{
+    WAIT
+    , LOGIN
+    , LOGOUT
+    , MATCH_REQUEST
+    , MATCH_RECVER
+    , MATCH_COMPLETE
+} status;
 
 struct packet_header
 {
@@ -75,73 +85,55 @@ public:
         return incoding(channel_serv::MESSAGE_ID::LOGOUT_NTF, message);
     }
 
-    channel_serv::friends_req decode_friends_req_message(const char *decoding_data,const int data_size)
+    inline void decode_message(channel_serv::join_req &message, const char *decoding_data, const int data_size)
     {
-        channel_serv::friends_req  message;
-        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
-        return message;
+        message.ParseFromArray(decoding_data, data_size);
     }
 
-    channel_serv::friends_ans decode_friends_ans_message(const char *decoding_data, const int data_size)
+    inline void decode_message(channel_serv::join_ans &message, const char *decoding_data, const int data_size)
     {
-        channel_serv::friends_ans  message;
-        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
-        return message;
+        message.ParseFromArray(decoding_data, data_size);
     }
 
-    channel_serv::play_friends_game_req decode_play_friends_game_req_message(const char *decoding_data, const int data_size)
+    inline void decode_message(channel_serv::logout_ntf &message, const char *decoding_data, const int data_size)
     {
-        channel_serv::play_friends_game_req  message;
-        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
-        return message;
+        message.ParseFromArray(decoding_data, data_size);
     }
 
-    channel_serv::play_rank_game_req decode_play_game_req_message(const char *decoding_data, const int data_size)
+    inline void decode_message(channel_serv::error_msg &message, const char *decoding_data, const int data_size)
     {
-        channel_serv::play_rank_game_req  message;
-        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
-        return message;
+        message.ParseFromArray(decoding_data, data_size);
     }
 
-    channel_serv::join_req decode_join_req_message(const char *decoding_data, const int data_size)
+    inline void decode_message(channel_serv::matching_complete_ans &message, const char *decoding_data, const int data_size)
     {
-        channel_serv::join_req  message;
-        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
-        return message;
+        message.ParseFromArray(decoding_data, data_size);
     }
 
-    channel_serv::join_ans decode_join_ans_message(const char *decoding_data, const int data_size)
+    inline void decode_message(channel_serv::play_friends_game_req &message, const char *decoding_data, const int data_size)
     {
-        channel_serv::join_ans  message;
-        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
-        return message;
+        message.ParseFromArray(decoding_data, data_size);
     }
 
-    channel_serv::matching_complete_ans decode_matching_complete_ans_message(const char *decoding_data, const int data_size)
+    inline void decode_message(channel_serv::play_rank_game_req &message, const char *decoding_data, const int data_size)
     {
-        channel_serv::matching_complete_ans  message;
-        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
-        return message;
+        message.ParseFromArray(decoding_data, data_size);
     }
 
-    channel_serv::error_msg decode_error_msg_message(const char *decoding_data, const int data_size)
+    inline void decode_message(channel_serv::friends_req &message, const char *decoding_data, const int data_size)
     {
-        channel_serv::error_msg  message;
-        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
-        return message;
+        message.ParseFromArray(decoding_data, data_size);
     }
 
-    channel_serv::logout_ntf decode_logout_nt_message(const char *decoding_data, const int data_size)
+    inline void decode_message(channel_serv::friends_ans &message, const char *decoding_data, const int data_size)
     {
-        channel_serv::logout_ntf  message;
-        message.ParseFromArray(&decoding_data[packet_header_size], data_size);
-        return message;
+        message.ParseFromArray(decoding_data, data_size);
     }
-
+    
     channel_serv::RATING check_rating(const int rating)
     {
         if (rating < 100) return channel_serv::RATING::BRONZE;
-        else if (rating < 200) return channel_serv::RATING::SLIVER;
+        else if (rating < 200) return channel_serv::RATING::SILVER;
         else if (rating < 300) return channel_serv::RATING::GOLD;
         else if (rating < 400) return channel_serv::RATING::PLATINUM;
         else if (rating < 500) return channel_serv::RATING::DIAMOND;
@@ -156,7 +148,9 @@ private:
 
         header->ID = id;
         header->size = message.ByteSize();
-        message.SerializePartialToArray(incoding_data, header->size);
+        message.SerializePartialToArray(&incoding_data[packet_header_size], header->size);
+
+        return incoding_data;
     }
 
     void PrintMessage(const protobuf::Message& message) const

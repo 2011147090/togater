@@ -36,7 +36,7 @@ private:
 
     std::vector< session* > session_list_;
     std::deque<int> session_queue_;
-    
+
     /* friends manager */
     friends_manager &friends_manager_;
     /* match manager */

@@ -41,11 +41,51 @@ void tcp_server::start()
 
 void tcp_server::close_session(const int n_session_id)
 {
-    std::cout << "세션 ID : " << n_session_id << std::endl;
+    
+    session *request_session = session_list_[n_session_id];
     //std::cout << "종료 클라이언트 토큰 : " << session_list_[n_session_id]->get_token();
     //std::cout << " 클라이언트 ID : " << session_list_[n_session_id]->get_user_id() << std::endl << std::endl;
     
-    session_list_[n_session_id]->get_socket().close();
+    if (request_session->get_status() == status::LOGIN)
+    {
+        //비정상 종료
+        friends_manager_.del_redis_token(request_session->get_token());
+        friends_manager_.del_id_in_user_map(request_session->get_user_id());
+        std::cout << "세션 ID : " << n_session_id << "비정상 종료" << std::endl;
+    }
+    else if (request_session->get_status() == status::LOGOUT)
+    {
+        //정상 종료
+        std::cout << "세션 ID : " << n_session_id << "로그 아웃" << std::endl;
+    }
+    else if (request_session->get_status() == status::MATCH_COMPLETE)
+    {
+        friends_manager_.del_id_in_user_map(request_session->get_user_id());
+        std::cout << "세션 ID : " << n_session_id << "매칭 완료" << std::endl;
+        //정상 종료
+    }
+    else if (request_session->get_status() == status::MATCH_RECVER)
+    {
+        friends_manager_.del_redis_token(request_session->get_token());
+        friends_manager_.del_id_in_user_map(request_session->get_user_id());
+        std::cout << "세션 ID : " << n_session_id << "비정상 종료" << std::endl;
+        //비정상 종료
+    }
+    else if (request_session->get_status() == status::MATCH_REQUEST)
+    {
+        friends_manager_.del_redis_token(request_session->get_token());
+        friends_manager_.del_id_in_user_map(request_session->get_user_id());
+        std::cout << "세션 ID : " << n_session_id << "비정상 종료" << std::endl;
+        //비정상 종료
+    }
+    else
+    {
+
+    }
+    
+    request_session->set_status(status::WAIT);
+
+    request_session->get_socket().close();
     session_queue_.push_back(n_session_id);
 
     if (accepting_flag_ == false)
@@ -57,39 +97,32 @@ void tcp_server::close_session(const int n_session_id)
 void tcp_server::process_packet(const int n_session_id, const char * p_data)
 {
     packet_header *p_header = (packet_header *)p_data;
-
+    session *request_session = get_session(n_session_id);
     switch (p_header->ID)
     {
     case ch::MESSAGE_ID::FRIENDS_REQ:
         {
-            friends_manager_.process_friends_function(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
+        friends_manager_.process_friends_function(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
         }
         break;
     case ch::MESSAGE_ID::PLAY_FRIENDS_REQ:
         {
-            
+        match_manager_.process_matching_with_friends(request_session, &p_data[packet_header_size], p_header->size);
         }
         break;
     case ch::MESSAGE_ID::PLAY_RANK_REQ:
         {
-            
+        match_manager_.process_matching(request_session, &p_data[packet_header_size], p_header->size);
         }
         break;
     case ch::MESSAGE_ID::JOIN_REQ:
         {
-            if(friends_manager_.lobby_login_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size) == false)
-            {
-                close_session(n_session_id);
-            }
-           
+        friends_manager_.lobby_login_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
         }
         break;
     case ch::MESSAGE_ID::LOGOUT_NTF:
         {
-            if (friends_manager_.lobby_logout_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size))
-            {
-                close_session(n_session_id);
-            }
+        friends_manager_.lobby_logout_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
         }
         break;
     default:
@@ -107,9 +140,9 @@ bool tcp_server::post_accept()
     }
     
     accepting_flag_ = true;
-    int n_session_id = session_queue_.front();
+    int n_session_id = session_queue_.front(); // shared resource !
     
-    session_queue_.pop_front();
+    session_queue_.pop_front(); // shared resource !
     
     acceptor_.async_accept(session_list_[n_session_id]->get_socket(), boost::bind(&tcp_server::handle_accept, this, session_list_[n_session_id], boost::asio::placeholders::error));
 
@@ -127,6 +160,6 @@ void tcp_server::handle_accept(session * p_session, const boost::system::error_c
     }
     else
     {
-        std::cout << "error No: " << error.value() << "error Message : " << error.message() << std::endl;
+        std::cout << "Accept error No: " << error.value() << "error Message : " << error.message() << std::endl;
     }
 }
