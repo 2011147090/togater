@@ -81,11 +81,11 @@
     <ClCompile Include="config.cpp">
       <Filter>소스 파일\config</Filter>
     </ClCompile>
-    <ClCompile Include="packet.pb.cc">
-      <Filter>소스 파일\packet</Filter>
-    </ClCompile>
     <ClCompile Include="friends_manager.cpp">
       <Filter>소스 파일\server feature</Filter>
+    </ClCompile>
+    <ClCompile Include="packet.pb.cc">
+      <Filter>소스 파일\packet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -113,11 +113,11 @@
     <ClInclude Include="config.h">
       <Filter>헤더 파일\config</Filter>
     </ClInclude>
-    <ClInclude Include="packet.pb.h">
-      <Filter>헤더 파일\packet</Filter>
-    </ClInclude>
     <ClInclude Include="friends_manager.h">
       <Filter>헤더 파일\server feature</Filter>
+    </ClInclude>
+    <ClInclude Include="packet.pb.h">
+      <Filter>헤더 파일\packet</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

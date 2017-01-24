@@ -8,6 +8,7 @@ session::session(int session_id, boost::asio::io_service &io_service, tcp_server
     , socket_(io_service)
     , channel_serv_(p_channel_serv)
 {
+    stat_ = status::WAIT;
 }
 
 session::~session()
@@ -38,11 +39,11 @@ void session::post_receive()
     );
 }
 
-void session::post_send(const bool immediately, const int n_size, char * p_data)
+void session::post_send(const bool immediately, const int send_data_size, char * send_data)
 {
     if (immediately == false)
     {
-        send_data_queue_.push_back(p_data);
+        send_data_queue_.push_back(send_data);
     }
 
 
@@ -52,7 +53,7 @@ void session::post_send(const bool immediately, const int n_size, char * p_data)
     }
 
     boost::asio::async_write(
-        socket_, boost::asio::buffer(p_data, n_size),   
+        socket_, boost::asio::buffer(send_data, send_data_size),   
         boost::bind(
             &session::handle_write, this,
             boost::asio::placeholders::error,
@@ -74,18 +75,24 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
     }
 }
 
-void session::handle_receive(const boost::system::error_code & error, size_t bytes_transferred)
+void session::handle_receive(const boost::system::error_code & error, size_t bytes_transferred) // bytes_transferred 크기가 MAX_BUFFER_LEN * 2 보다 클수도 있다
 {
     if (error)
     {
+        
         if (error == boost::asio::error::eof)
         {
             std::cout << "클라이언트와 연결이 끊어졌습니다" << std::endl; //log
             channel_serv_->close_session(session_id_);
         }
+        else if(error == boost::asio::error::connection_reset)
+        {
+            channel_serv_->close_session(session_id_);
+        }
         else
         {
-            std::cout << "error No: " << error.value() << "error Message: " << error.message() << std::endl; //log
+            std::cout << "Recv error No: " << error.value() << "error Message: " << error.message() << std::endl;
+            channel_serv_->close_session(session_id_);
         }
     }
     else
