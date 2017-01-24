@@ -17,11 +17,13 @@ bool logic_session::destroy()
 {
     thread_sync sync;
 
+    disconnect();
+
     is_connected_ = false;
 
     work_thread_->join();
 
-    if (socket_ != NULL)
+    if (socket_ != nullptr)
         delete socket_;
 
     return true;
@@ -185,8 +187,6 @@ void logic_session::process_packet_game_state_ntf(logic_server::packet_game_stat
     }
     else if (packet.state() == 2)
     {
-        this->disconnect();
-
         game_mgr->scheduler_->performFunctionInCocosThread(
             CC_CALLBACK_0(
                 main_scene::end, game_mgr->scene_,

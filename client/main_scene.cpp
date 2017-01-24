@@ -43,7 +43,7 @@ void main_scene::setup_scene()
     //    origin.y + closeItem->getContentSize().height / 2));
 
     // create menu, it's an autorelease object
-    //auto menu = Menu::create(closeItem, NULL);
+    //auto menu = Menu::create(closeItem, nullptr);
     //menu->setPosition(Vec2::ZERO);
     //this->addChild(menu, 1);
 
@@ -60,8 +60,7 @@ void main_scene::setup_scene()
         switch (type)
         {
         case ui::Widget::TouchEventType::ENDED:
-            ((logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)))->
-                send_packet_disconnect_room_ntf();
+            network_logic->send_packet_disconnect_room_ntf();
             break;
         }
     });
@@ -159,12 +158,11 @@ void main_scene::setup_scene()
     listener->onTouchEnded = CC_CALLBACK_2(main_scene::on_touch_ended, this);
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
-    //scheduleUpdate();
 }
 
 void main_scene::end()
 {
+    network_logic->destroy();
     game_mgr->release_singleton();
   
     Director::getInstance()->popScene();

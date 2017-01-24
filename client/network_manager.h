@@ -24,6 +24,9 @@ using boost::asio::ip::tcp;
 
 #define network_mgr network_manager::get_instance()
 
+#define network_chat ((chat_session*)(network_mgr->get_session(network_manager::CHAT_SESSION)))
+#define network_logic ((logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION))) 
+
 class network_manager : public singleton<network_manager>, public multi_thread_sync<network_manager> {
 private:
     std::string room_key_;

@@ -21,31 +21,31 @@ namespace chat_server {
 
 namespace {
 
-const ::google::protobuf::Descriptor* packet_verify_req_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* packet_verify_req_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_verify_req_reflection_ = NULL;
-const ::google::protobuf::Descriptor* packet_verify_res_descriptor_ = NULL;
+  packet_verify_req_reflection_ = nullptr;
+const ::google::protobuf::Descriptor* packet_verify_res_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_verify_res_reflection_ = NULL;
-const ::google::protobuf::Descriptor* packet_match_req_descriptor_ = NULL;
+  packet_verify_res_reflection_ = nullptr;
+const ::google::protobuf::Descriptor* packet_match_req_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_match_req_reflection_ = NULL;
-const ::google::protobuf::Descriptor* packet_match_res_descriptor_ = NULL;
+  packet_match_req_reflection_ = nullptr;
+const ::google::protobuf::Descriptor* packet_match_res_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_match_res_reflection_ = NULL;
-const ::google::protobuf::Descriptor* packet_chat_normal_descriptor_ = NULL;
+  packet_match_res_reflection_ = nullptr;
+const ::google::protobuf::Descriptor* packet_chat_normal_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_chat_normal_reflection_ = NULL;
-const ::google::protobuf::Descriptor* packet_chat_whisper_descriptor_ = NULL;
+  packet_chat_normal_reflection_ = nullptr;
+const ::google::protobuf::Descriptor* packet_chat_whisper_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_chat_whisper_reflection_ = NULL;
-const ::google::protobuf::Descriptor* packet_chat_room_descriptor_ = NULL;
+  packet_chat_whisper_reflection_ = nullptr;
+const ::google::protobuf::Descriptor* packet_chat_room_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_chat_room_reflection_ = NULL;
-const ::google::protobuf::Descriptor* packet_chat_notice_descriptor_ = NULL;
+  packet_chat_room_reflection_ = nullptr;
+const ::google::protobuf::Descriptor* packet_chat_notice_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_chat_notice_reflection_ = NULL;
-const ::google::protobuf::EnumDescriptor* message_type_descriptor_ = NULL;
+  packet_chat_notice_reflection_ = nullptr;
+const ::google::protobuf::EnumDescriptor* message_type_descriptor_ = nullptr;
 
 }  // namespace
 
@@ -56,7 +56,7 @@ void protobuf_AssignDesc_chat_5fprotobuf_2eproto() {
   const ::google::protobuf::FileDescriptor* file =
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "chat_protobuf.proto");
-  GOOGLE_CHECK(file != NULL);
+  GOOGLE_CHECK(file != nullptr);
   packet_verify_req_descriptor_ = file->message_type(0);
   static const int packet_verify_req_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_verify_req, key_string_),
@@ -337,7 +337,7 @@ const int packet_verify_req::kValueUserIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_verify_req::packet_verify_req()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:chat_server.packet_verify_req)
@@ -348,7 +348,7 @@ void packet_verify_req::InitAsDefaultInstance() {
 
 packet_verify_req::packet_verify_req(const packet_verify_req& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+    _internal_metadata_(nullptr) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:chat_server.packet_verify_req)
@@ -389,7 +389,7 @@ const packet_verify_req& packet_verify_req::default_instance() {
 
 packet_verify_req* packet_verify_req::New(::google::protobuf::Arena* arena) const {
   packet_verify_req* n = new packet_verify_req;
-  if (arena != NULL) {
+  if (arena != nullptr) {
     arena->Own(n);
   }
   return n;
@@ -596,7 +596,7 @@ void packet_verify_req::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_verify_req* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_verify_req>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_verify_req)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -720,7 +720,7 @@ void packet_verify_req::set_key_string(const char* value, size_t size) {
   return key_string_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_verify_req::set_allocated_key_string(::std::string* key_string) {
-  if (key_string != NULL) {
+  if (key_string != nullptr) {
     set_has_key_string();
   } else {
     clear_has_key_string();
@@ -774,7 +774,7 @@ void packet_verify_req::set_value_user_id(const char* value, size_t size) {
   return value_user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_verify_req::set_allocated_value_user_id(::std::string* value_user_id) {
-  if (value_user_id != NULL) {
+  if (value_user_id != nullptr) {
     set_has_value_user_id();
   } else {
     clear_has_value_user_id();
@@ -795,7 +795,7 @@ const int packet_verify_res::kIsSuccessfulFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_verify_res::packet_verify_res()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:chat_server.packet_verify_res)
@@ -806,7 +806,7 @@ void packet_verify_res::InitAsDefaultInstance() {
 
 packet_verify_res::packet_verify_res(const packet_verify_res& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+    _internal_metadata_(nullptr) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:chat_server.packet_verify_res)
@@ -844,7 +844,7 @@ const packet_verify_res& packet_verify_res::default_instance() {
 
 packet_verify_res* packet_verify_res::New(::google::protobuf::Arena* arena) const {
   packet_verify_res* n = new packet_verify_res;
-  if (arena != NULL) {
+  if (arena != nullptr) {
     arena->Own(n);
   }
   return n;
@@ -963,7 +963,7 @@ void packet_verify_res::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_verify_res* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_verify_res>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_verify_res)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1073,7 +1073,7 @@ const int packet_match_req::kOpponentIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_match_req::packet_match_req()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:chat_server.packet_match_req)
@@ -1084,7 +1084,7 @@ void packet_match_req::InitAsDefaultInstance() {
 
 packet_match_req::packet_match_req(const packet_match_req& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+    _internal_metadata_(nullptr) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:chat_server.packet_match_req)
@@ -1125,7 +1125,7 @@ const packet_match_req& packet_match_req::default_instance() {
 
 packet_match_req* packet_match_req::New(::google::protobuf::Arena* arena) const {
   packet_match_req* n = new packet_match_req;
-  if (arena != NULL) {
+  if (arena != nullptr) {
     arena->Own(n);
   }
   return n;
@@ -1332,7 +1332,7 @@ void packet_match_req::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_match_req* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_match_req>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_match_req)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1456,7 +1456,7 @@ void packet_match_req::set_user_id(const char* value, size_t size) {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_match_req::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -1510,7 +1510,7 @@ void packet_match_req::set_opponent_id(const char* value, size_t size) {
   return opponent_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_match_req::set_allocated_opponent_id(::std::string* opponent_id) {
-  if (opponent_id != NULL) {
+  if (opponent_id != nullptr) {
     set_has_opponent_id();
   } else {
     clear_has_opponent_id();
@@ -1531,7 +1531,7 @@ const int packet_match_res::kIsSuccessfulFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_match_res::packet_match_res()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:chat_server.packet_match_res)
@@ -1542,7 +1542,7 @@ void packet_match_res::InitAsDefaultInstance() {
 
 packet_match_res::packet_match_res(const packet_match_res& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+    _internal_metadata_(nullptr) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:chat_server.packet_match_res)
@@ -1580,7 +1580,7 @@ const packet_match_res& packet_match_res::default_instance() {
 
 packet_match_res* packet_match_res::New(::google::protobuf::Arena* arena) const {
   packet_match_res* n = new packet_match_res;
-  if (arena != NULL) {
+  if (arena != nullptr) {
     arena->Own(n);
   }
   return n;
@@ -1699,7 +1699,7 @@ void packet_match_res::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_match_res* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_match_res>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_match_res)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1809,7 +1809,7 @@ const int packet_chat_normal::kChatMessageFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_chat_normal::packet_chat_normal()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:chat_server.packet_chat_normal)
@@ -1820,7 +1820,7 @@ void packet_chat_normal::InitAsDefaultInstance() {
 
 packet_chat_normal::packet_chat_normal(const packet_chat_normal& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+    _internal_metadata_(nullptr) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:chat_server.packet_chat_normal)
@@ -1861,7 +1861,7 @@ const packet_chat_normal& packet_chat_normal::default_instance() {
 
 packet_chat_normal* packet_chat_normal::New(::google::protobuf::Arena* arena) const {
   packet_chat_normal* n = new packet_chat_normal;
-  if (arena != NULL) {
+  if (arena != nullptr) {
     arena->Own(n);
   }
   return n;
@@ -2068,7 +2068,7 @@ void packet_chat_normal::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_chat_normal* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_chat_normal>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_chat_normal)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -2192,7 +2192,7 @@ void packet_chat_normal::set_user_id(const char* value, size_t size) {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_chat_normal::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -2246,7 +2246,7 @@ void packet_chat_normal::set_chat_message(const char* value, size_t size) {
   return chat_message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_chat_normal::set_allocated_chat_message(::std::string* chat_message) {
-  if (chat_message != NULL) {
+  if (chat_message != nullptr) {
     set_has_chat_message();
   } else {
     clear_has_chat_message();
@@ -2269,7 +2269,7 @@ const int packet_chat_whisper::kChatMessageFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_chat_whisper::packet_chat_whisper()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:chat_server.packet_chat_whisper)
@@ -2280,7 +2280,7 @@ void packet_chat_whisper::InitAsDefaultInstance() {
 
 packet_chat_whisper::packet_chat_whisper(const packet_chat_whisper& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+    _internal_metadata_(nullptr) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:chat_server.packet_chat_whisper)
@@ -2323,7 +2323,7 @@ const packet_chat_whisper& packet_chat_whisper::default_instance() {
 
 packet_chat_whisper* packet_chat_whisper::New(::google::protobuf::Arena* arena) const {
   packet_chat_whisper* n = new packet_chat_whisper;
-  if (arena != NULL) {
+  if (arena != nullptr) {
     arena->Own(n);
   }
   return n;
@@ -2583,7 +2583,7 @@ void packet_chat_whisper::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_chat_whisper* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_chat_whisper>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_chat_whisper)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -2712,7 +2712,7 @@ void packet_chat_whisper::set_user_id(const char* value, size_t size) {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_chat_whisper::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -2766,7 +2766,7 @@ void packet_chat_whisper::set_target_id(const char* value, size_t size) {
   return target_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_chat_whisper::set_allocated_target_id(::std::string* target_id) {
-  if (target_id != NULL) {
+  if (target_id != nullptr) {
     set_has_target_id();
   } else {
     clear_has_target_id();
@@ -2820,7 +2820,7 @@ void packet_chat_whisper::set_chat_message(const char* value, size_t size) {
   return chat_message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_chat_whisper::set_allocated_chat_message(::std::string* chat_message) {
-  if (chat_message != NULL) {
+  if (chat_message != nullptr) {
     set_has_chat_message();
   } else {
     clear_has_chat_message();
@@ -2842,7 +2842,7 @@ const int packet_chat_room::kChatMessageFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_chat_room::packet_chat_room()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:chat_server.packet_chat_room)
@@ -2853,7 +2853,7 @@ void packet_chat_room::InitAsDefaultInstance() {
 
 packet_chat_room::packet_chat_room(const packet_chat_room& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+    _internal_metadata_(nullptr) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:chat_server.packet_chat_room)
@@ -2894,7 +2894,7 @@ const packet_chat_room& packet_chat_room::default_instance() {
 
 packet_chat_room* packet_chat_room::New(::google::protobuf::Arena* arena) const {
   packet_chat_room* n = new packet_chat_room;
-  if (arena != NULL) {
+  if (arena != nullptr) {
     arena->Own(n);
   }
   return n;
@@ -3101,7 +3101,7 @@ void packet_chat_room::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_chat_room* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_chat_room>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_chat_room)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -3225,7 +3225,7 @@ void packet_chat_room::set_user_id(const char* value, size_t size) {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_chat_room::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -3279,7 +3279,7 @@ void packet_chat_room::set_chat_message(const char* value, size_t size) {
   return chat_message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_chat_room::set_allocated_chat_message(::std::string* chat_message) {
-  if (chat_message != NULL) {
+  if (chat_message != nullptr) {
     set_has_chat_message();
   } else {
     clear_has_chat_message();
@@ -3301,7 +3301,7 @@ const int packet_chat_notice::kChatMessageFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_chat_notice::packet_chat_notice()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   if (this != internal_default_instance()) protobuf_InitDefaults_chat_5fprotobuf_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:chat_server.packet_chat_notice)
@@ -3312,7 +3312,7 @@ void packet_chat_notice::InitAsDefaultInstance() {
 
 packet_chat_notice::packet_chat_notice(const packet_chat_notice& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+    _internal_metadata_(nullptr) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:chat_server.packet_chat_notice)
@@ -3353,7 +3353,7 @@ const packet_chat_notice& packet_chat_notice::default_instance() {
 
 packet_chat_notice* packet_chat_notice::New(::google::protobuf::Arena* arena) const {
   packet_chat_notice* n = new packet_chat_notice;
-  if (arena != NULL) {
+  if (arena != nullptr) {
     arena->Own(n);
   }
   return n;
@@ -3560,7 +3560,7 @@ void packet_chat_notice::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_chat_notice* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_chat_notice>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:chat_server.packet_chat_notice)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -3684,7 +3684,7 @@ void packet_chat_notice::set_user_id(const char* value, size_t size) {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_chat_notice::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -3738,7 +3738,7 @@ void packet_chat_notice::set_chat_message(const char* value, size_t size) {
   return chat_message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_chat_notice::set_allocated_chat_message(::std::string* chat_message) {
-  if (chat_message != NULL) {
+  if (chat_message != nullptr) {
     set_has_chat_message();
   } else {
     clear_has_chat_message();

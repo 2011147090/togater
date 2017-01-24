@@ -3,7 +3,7 @@
 
 player::player()
 {
-    srand((unsigned int)time(NULL));
+    srand((unsigned int)time(nullptr));
 
     lock_bet_size_ = 1;
 }
@@ -14,13 +14,13 @@ player::~player()
 
 void player::release()
 {
-    if (coin_list_ != NULL)
+    if (coin_list_ != nullptr)
     {
         coin_list_->clear();
         delete coin_list_;
     }
 
-    if (bet_coin_list_ != NULL)
+    if (bet_coin_list_ != nullptr)
     {
         bet_coin_list_->clear();
         delete bet_coin_list_;
@@ -57,7 +57,7 @@ coin* player::find_coin(cocos2d::Sprite* sprite)
         if ((*iter).sprite_ == sprite)
             return &(*iter);
 
-    return NULL;
+    return nullptr;
 }
 
 void player::reset_coin(player* other_player)

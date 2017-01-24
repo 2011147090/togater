@@ -13,10 +13,16 @@ network_manager::~network_manager() {}
 bool network_manager::init_singleton()
 {
     if (session[0] == nullptr)
+    {
         session[0] = new logic_session();
+        session[0]->create();
+    }
 
     if (session[1] == nullptr)
+    {
         session[1] = new chat_session();
+        session[1]->create();
+    }
 
     if (!session[0]->create())
         return false;
@@ -37,6 +43,11 @@ bool network_manager::release_singleton()
         if (!session[1]->destroy())
             return false;
 
+    delete[] session;
+
+    session[0] = nullptr;
+    session[1] = nullptr;
+        
     return true;
 }
 

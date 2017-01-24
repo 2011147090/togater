@@ -68,7 +68,7 @@ void loading_scene::update(float delta)
         this->getScheduler()->performFunctionInCocosThread(
             CC_CALLBACK_0(
                 logic_session::connect, 
-                (logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)), 
+                network_logic,
                 LOGIC_SERVER_IP, "8600"
             )
         );
@@ -81,9 +81,9 @@ void loading_scene::update(float delta)
     {
         timer = 3;
 
-        if (((logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)))->is_run())
+        if (network_logic->is_run())
         {
-            ((logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)))->send_packet_enter_req(
+            network_logic->send_packet_enter_req(
                 "temp",
                 network_mgr->get_player_key()
             );

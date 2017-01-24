@@ -103,7 +103,7 @@ class packet_enter_req : public ::google::protobuf::Message /* @@protoc_insertio
 
   // implements Message ----------------------------------------------
 
-  inline packet_enter_req* New() const { return New(NULL); }
+  inline packet_enter_req* New() const { return New(nullptr); }
 
   packet_enter_req* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -224,7 +224,7 @@ class packet_enter_ans : public ::google::protobuf::Message /* @@protoc_insertio
 
   // implements Message ----------------------------------------------
 
-  inline packet_enter_ans* New() const { return New(NULL); }
+  inline packet_enter_ans* New() const { return New(nullptr); }
 
   packet_enter_ans* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -322,7 +322,7 @@ class packet_game_state_ntf : public ::google::protobuf::Message /* @@protoc_ins
 
   // implements Message ----------------------------------------------
 
-  inline packet_game_state_ntf* New() const { return New(NULL); }
+  inline packet_game_state_ntf* New() const { return New(nullptr); }
 
   packet_game_state_ntf* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -438,7 +438,7 @@ class packet_process_turn_req : public ::google::protobuf::Message /* @@protoc_i
 
   // implements Message ----------------------------------------------
 
-  inline packet_process_turn_req* New() const { return New(NULL); }
+  inline packet_process_turn_req* New() const { return New(nullptr); }
 
   packet_process_turn_req* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -549,7 +549,7 @@ class packet_process_turn_ans : public ::google::protobuf::Message /* @@protoc_i
 
   // implements Message ----------------------------------------------
 
-  inline packet_process_turn_ans* New() const { return New(NULL); }
+  inline packet_process_turn_ans* New() const { return New(nullptr); }
 
   packet_process_turn_ans* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -647,7 +647,7 @@ class packet_process_turn_ntf : public ::google::protobuf::Message /* @@protoc_i
 
   // implements Message ----------------------------------------------
 
-  inline packet_process_turn_ntf* New() const { return New(NULL); }
+  inline packet_process_turn_ntf* New() const { return New(nullptr); }
 
   packet_process_turn_ntf* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -798,7 +798,7 @@ class packet_process_check_card_ntf : public ::google::protobuf::Message /* @@pr
 
   // implements Message ----------------------------------------------
 
-  inline packet_process_check_card_ntf* New() const { return New(NULL); }
+  inline packet_process_check_card_ntf* New() const { return New(nullptr); }
 
   packet_process_check_card_ntf* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -896,7 +896,7 @@ class packet_disconnect_room_ntf : public ::google::protobuf::Message /* @@proto
 
   // implements Message ----------------------------------------------
 
-  inline packet_disconnect_room_ntf* New() const { return New(NULL); }
+  inline packet_disconnect_room_ntf* New() const { return New(nullptr); }
 
   packet_disconnect_room_ntf* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -1021,7 +1021,7 @@ inline ::std::string* packet_enter_req::release_player_key() {
   return player_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_enter_req::set_allocated_player_key(::std::string* player_key) {
-  if (player_key != NULL) {
+  if (player_key != nullptr) {
     set_has_player_key();
   } else {
     clear_has_player_key();
@@ -1075,7 +1075,7 @@ inline ::std::string* packet_enter_req::release_room_key() {
   return room_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_enter_req::set_allocated_room_key(::std::string* room_key) {
-  if (room_key != NULL) {
+  if (room_key != nullptr) {
     set_has_room_key();
   } else {
     clear_has_room_key();
@@ -1191,7 +1191,7 @@ inline ::std::string* packet_game_state_ntf::release_win_player_key() {
   return win_player_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_game_state_ntf::set_allocated_win_player_key(::std::string* win_player_key) {
-  if (win_player_key != NULL) {
+  if (win_player_key != nullptr) {
     set_has_win_player_key();
   } else {
     clear_has_win_player_key();
@@ -1520,7 +1520,7 @@ inline ::std::string* packet_disconnect_room_ntf::release_room_key() {
   return room_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_disconnect_room_ntf::set_allocated_room_key(::std::string* room_key) {
-  if (room_key != NULL) {
+  if (room_key != nullptr) {
     set_has_room_key();
   } else {
     clear_has_room_key();

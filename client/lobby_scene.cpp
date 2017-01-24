@@ -222,7 +222,7 @@ bool lobby_scene::init()
     this->getScheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             chat_session::connect,
-            (chat_session*)(network_mgr->get_session(network_manager::CHAT_SESSION)),
+            network_chat,
             CHAT_SERVER_IP, "8700"
         )
     );
@@ -230,7 +230,7 @@ bool lobby_scene::init()
     this->getScheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             chat_session::send_packet_verify_req,
-            (chat_session*)(network_mgr->get_session(network_manager::CHAT_SESSION)),
+            network_chat,
             network_mgr->get_player_key(),
             network_mgr->get_player_id()
         )
@@ -249,7 +249,7 @@ bool lobby_scene::init()
         switch (type)
         {
         case ui::Widget::TouchEventType::ENDED:
-            ((chat_session*)network_mgr->get_session(network_manager::CHAT_SESSION))->send_packet_chat_normal(
+            network_chat->send_packet_chat_normal(
                 network_mgr->get_player_id(),
                 chat_field->getString()
             );
@@ -293,7 +293,7 @@ void lobby_scene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
     {
         if (chat_field->isFocused())
         {
-            ((chat_session*)network_mgr->get_session(network_manager::CHAT_SESSION))->send_packet_chat_normal(
+            network_chat->send_packet_chat_normal(
                 network_mgr->get_player_id(),
                 chat_field->getString()
             );

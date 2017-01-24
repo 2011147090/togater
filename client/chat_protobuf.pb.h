@@ -103,7 +103,7 @@ class packet_verify_req : public ::google::protobuf::Message /* @@protoc_inserti
 
   // implements Message ----------------------------------------------
 
-  inline packet_verify_req* New() const { return New(NULL); }
+  inline packet_verify_req* New() const { return New(nullptr); }
 
   packet_verify_req* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -224,7 +224,7 @@ class packet_verify_res : public ::google::protobuf::Message /* @@protoc_inserti
 
   // implements Message ----------------------------------------------
 
-  inline packet_verify_res* New() const { return New(NULL); }
+  inline packet_verify_res* New() const { return New(nullptr); }
 
   packet_verify_res* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -322,7 +322,7 @@ class packet_match_req : public ::google::protobuf::Message /* @@protoc_insertio
 
   // implements Message ----------------------------------------------
 
-  inline packet_match_req* New() const { return New(NULL); }
+  inline packet_match_req* New() const { return New(nullptr); }
 
   packet_match_req* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -443,7 +443,7 @@ class packet_match_res : public ::google::protobuf::Message /* @@protoc_insertio
 
   // implements Message ----------------------------------------------
 
-  inline packet_match_res* New() const { return New(NULL); }
+  inline packet_match_res* New() const { return New(nullptr); }
 
   packet_match_res* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -541,7 +541,7 @@ class packet_chat_normal : public ::google::protobuf::Message /* @@protoc_insert
 
   // implements Message ----------------------------------------------
 
-  inline packet_chat_normal* New() const { return New(NULL); }
+  inline packet_chat_normal* New() const { return New(nullptr); }
 
   packet_chat_normal* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -662,7 +662,7 @@ class packet_chat_whisper : public ::google::protobuf::Message /* @@protoc_inser
 
   // implements Message ----------------------------------------------
 
-  inline packet_chat_whisper* New() const { return New(NULL); }
+  inline packet_chat_whisper* New() const { return New(nullptr); }
 
   packet_chat_whisper* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -798,7 +798,7 @@ class packet_chat_room : public ::google::protobuf::Message /* @@protoc_insertio
 
   // implements Message ----------------------------------------------
 
-  inline packet_chat_room* New() const { return New(NULL); }
+  inline packet_chat_room* New() const { return New(nullptr); }
 
   packet_chat_room* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -919,7 +919,7 @@ class packet_chat_notice : public ::google::protobuf::Message /* @@protoc_insert
 
   // implements Message ----------------------------------------------
 
-  inline packet_chat_notice* New() const { return New(NULL); }
+  inline packet_chat_notice* New() const { return New(nullptr); }
 
   packet_chat_notice* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -1062,7 +1062,7 @@ inline ::std::string* packet_verify_req::release_key_string() {
   return key_string_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_verify_req::set_allocated_key_string(::std::string* key_string) {
-  if (key_string != NULL) {
+  if (key_string != nullptr) {
     set_has_key_string();
   } else {
     clear_has_key_string();
@@ -1116,7 +1116,7 @@ inline ::std::string* packet_verify_req::release_value_user_id() {
   return value_user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_verify_req::set_allocated_value_user_id(::std::string* value_user_id) {
-  if (value_user_id != NULL) {
+  if (value_user_id != nullptr) {
     set_has_value_user_id();
   } else {
     clear_has_value_user_id();
@@ -1208,7 +1208,7 @@ inline ::std::string* packet_match_req::release_user_id() {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_match_req::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -1262,7 +1262,7 @@ inline ::std::string* packet_match_req::release_opponent_id() {
   return opponent_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_match_req::set_allocated_opponent_id(::std::string* opponent_id) {
-  if (opponent_id != NULL) {
+  if (opponent_id != nullptr) {
     set_has_opponent_id();
   } else {
     clear_has_opponent_id();
@@ -1354,7 +1354,7 @@ inline ::std::string* packet_chat_normal::release_user_id() {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_chat_normal::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -1408,7 +1408,7 @@ inline ::std::string* packet_chat_normal::release_chat_message() {
   return chat_message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_chat_normal::set_allocated_chat_message(::std::string* chat_message) {
-  if (chat_message != NULL) {
+  if (chat_message != nullptr) {
     set_has_chat_message();
   } else {
     clear_has_chat_message();
@@ -1469,7 +1469,7 @@ inline ::std::string* packet_chat_whisper::release_user_id() {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_chat_whisper::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -1523,7 +1523,7 @@ inline ::std::string* packet_chat_whisper::release_target_id() {
   return target_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_chat_whisper::set_allocated_target_id(::std::string* target_id) {
-  if (target_id != NULL) {
+  if (target_id != nullptr) {
     set_has_target_id();
   } else {
     clear_has_target_id();
@@ -1577,7 +1577,7 @@ inline ::std::string* packet_chat_whisper::release_chat_message() {
   return chat_message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_chat_whisper::set_allocated_chat_message(::std::string* chat_message) {
-  if (chat_message != NULL) {
+  if (chat_message != nullptr) {
     set_has_chat_message();
   } else {
     clear_has_chat_message();
@@ -1638,7 +1638,7 @@ inline ::std::string* packet_chat_room::release_user_id() {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_chat_room::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -1692,7 +1692,7 @@ inline ::std::string* packet_chat_room::release_chat_message() {
   return chat_message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_chat_room::set_allocated_chat_message(::std::string* chat_message) {
-  if (chat_message != NULL) {
+  if (chat_message != nullptr) {
     set_has_chat_message();
   } else {
     clear_has_chat_message();
@@ -1753,7 +1753,7 @@ inline ::std::string* packet_chat_notice::release_user_id() {
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_chat_notice::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
+  if (user_id != nullptr) {
     set_has_user_id();
   } else {
     clear_has_user_id();
@@ -1807,7 +1807,7 @@ inline ::std::string* packet_chat_notice::release_chat_message() {
   return chat_message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_chat_notice::set_allocated_chat_message(::std::string* chat_message) {
-  if (chat_message != NULL) {
+  if (chat_message != nullptr) {
     set_has_chat_message();
   } else {
     clear_has_chat_message();

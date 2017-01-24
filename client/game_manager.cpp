@@ -6,24 +6,24 @@
 
 bool game_manager::init_singleton()
 {
-    public_card_ = NULL;
-    opponent_card_ = NULL;
+    public_card_ = nullptr;
+    opponent_card_ = nullptr;
 
     return true;
 }
 
 bool game_manager::release_singleton()
 {
-    if (user_ != NULL)
+    if (user_ != nullptr)
     {
         delete user_;
-        user_ = NULL;
+        user_ = nullptr;
     }
 
-    if (opponent_ != NULL)
+    if (opponent_ != nullptr)
     {
         delete opponent_;
-        opponent_ = NULL;
+        opponent_ = nullptr;
     }
 
     return true;
@@ -56,7 +56,7 @@ void game_manager::new_turn(int public_card_1, int public_card_2, int opponent_c
     user_->set_bet_coin(1);
     opponent_->set_bet_coin(1);
    
-    if (public_card_ != NULL)
+    if (public_card_ != nullptr)
     {
         public_card_[0].release();
         public_card_[1].release();
@@ -64,7 +64,7 @@ void game_manager::new_turn(int public_card_1, int public_card_2, int opponent_c
         delete[] public_card_;
     }
 
-    if (opponent_card_ != NULL)
+    if (opponent_card_ != nullptr)
     {
         opponent_card_->release();
 
@@ -88,7 +88,7 @@ void game_manager::betting(int player_key)
     if (user_->get_bet_coin_size() >= opponent_->get_bet_coin_size()
         || user_->get_bet_coin_size() - user_->get_lock_bet_size() == 0 || user_->get_coin_size() == 0)
     {
-        ((logic_session*)(network_mgr->get_session(network_manager::LOGIC_SESSION)))->send_packet_process_turn_ans(user_->get_bet_coin_size() - user_->get_lock_bet_size());
+        network_logic->send_packet_process_turn_ans(user_->get_bet_coin_size() - user_->get_lock_bet_size());
 
         user_->set_lock_bet_size(user_->get_bet_coin_size());
 

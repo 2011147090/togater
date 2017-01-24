@@ -21,7 +21,7 @@ bool chat_session::destroy()
 
     work_thread_->join();
 
-    if (socket_ != NULL)
+    if (socket_ != nullptr)
         delete socket_;
 
     return true;
