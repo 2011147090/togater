@@ -1,0 +1,27 @@
+{
+  "name": "garam",
+  "version": "1.0.0",
+  "description": "server for login and register",
+  "main": "app.js",
+  "scripts": {
+    "test": "no"
+  },
+  "repository": {
+    "type": "git",
+    "url": "no"
+  },
+  "keywords": [
+    "no"
+  ],
+  "author": "no",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.0",
+    "express-session": "^1.14.2",
+    "morgan": "^1.7.0",
+    "mysql": "^2.12.0",
+    "redis": "^2.6.5"
+  }
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | Login Project</title>
+    <style>
+    * {
+  margin: 0;
+  padding: 0;
+}
+canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+    </style>
+  </head>
+  <body>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="720px" width="1280px"></canvas>
+    <script type='text/javascript'>
+  var Module = {
+    TOTAL_MEMORY: 268435456,
+    errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
+    compatibilitycheck: null,
+    backgroundColor: "#80858B",
+    splashStyle: "Dark",
+    dataUrl: "Release/test game.data",
+    codeUrl: "Release/test game.js",
+    asmUrl: "Release/test game.asm.js",
+    memUrl: "Release/test game.mem",
+  };
+  window.onload = function () {
+    window.focus(); // 현재 window 즉 익스플러러를 윈도우 최상단에 위치
+    //window.moveTo(0,0); // 웹 페이지의 창 위치를 0,0 (왼쪽 최상단) 으로 고정
+    window.resizeTo(1280, 800); // 웹페이지의 크기를 가로 1280 , 세로 800 으로 고정(확장 및 축소)
+}
+window.onresize = function () {
+    window.focus();
+    window.resizeTo(1280, 800);
+}
+</script>
+<script src="Release/UnityLoader.js"></script>
+
+  </body>
+</html>
