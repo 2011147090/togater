@@ -6,9 +6,12 @@
 #include "holdem_card.h"
 #include "game_manager.h"
 #include "network_manager.h"
+#include "chat_session.h"
 #include "logic_session.h"
 
 USING_NS_CC;
+
+ui::TextField* room_chat_field;
 
 Scene* main_scene::createScene()
 {
@@ -36,26 +39,15 @@ void main_scene::setup_scene()
 
     Vec2 middle_pos(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y);
 
-    //auto closeItem = MenuItemImage::create("CloseNormal.png", "CloseSelected.png",
-    //    CC_CALLBACK_1(main_scene::menu_close_callback, this));
-
-    //closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width / 2,
-    //    origin.y + closeItem->getContentSize().height / 2));
-
-    // create menu, it's an autorelease object
-    //auto menu = Menu::create(closeItem, nullptr);
-    //menu->setPosition(Vec2::ZERO);
-    //this->addChild(menu, 1);
-
     auto back = ui::Button::create("button2_normal.png", "button2_pressed.png");
 
     back->setTitleText("Give Up");
     back->setTitleFontName("fonts/D2Coding.ttf");
-    back->setTitleFontSize(10);
+    back->setTitleFontSize(20);
     back->setTitleColor(Color3B::BLACK);
     back->setScale(1.0f, 1.0);
-    back->setAnchorPoint(Vec2(0, 1));
-    back->setPosition(Vec2(visibleSize.width - 100, 10));
+    back->setAnchorPoint(Vec2(0.5, 0.5));
+    back->setPosition(Vec2(visibleSize.width - 100, 100));
     back->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
         switch (type)
         {
@@ -64,7 +56,6 @@ void main_scene::setup_scene()
             break;
         }
     });
-
 
     this->addChild(back, 1);
 
@@ -89,6 +80,20 @@ void main_scene::setup_scene()
     label_info_3->setPosition(middle_pos + cocos2d::Vec2(-130, 85));
     this->addChild(label_info_3, 1);
 
+    auto bet_coin_user = cocos2d::Label::createWithTTF("Bet : 0", "fonts/arial.ttf", 15);
+    bet_coin_user->setColor(cocos2d::Color3B::ORANGE);
+    bet_coin_user->setPosition(cocos2d::Vec2(visibleSize.width - 100, 150));
+    this->addChild(bet_coin_user, 1);
+
+    game_mgr->user_bet_text_ = bet_coin_user;
+
+    auto opponent_info = cocos2d::Label::createWithTTF("ID : Temp\nWin : 0, Defeat : 0\nRating : 1200\nBet : 0", "fonts/arial.ttf", 15);
+    opponent_info->setColor(cocos2d::Color3B::RED);
+    opponent_info->setPosition(cocos2d::Vec2(visibleSize.width - 100, visibleSize.height - 100));
+    this->addChild(opponent_info, 1);
+
+    game_mgr->opponent_info_text_ = opponent_info;
+
     auto card_pack = Sprite::create("card_pack.png");
     card_pack->setScale(1.0f);
     card_pack->setPosition(middle_pos - Vec2(150, 110));
@@ -104,16 +109,39 @@ void main_scene::setup_scene()
     chat_background->setPosition(Vec2(0, 0));
     this->addChild(chat_background, 4);
 
-    auto chat_field = ui::TextField::create("Input Chat Here", "fonts/arial.ttf", 15);
-    chat_field->setMaxLength(10);
-    chat_field->setColor(cocos2d::Color3B::BLACK);
-    chat_field->setMaxLength(true);
-    chat_field->setAnchorPoint(Vec2(0, 0));
-    chat_field->setPosition(Vec2(9, 5));
+    room_chat_field = ui::TextField::create("Input Chat Here", "fonts/D2Coding.ttf", 15);
+    room_chat_field->setMaxLength(10);
+    room_chat_field->setColor(cocos2d::Color3B::BLACK);
+    room_chat_field->setMaxLength(true);
+    room_chat_field->setAnchorPoint(Vec2(0, 0));
+    room_chat_field->setPosition(Vec2(9, 5));
 
-    game_mgr->text_field_ = chat_field;
-    
-    this->addChild(chat_field, 5);
+    this->addChild(room_chat_field, 5);
+
+    auto chat_button = ui::Button::create("button3_normal.png", "button3_pressed.png");
+
+    chat_button->setTitleText("");
+    chat_button->setTitleFontName("fonts/D2Coding.ttf");
+    chat_button->setTitleFontSize(20);
+    chat_button->setTitleColor(Color3B::BLACK);
+    chat_button->setScale(0.6f, 0.6f);
+    chat_button->setAnchorPoint(Vec2(0.5, 0.5));
+    chat_button->setPosition(Vec2(140, 13));
+    chat_button->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
+        switch (type)
+        {
+        case ui::Widget::TouchEventType::ENDED:
+            network_chat->send_packet_chat_normal(
+                network_mgr->get_player_id(),
+                room_chat_field->getString()
+            );
+
+            room_chat_field->setText("");
+            break;
+        }
+    });
+
+    this->addChild(chat_button, 6);
 
     auto keylistener = EventListenerKeyboard::create();
     keylistener->onKeyReleased = CC_CALLBACK_2(main_scene::on_key_released, this);
@@ -134,13 +162,12 @@ void main_scene::setup_scene()
     bet_button->setTitleText("BET");
     bet_button->setTitleFontSize(20);
     bet_button->setEnabled(false);
-    bet_button
-        ->setPosition(Vec2(visibleSize.width - 100, visibleSize.height / 2));
+    bet_button->setPosition(Vec2(visibleSize.width - 100, visibleSize.height / 2));
     bet_button->addTouchEventListener([&](Ref* sender, cocos2d::ui::Widget::TouchEventType type) {
         switch (type)
         {
         case ui::Widget::TouchEventType::ENDED:
-            game_mgr->betting(atoi(game_mgr->text_field_->getString().c_str()));
+            game_mgr->betting();
             break;
         }
     });
@@ -201,13 +228,39 @@ void main_scene::on_touch_ended(cocos2d::Touch* touch, Event *unused_event)
     cocos2d::Vec2 middle_pos(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y);
     middle_pos += cocos2d::Vec2(100 + rand() % 100, rand() % 100);
 
+    bool move_coin = false;
+
     if (touch->getLocation().x >= 210 && touch->getLocation().x <= 220 + game_mgr->user_->get_coin_size() * 10)
+    {
         if (touch->getLocation().y >= 0 && touch->getLocation().y <= 60)
+        {
             game_mgr->user_->bet_coin();
 
+            move_coin = true;
+        }
+    }
+
     if (touch->getLocation().x >= middle_pos.x - 100 && touch->getLocation().x <= middle_pos.x + 100)
+    {
         if (touch->getLocation().y >= middle_pos.y - 100 && touch->getLocation().y <= middle_pos.y + 100)
+        {
             game_mgr->user_->restore_coin();
+
+            move_coin = true;
+        }
+    }
+
+    if (move_coin)
+    {
+        int bet_size = game_mgr->user_->get_bet_coin_size();
+        char temp[5] = "";
+        itoa(bet_size, temp, 10);
+
+        std::string bet_text = "Bet : ";
+        bet_text += temp;
+
+        game_mgr->user_bet_text_->setString(bet_text);
+    }
 }
 
 void main_scene::menu_close_callback(Ref* sender)

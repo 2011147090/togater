@@ -28,6 +28,13 @@ public:
     holdem_card* public_card_;
     holdem_card* opponent_card_;
 
+    cocos2d::Label* opponent_info_text_;
+    
+    cocos2d::Label* user_bet_text_;
+    
+    std::string opponent_info_;
+    void set_opponent_info(std::string id, int win, int defeat, int rating);
+
     cocos2d::Scheduler* scheduler_;
     
     cocos2d::ui::Button* bet_button_;
@@ -42,7 +49,7 @@ public:
 
     void new_turn(int public_card_1, int public_card_2, int opponent_card, int remain_money, int my_money, int opponent_money);
     void opponent_turn_end(int my_money, int opponent_money);
-    void betting(int player_key);
+    void betting();
 
     void check_public_card();
     void start_game();

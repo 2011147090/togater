@@ -4,8 +4,7 @@
 #include "network_session.h"
 #include "logic_server.pb.h"
 
-const std::string LOGIC_SERVER_IP("127.0.0.1");
-//"192.168.1.201");
+const std::string LOGIC_SERVER_IP("192.168.1.24");
 
 class logic_session : public network_session {
 private:

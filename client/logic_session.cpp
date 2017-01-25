@@ -54,8 +54,15 @@ void logic_session::handle_read()
         if (!is_socket_open())
             break;
 
-        socket_->receive(boost::asio::buffer(recv_buf_));
+        boost::system::error_code error;
 
+        int i = 0;
+
+        socket_->receive(boost::asio::buffer(recv_buf_), i, error);
+
+        if (error)
+            return;
+        
         thread_sync sync;
 
         MESSAGE_HEADER message_header;

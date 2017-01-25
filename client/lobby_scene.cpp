@@ -219,23 +219,26 @@ bool lobby_scene::init()
     game_mgr->scheduler_ = this->getScheduler();
     game_mgr->lobby_chat_list_ = chat_list;
     
-    this->getScheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            chat_session::connect,
-            network_chat,
-            CHAT_SERVER_IP, "8700"
-        )
-    );
+    if (!network_chat->is_run())
+    {
+        this->getScheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                chat_session::connect,
+                network_chat,
+                CHAT_SERVER_IP, "8700"
+            )
+        );
 
-    this->getScheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            chat_session::send_packet_verify_req,
-            network_chat,
-            network_mgr->get_player_key(),
-            network_mgr->get_player_id()
-        )
-    );
-    
+        this->getScheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                chat_session::send_packet_verify_req,
+                network_chat,
+                network_mgr->get_player_key(),
+                network_mgr->get_player_id()
+            )
+        );
+    }
+
     auto chat_button = ui::Button::create("button3_normal.png", "button3_pressed.png");
 
     chat_button->setTitleText("");

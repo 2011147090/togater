@@ -2,7 +2,7 @@
 
 network_session::network_session()
 {
-
+    is_connected_ = false;
 }
 
 network_session::~network_session()

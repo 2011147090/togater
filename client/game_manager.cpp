@@ -34,6 +34,15 @@ game_manager::game_manager()
     
 }
 
+void game_manager::set_opponent_info(std::string id, int win, int defeat, int rating)
+{
+    opponent_info_ = "ID : ";
+    opponent_info_ += id;
+    opponent_info_ += "\nWin : " + win;
+    opponent_info_ += ", Defeat : " + defeat;
+    opponent_info_ += "\nRating : " + rating;
+}
+
 void game_manager::new_turn(int public_card_1, int public_card_2, int opponent_card, int remain_money, int my_money, int opponent_money)
 {
     auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
@@ -81,9 +90,15 @@ void game_manager::new_turn(int public_card_1, int public_card_2, int opponent_c
 
     opponent_card_ = new holdem_card(2, opponent_card, false, "Opponent Card");
     opponent_card_->move_action(cocos2d::Vec2(270, visibleSize.height - 100), 2);
+
+
+    std::string opponent_bet_text = "\nBet : 1";
+    
+    opponent_info_text_->setString(opponent_info_ + opponent_bet_text);
+    user_bet_text_->setString("Bet : 1");
 }
 
-void game_manager::betting(int player_key)
+void game_manager::betting()
 { 
     if (user_->get_bet_coin_size() >= opponent_->get_bet_coin_size()
         || user_->get_bet_coin_size() - user_->get_lock_bet_size() == 0 || user_->get_coin_size() == 0)
@@ -106,6 +121,14 @@ void game_manager::opponent_turn_end(int my_money, int opponent_money)
     user_->set_lock_bet_size(my_money);
 
     bet_button_->setEnabled(true);
+
+    char temp[5] = "";
+    itoa(opponent_->get_bet_coin_size(), temp, 10);
+
+    std::string opponent_bet_text = "\nBet : ";
+    opponent_bet_text += temp;
+    
+    opponent_info_text_->setString(opponent_info_ + opponent_bet_text);
 }
 
 void game_manager::check_public_card()
