@@ -1,6 +1,6 @@
 #include "redis_connector.h"
 
-const std::string redis_ip = "192.168.1.201";
+const std::string redis_ip = "127.0.0.1";//"192.168.1.201";
 const std::string redis_port = "6379";
 const std::string redis_password = "password";
 
@@ -43,14 +43,5 @@ void redis_connector::set(std::string key, std::string value)
 
 std::string redis_connector::get(std::string key)
 {
-    const std::string asd = key;
-
-    return conn_->get(asd);
-
-    //auto temp = conn_->get(key);
-
-    //if (temp.result().is_initialized())
-    //    return temp.result().get().c_str();
-
-    //return "";
+    return conn_->get(key);
 }

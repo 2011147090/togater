@@ -54,7 +54,7 @@ int main()
     
 
     // -----temporary start-----
-    chat_client.post_verify();
+    chat_client.post_verify_req();
     // ------temporary end------
 
 

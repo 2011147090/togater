@@ -42,20 +42,24 @@ class packet_chat_normal;
 class packet_chat_notice;
 class packet_chat_room;
 class packet_chat_whisper;
-class packet_match_req;
-class packet_match_res;
+class packet_enter_match_ntf;
+class packet_leave_match_ntf;
+class packet_logout_ans;
+class packet_logout_req;
+class packet_verify_ans;
 class packet_verify_req;
-class packet_verify_res;
 
 enum message_type {
   VERIFY_REQ = 0,
-  VERIFY_RES = 1,
-  MATCH_REQ = 2,
-  MATCH_RES = 3,
-  NORMAL = 10,
-  WHISPER = 11,
-  ROOM = 12,
-  NOTICE = 13
+  VERIFY_ANS = 1,
+  LOGOUT_REQ = 2,
+  LOGOUT_ANS = 3,
+  ENTER_MATCH_NTF = 10,
+  LEAVE_MATCH_NTF = 11,
+  NORMAL = 20,
+  WHISPER = 21,
+  ROOM = 22,
+  NOTICE = 23
 };
 bool message_type_IsValid(int value);
 const message_type message_type_MIN = VERIFY_REQ;
@@ -195,14 +199,14 @@ extern ::google::protobuf::internal::ExplicitlyConstructed<packet_verify_req> pa
 
 // -------------------------------------------------------------------
 
-class packet_verify_res : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_verify_res) */ {
+class packet_verify_ans : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_verify_ans) */ {
  public:
-  packet_verify_res();
-  virtual ~packet_verify_res();
+  packet_verify_ans();
+  virtual ~packet_verify_ans();
 
-  packet_verify_res(const packet_verify_res& from);
+  packet_verify_ans(const packet_verify_ans& from);
 
-  inline packet_verify_res& operator=(const packet_verify_res& from) {
+  inline packet_verify_ans& operator=(const packet_verify_ans& from) {
     CopyFrom(from);
     return *this;
   }
@@ -216,21 +220,21 @@ class packet_verify_res : public ::google::protobuf::Message /* @@protoc_inserti
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const packet_verify_res& default_instance();
+  static const packet_verify_ans& default_instance();
 
-  static const packet_verify_res* internal_default_instance();
+  static const packet_verify_ans* internal_default_instance();
 
-  void Swap(packet_verify_res* other);
+  void Swap(packet_verify_ans* other);
 
   // implements Message ----------------------------------------------
 
-  inline packet_verify_res* New() const { return New(NULL); }
+  inline packet_verify_ans* New() const { return New(NULL); }
 
-  packet_verify_res* New(::google::protobuf::Arena* arena) const;
+  packet_verify_ans* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const packet_verify_res& from);
-  void MergeFrom(const packet_verify_res& from);
+  void CopyFrom(const packet_verify_ans& from);
+  void MergeFrom(const packet_verify_ans& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -249,8 +253,8 @@ class packet_verify_res : public ::google::protobuf::Message /* @@protoc_inserti
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(packet_verify_res* other);
-  void UnsafeMergeFrom(const packet_verify_res& from);
+  void InternalSwap(packet_verify_ans* other);
+  void UnsafeMergeFrom(const packet_verify_ans& from);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return _internal_metadata_.arena();
@@ -273,7 +277,7 @@ class packet_verify_res : public ::google::protobuf::Message /* @@protoc_inserti
   bool is_successful() const;
   void set_is_successful(bool value);
 
-  // @@protoc_insertion_point(class_scope:chat_server.packet_verify_res)
+  // @@protoc_insertion_point(class_scope:chat_server.packet_verify_ans)
  private:
   inline void set_has_is_successful();
   inline void clear_has_is_successful();
@@ -289,18 +293,18 @@ class packet_verify_res : public ::google::protobuf::Message /* @@protoc_inserti
 
   void InitAsDefaultInstance();
 };
-extern ::google::protobuf::internal::ExplicitlyConstructed<packet_verify_res> packet_verify_res_default_instance_;
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_verify_ans> packet_verify_ans_default_instance_;
 
 // -------------------------------------------------------------------
 
-class packet_match_req : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_match_req) */ {
+class packet_logout_req : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_logout_req) */ {
  public:
-  packet_match_req();
-  virtual ~packet_match_req();
+  packet_logout_req();
+  virtual ~packet_logout_req();
 
-  packet_match_req(const packet_match_req& from);
+  packet_logout_req(const packet_logout_req& from);
 
-  inline packet_match_req& operator=(const packet_match_req& from) {
+  inline packet_logout_req& operator=(const packet_logout_req& from) {
     CopyFrom(from);
     return *this;
   }
@@ -314,21 +318,21 @@ class packet_match_req : public ::google::protobuf::Message /* @@protoc_insertio
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const packet_match_req& default_instance();
+  static const packet_logout_req& default_instance();
 
-  static const packet_match_req* internal_default_instance();
+  static const packet_logout_req* internal_default_instance();
 
-  void Swap(packet_match_req* other);
+  void Swap(packet_logout_req* other);
 
   // implements Message ----------------------------------------------
 
-  inline packet_match_req* New() const { return New(NULL); }
+  inline packet_logout_req* New() const { return New(NULL); }
 
-  packet_match_req* New(::google::protobuf::Arena* arena) const;
+  packet_logout_req* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const packet_match_req& from);
-  void MergeFrom(const packet_match_req& from);
+  void CopyFrom(const packet_logout_req& from);
+  void MergeFrom(const packet_logout_req& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -347,8 +351,209 @@ class packet_match_req : public ::google::protobuf::Message /* @@protoc_insertio
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(packet_match_req* other);
-  void UnsafeMergeFrom(const packet_match_req& from);
+  void InternalSwap(packet_logout_req* other);
+  void UnsafeMergeFrom(const packet_logout_req& from);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string user_id = 1;
+  bool has_user_id() const;
+  void clear_user_id();
+  static const int kUserIdFieldNumber = 1;
+  const ::std::string& user_id() const;
+  void set_user_id(const ::std::string& value);
+  void set_user_id(const char* value);
+  void set_user_id(const char* value, size_t size);
+  ::std::string* mutable_user_id();
+  ::std::string* release_user_id();
+  void set_allocated_user_id(::std::string* user_id);
+
+  // @@protoc_insertion_point(class_scope:chat_server.packet_logout_req)
+ private:
+  inline void set_has_user_id();
+  inline void clear_has_user_id();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  ::google::protobuf::internal::ArenaStringPtr user_id_;
+  friend void  protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl();
+  friend void  protobuf_AddDesc_chat_5fprotobuf_2eproto_impl();
+  friend void protobuf_AssignDesc_chat_5fprotobuf_2eproto();
+  friend void protobuf_ShutdownFile_chat_5fprotobuf_2eproto();
+
+  void InitAsDefaultInstance();
+};
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_logout_req> packet_logout_req_default_instance_;
+
+// -------------------------------------------------------------------
+
+class packet_logout_ans : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_logout_ans) */ {
+ public:
+  packet_logout_ans();
+  virtual ~packet_logout_ans();
+
+  packet_logout_ans(const packet_logout_ans& from);
+
+  inline packet_logout_ans& operator=(const packet_logout_ans& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const packet_logout_ans& default_instance();
+
+  static const packet_logout_ans* internal_default_instance();
+
+  void Swap(packet_logout_ans* other);
+
+  // implements Message ----------------------------------------------
+
+  inline packet_logout_ans* New() const { return New(NULL); }
+
+  packet_logout_ans* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const packet_logout_ans& from);
+  void MergeFrom(const packet_logout_ans& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  size_t ByteSizeLong() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(packet_logout_ans* other);
+  void UnsafeMergeFrom(const packet_logout_ans& from);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required bool is_successful = 1;
+  bool has_is_successful() const;
+  void clear_is_successful();
+  static const int kIsSuccessfulFieldNumber = 1;
+  bool is_successful() const;
+  void set_is_successful(bool value);
+
+  // @@protoc_insertion_point(class_scope:chat_server.packet_logout_ans)
+ private:
+  inline void set_has_is_successful();
+  inline void clear_has_is_successful();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  bool is_successful_;
+  friend void  protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl();
+  friend void  protobuf_AddDesc_chat_5fprotobuf_2eproto_impl();
+  friend void protobuf_AssignDesc_chat_5fprotobuf_2eproto();
+  friend void protobuf_ShutdownFile_chat_5fprotobuf_2eproto();
+
+  void InitAsDefaultInstance();
+};
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_logout_ans> packet_logout_ans_default_instance_;
+
+// -------------------------------------------------------------------
+
+class packet_enter_match_ntf : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_enter_match_ntf) */ {
+ public:
+  packet_enter_match_ntf();
+  virtual ~packet_enter_match_ntf();
+
+  packet_enter_match_ntf(const packet_enter_match_ntf& from);
+
+  inline packet_enter_match_ntf& operator=(const packet_enter_match_ntf& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const packet_enter_match_ntf& default_instance();
+
+  static const packet_enter_match_ntf* internal_default_instance();
+
+  void Swap(packet_enter_match_ntf* other);
+
+  // implements Message ----------------------------------------------
+
+  inline packet_enter_match_ntf* New() const { return New(NULL); }
+
+  packet_enter_match_ntf* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const packet_enter_match_ntf& from);
+  void MergeFrom(const packet_enter_match_ntf& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  size_t ByteSizeLong() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(packet_enter_match_ntf* other);
+  void UnsafeMergeFrom(const packet_enter_match_ntf& from);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return _internal_metadata_.arena();
@@ -388,7 +593,7 @@ class packet_match_req : public ::google::protobuf::Message /* @@protoc_insertio
   ::std::string* release_opponent_id();
   void set_allocated_opponent_id(::std::string* opponent_id);
 
-  // @@protoc_insertion_point(class_scope:chat_server.packet_match_req)
+  // @@protoc_insertion_point(class_scope:chat_server.packet_enter_match_ntf)
  private:
   inline void set_has_user_id();
   inline void clear_has_user_id();
@@ -410,18 +615,18 @@ class packet_match_req : public ::google::protobuf::Message /* @@protoc_insertio
 
   void InitAsDefaultInstance();
 };
-extern ::google::protobuf::internal::ExplicitlyConstructed<packet_match_req> packet_match_req_default_instance_;
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_enter_match_ntf> packet_enter_match_ntf_default_instance_;
 
 // -------------------------------------------------------------------
 
-class packet_match_res : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_match_res) */ {
+class packet_leave_match_ntf : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:chat_server.packet_leave_match_ntf) */ {
  public:
-  packet_match_res();
-  virtual ~packet_match_res();
+  packet_leave_match_ntf();
+  virtual ~packet_leave_match_ntf();
 
-  packet_match_res(const packet_match_res& from);
+  packet_leave_match_ntf(const packet_leave_match_ntf& from);
 
-  inline packet_match_res& operator=(const packet_match_res& from) {
+  inline packet_leave_match_ntf& operator=(const packet_leave_match_ntf& from) {
     CopyFrom(from);
     return *this;
   }
@@ -435,21 +640,21 @@ class packet_match_res : public ::google::protobuf::Message /* @@protoc_insertio
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const packet_match_res& default_instance();
+  static const packet_leave_match_ntf& default_instance();
 
-  static const packet_match_res* internal_default_instance();
+  static const packet_leave_match_ntf* internal_default_instance();
 
-  void Swap(packet_match_res* other);
+  void Swap(packet_leave_match_ntf* other);
 
   // implements Message ----------------------------------------------
 
-  inline packet_match_res* New() const { return New(NULL); }
+  inline packet_leave_match_ntf* New() const { return New(NULL); }
 
-  packet_match_res* New(::google::protobuf::Arena* arena) const;
+  packet_leave_match_ntf* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const packet_match_res& from);
-  void MergeFrom(const packet_match_res& from);
+  void CopyFrom(const packet_leave_match_ntf& from);
+  void MergeFrom(const packet_leave_match_ntf& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -468,8 +673,8 @@ class packet_match_res : public ::google::protobuf::Message /* @@protoc_insertio
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(packet_match_res* other);
-  void UnsafeMergeFrom(const packet_match_res& from);
+  void InternalSwap(packet_leave_match_ntf* other);
+  void UnsafeMergeFrom(const packet_leave_match_ntf& from);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return _internal_metadata_.arena();
@@ -485,22 +690,27 @@ class packet_match_res : public ::google::protobuf::Message /* @@protoc_insertio
 
   // accessors -------------------------------------------------------
 
-  // required bool is_successful = 1;
-  bool has_is_successful() const;
-  void clear_is_successful();
-  static const int kIsSuccessfulFieldNumber = 1;
-  bool is_successful() const;
-  void set_is_successful(bool value);
+  // required string user_id = 1;
+  bool has_user_id() const;
+  void clear_user_id();
+  static const int kUserIdFieldNumber = 1;
+  const ::std::string& user_id() const;
+  void set_user_id(const ::std::string& value);
+  void set_user_id(const char* value);
+  void set_user_id(const char* value, size_t size);
+  ::std::string* mutable_user_id();
+  ::std::string* release_user_id();
+  void set_allocated_user_id(::std::string* user_id);
 
-  // @@protoc_insertion_point(class_scope:chat_server.packet_match_res)
+  // @@protoc_insertion_point(class_scope:chat_server.packet_leave_match_ntf)
  private:
-  inline void set_has_is_successful();
-  inline void clear_has_is_successful();
+  inline void set_has_user_id();
+  inline void clear_has_user_id();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
-  bool is_successful_;
+  ::google::protobuf::internal::ArenaStringPtr user_id_;
   friend void  protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl();
   friend void  protobuf_AddDesc_chat_5fprotobuf_2eproto_impl();
   friend void protobuf_AssignDesc_chat_5fprotobuf_2eproto();
@@ -508,7 +718,7 @@ class packet_match_res : public ::google::protobuf::Message /* @@protoc_insertio
 
   void InitAsDefaultInstance();
 };
-extern ::google::protobuf::internal::ExplicitlyConstructed<packet_match_res> packet_match_res_default_instance_;
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_leave_match_ntf> packet_leave_match_ntf_default_instance_;
 
 // -------------------------------------------------------------------
 
@@ -1130,180 +1340,302 @@ inline const packet_verify_req* packet_verify_req::internal_default_instance() {
 }
 // -------------------------------------------------------------------
 
-// packet_verify_res
+// packet_verify_ans
 
 // required bool is_successful = 1;
-inline bool packet_verify_res::has_is_successful() const {
+inline bool packet_verify_ans::has_is_successful() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void packet_verify_res::set_has_is_successful() {
+inline void packet_verify_ans::set_has_is_successful() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void packet_verify_res::clear_has_is_successful() {
+inline void packet_verify_ans::clear_has_is_successful() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void packet_verify_res::clear_is_successful() {
+inline void packet_verify_ans::clear_is_successful() {
   is_successful_ = false;
   clear_has_is_successful();
 }
-inline bool packet_verify_res::is_successful() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_verify_res.is_successful)
+inline bool packet_verify_ans::is_successful() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_verify_ans.is_successful)
   return is_successful_;
 }
-inline void packet_verify_res::set_is_successful(bool value) {
+inline void packet_verify_ans::set_is_successful(bool value) {
   set_has_is_successful();
   is_successful_ = value;
-  // @@protoc_insertion_point(field_set:chat_server.packet_verify_res.is_successful)
+  // @@protoc_insertion_point(field_set:chat_server.packet_verify_ans.is_successful)
 }
 
-inline const packet_verify_res* packet_verify_res::internal_default_instance() {
-  return &packet_verify_res_default_instance_.get();
+inline const packet_verify_ans* packet_verify_ans::internal_default_instance() {
+  return &packet_verify_ans_default_instance_.get();
 }
 // -------------------------------------------------------------------
 
-// packet_match_req
+// packet_logout_req
 
 // required string user_id = 1;
-inline bool packet_match_req::has_user_id() const {
+inline bool packet_logout_req::has_user_id() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void packet_match_req::set_has_user_id() {
+inline void packet_logout_req::set_has_user_id() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void packet_match_req::clear_has_user_id() {
+inline void packet_logout_req::clear_has_user_id() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void packet_match_req::clear_user_id() {
+inline void packet_logout_req::clear_user_id() {
   user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_user_id();
 }
-inline const ::std::string& packet_match_req::user_id() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_match_req.user_id)
+inline const ::std::string& packet_logout_req::user_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_logout_req.user_id)
   return user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_match_req::set_user_id(const ::std::string& value) {
+inline void packet_logout_req::set_user_id(const ::std::string& value) {
   set_has_user_id();
   user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:chat_server.packet_match_req.user_id)
+  // @@protoc_insertion_point(field_set:chat_server.packet_logout_req.user_id)
 }
-inline void packet_match_req::set_user_id(const char* value) {
+inline void packet_logout_req::set_user_id(const char* value) {
   set_has_user_id();
   user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:chat_server.packet_match_req.user_id)
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_logout_req.user_id)
 }
-inline void packet_match_req::set_user_id(const char* value, size_t size) {
+inline void packet_logout_req::set_user_id(const char* value, size_t size) {
   set_has_user_id();
   user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_match_req.user_id)
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_logout_req.user_id)
 }
-inline ::std::string* packet_match_req::mutable_user_id() {
+inline ::std::string* packet_logout_req::mutable_user_id() {
   set_has_user_id();
-  // @@protoc_insertion_point(field_mutable:chat_server.packet_match_req.user_id)
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_logout_req.user_id)
   return user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* packet_match_req::release_user_id() {
-  // @@protoc_insertion_point(field_release:chat_server.packet_match_req.user_id)
+inline ::std::string* packet_logout_req::release_user_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_logout_req.user_id)
   clear_has_user_id();
   return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_match_req::set_allocated_user_id(::std::string* user_id) {
+inline void packet_logout_req::set_allocated_user_id(::std::string* user_id) {
   if (user_id != NULL) {
     set_has_user_id();
   } else {
     clear_has_user_id();
   }
   user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_id);
-  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_match_req.user_id)
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_logout_req.user_id)
+}
+
+inline const packet_logout_req* packet_logout_req::internal_default_instance() {
+  return &packet_logout_req_default_instance_.get();
+}
+// -------------------------------------------------------------------
+
+// packet_logout_ans
+
+// required bool is_successful = 1;
+inline bool packet_logout_ans::has_is_successful() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void packet_logout_ans::set_has_is_successful() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void packet_logout_ans::clear_has_is_successful() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_logout_ans::clear_is_successful() {
+  is_successful_ = false;
+  clear_has_is_successful();
+}
+inline bool packet_logout_ans::is_successful() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_logout_ans.is_successful)
+  return is_successful_;
+}
+inline void packet_logout_ans::set_is_successful(bool value) {
+  set_has_is_successful();
+  is_successful_ = value;
+  // @@protoc_insertion_point(field_set:chat_server.packet_logout_ans.is_successful)
+}
+
+inline const packet_logout_ans* packet_logout_ans::internal_default_instance() {
+  return &packet_logout_ans_default_instance_.get();
+}
+// -------------------------------------------------------------------
+
+// packet_enter_match_ntf
+
+// required string user_id = 1;
+inline bool packet_enter_match_ntf::has_user_id() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void packet_enter_match_ntf::set_has_user_id() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void packet_enter_match_ntf::clear_has_user_id() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_enter_match_ntf::clear_user_id() {
+  user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_user_id();
+}
+inline const ::std::string& packet_enter_match_ntf::user_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_enter_match_ntf.user_id)
+  return user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_enter_match_ntf::set_user_id(const ::std::string& value) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:chat_server.packet_enter_match_ntf.user_id)
+}
+inline void packet_enter_match_ntf::set_user_id(const char* value) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_enter_match_ntf.user_id)
+}
+inline void packet_enter_match_ntf::set_user_id(const char* value, size_t size) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_enter_match_ntf.user_id)
+}
+inline ::std::string* packet_enter_match_ntf::mutable_user_id() {
+  set_has_user_id();
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_enter_match_ntf.user_id)
+  return user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* packet_enter_match_ntf::release_user_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_enter_match_ntf.user_id)
+  clear_has_user_id();
+  return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_enter_match_ntf::set_allocated_user_id(::std::string* user_id) {
+  if (user_id != NULL) {
+    set_has_user_id();
+  } else {
+    clear_has_user_id();
+  }
+  user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_id);
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_enter_match_ntf.user_id)
 }
 
 // required string opponent_id = 2;
-inline bool packet_match_req::has_opponent_id() const {
+inline bool packet_enter_match_ntf::has_opponent_id() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void packet_match_req::set_has_opponent_id() {
+inline void packet_enter_match_ntf::set_has_opponent_id() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void packet_match_req::clear_has_opponent_id() {
+inline void packet_enter_match_ntf::clear_has_opponent_id() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void packet_match_req::clear_opponent_id() {
+inline void packet_enter_match_ntf::clear_opponent_id() {
   opponent_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_opponent_id();
 }
-inline const ::std::string& packet_match_req::opponent_id() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_match_req.opponent_id)
+inline const ::std::string& packet_enter_match_ntf::opponent_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_enter_match_ntf.opponent_id)
   return opponent_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_match_req::set_opponent_id(const ::std::string& value) {
+inline void packet_enter_match_ntf::set_opponent_id(const ::std::string& value) {
   set_has_opponent_id();
   opponent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:chat_server.packet_match_req.opponent_id)
+  // @@protoc_insertion_point(field_set:chat_server.packet_enter_match_ntf.opponent_id)
 }
-inline void packet_match_req::set_opponent_id(const char* value) {
+inline void packet_enter_match_ntf::set_opponent_id(const char* value) {
   set_has_opponent_id();
   opponent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:chat_server.packet_match_req.opponent_id)
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_enter_match_ntf.opponent_id)
 }
-inline void packet_match_req::set_opponent_id(const char* value, size_t size) {
+inline void packet_enter_match_ntf::set_opponent_id(const char* value, size_t size) {
   set_has_opponent_id();
   opponent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_match_req.opponent_id)
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_enter_match_ntf.opponent_id)
 }
-inline ::std::string* packet_match_req::mutable_opponent_id() {
+inline ::std::string* packet_enter_match_ntf::mutable_opponent_id() {
   set_has_opponent_id();
-  // @@protoc_insertion_point(field_mutable:chat_server.packet_match_req.opponent_id)
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_enter_match_ntf.opponent_id)
   return opponent_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* packet_match_req::release_opponent_id() {
-  // @@protoc_insertion_point(field_release:chat_server.packet_match_req.opponent_id)
+inline ::std::string* packet_enter_match_ntf::release_opponent_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_enter_match_ntf.opponent_id)
   clear_has_opponent_id();
   return opponent_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_match_req::set_allocated_opponent_id(::std::string* opponent_id) {
+inline void packet_enter_match_ntf::set_allocated_opponent_id(::std::string* opponent_id) {
   if (opponent_id != NULL) {
     set_has_opponent_id();
   } else {
     clear_has_opponent_id();
   }
   opponent_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), opponent_id);
-  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_match_req.opponent_id)
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_enter_match_ntf.opponent_id)
 }
 
-inline const packet_match_req* packet_match_req::internal_default_instance() {
-  return &packet_match_req_default_instance_.get();
+inline const packet_enter_match_ntf* packet_enter_match_ntf::internal_default_instance() {
+  return &packet_enter_match_ntf_default_instance_.get();
 }
 // -------------------------------------------------------------------
 
-// packet_match_res
+// packet_leave_match_ntf
 
-// required bool is_successful = 1;
-inline bool packet_match_res::has_is_successful() const {
+// required string user_id = 1;
+inline bool packet_leave_match_ntf::has_user_id() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void packet_match_res::set_has_is_successful() {
+inline void packet_leave_match_ntf::set_has_user_id() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void packet_match_res::clear_has_is_successful() {
+inline void packet_leave_match_ntf::clear_has_user_id() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void packet_match_res::clear_is_successful() {
-  is_successful_ = false;
-  clear_has_is_successful();
+inline void packet_leave_match_ntf::clear_user_id() {
+  user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_user_id();
 }
-inline bool packet_match_res::is_successful() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_match_res.is_successful)
-  return is_successful_;
+inline const ::std::string& packet_leave_match_ntf::user_id() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_leave_match_ntf.user_id)
+  return user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void packet_match_res::set_is_successful(bool value) {
-  set_has_is_successful();
-  is_successful_ = value;
-  // @@protoc_insertion_point(field_set:chat_server.packet_match_res.is_successful)
+inline void packet_leave_match_ntf::set_user_id(const ::std::string& value) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:chat_server.packet_leave_match_ntf.user_id)
+}
+inline void packet_leave_match_ntf::set_user_id(const char* value) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:chat_server.packet_leave_match_ntf.user_id)
+}
+inline void packet_leave_match_ntf::set_user_id(const char* value, size_t size) {
+  set_has_user_id();
+  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_leave_match_ntf.user_id)
+}
+inline ::std::string* packet_leave_match_ntf::mutable_user_id() {
+  set_has_user_id();
+  // @@protoc_insertion_point(field_mutable:chat_server.packet_leave_match_ntf.user_id)
+  return user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* packet_leave_match_ntf::release_user_id() {
+  // @@protoc_insertion_point(field_release:chat_server.packet_leave_match_ntf.user_id)
+  clear_has_user_id();
+  return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_leave_match_ntf::set_allocated_user_id(::std::string* user_id) {
+  if (user_id != NULL) {
+    set_has_user_id();
+  } else {
+    clear_has_user_id();
+  }
+  user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_id);
+  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_leave_match_ntf.user_id)
 }
 
-inline const packet_match_res* packet_match_res::internal_default_instance() {
-  return &packet_match_res_default_instance_.get();
+inline const packet_leave_match_ntf* packet_leave_match_ntf::internal_default_instance() {
+  return &packet_leave_match_ntf_default_instance_.get();
 }
 // -------------------------------------------------------------------
 
@@ -1820,6 +2152,10 @@ inline const packet_chat_notice* packet_chat_notice::internal_default_instance()
   return &packet_chat_notice_default_instance_.get();
 }
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

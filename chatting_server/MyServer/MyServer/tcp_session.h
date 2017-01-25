@@ -42,12 +42,18 @@ public:
     
     std::string get_user_id() { return user_id_; }
     void set_user_id(std::string user_id) { user_id_ = user_id; }
+
+    tcp_session* get_opponent_session() { return opponent_session_; }
+    void set_opponent_session(tcp_session* opponent_session) { opponent_session_ = opponent_session; }
     
     user_status get_status() { return status_; }
     void set_status(user_status status) { status_ = status; }
     
     boost::asio::ip::tcp::socket& get_socket() { return socket_; }
 
+
+    void post_verify_ans(bool is_successful);
+    void post_logout_ans(bool is_successful);
     void post_send(const bool immediate, const int size, BYTE* data);
     void post_receive();
 };

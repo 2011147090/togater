@@ -4,7 +4,6 @@
 #include "redispp.h"
 
 #include "singleton.h"
-#include <Windows.h>
 
 
 class redis_connector :public singleton<redis_connector>

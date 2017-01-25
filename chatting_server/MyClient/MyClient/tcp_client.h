@@ -61,8 +61,9 @@ public:
 
     void post_send(const bool immediate, const int size, BYTE* data);
 
-    void post_verify();
-    void post_match(std::string opponent_id);
+    void post_verify_req();
+    void post_enter_match(std::string opponent_id);
+    void post_leave_match();
 
     void post_normal(std::string message);
     void post_whisper(std::string target_id, std::string message);

@@ -70,7 +70,7 @@ void tcp_client::post_send(const bool immediate, const int size, BYTE* data)
     // CRITICAL SECTION END
 }
 
-void tcp_client::post_verify()
+void tcp_client::post_verify_req()
 {
     chat_server::packet_verify_req verify_message;
     verify_message.set_key_string(key_);
@@ -87,19 +87,35 @@ void tcp_client::post_verify()
     post_send(false, message_header_size + header.size, send_buffer_.begin());
 }
 
-void tcp_client::post_match(std::string opponent_id)
+void tcp_client::post_enter_match(std::string opponent_id)
 {
-    chat_server::packet_match_req match_message;
-    match_message.set_user_id(user_id_);
-    match_message.set_opponent_id(opponent_id);
+    chat_server::packet_enter_match_ntf enter_match_message;
+    enter_match_message.set_user_id(user_id_);
+    enter_match_message.set_opponent_id(opponent_id);
 
     MESSAGE_HEADER header;
 
-    header.size = match_message.ByteSize();
-    header.type = chat_server::MATCH_REQ;
+    header.size = enter_match_message.ByteSize();
+    header.type = chat_server::ENTER_MATCH_NTF;
 
     CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
-    match_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
+    enter_match_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer_.begin());
+}
+
+void tcp_client::post_leave_match()
+{
+    chat_server::packet_leave_match_ntf leave_match_message;
+    leave_match_message.set_user_id(user_id_);
+
+    MESSAGE_HEADER header;
+
+    header.size = leave_match_message.ByteSize();
+    header.type = chat_server::LEAVE_MATCH_NTF;
+
+    CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
+    leave_match_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
 
     post_send(false, message_header_size + header.size, send_buffer_.begin());
 }
@@ -248,10 +264,13 @@ void tcp_client::process_packet(const int size)
 
     switch (message_header->type)
     {
-    case chat_server::VERIFY_RES:
+    case chat_server::VERIFY_ANS:
         break;
-    case chat_server::MATCH_RES:
+
+    case chat_server::LOGOUT_ANS:
         break;
+
+
 
     case chat_server::NORMAL:
     {
@@ -263,10 +282,13 @@ void tcp_client::process_packet(const int size)
         std::cout << normal_message.chat_message() << std::endl;
     }
     break;
+
     case chat_server::WHISPER:
         break;
+
     case chat_server::ROOM:
         break;
+
     case chat_server::NOTICE:
         break;
     }

@@ -16,7 +16,7 @@ int main()
     io_service.run();
 
 
-    std::cout << "匙飘况农 立加 辆丰" << std::endl;
+    std::cout << "Server Closed" << std::endl;
 
     return 0;
 }

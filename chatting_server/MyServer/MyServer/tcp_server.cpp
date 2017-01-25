@@ -7,52 +7,38 @@ tcp_server::tcp_server(boost::asio::io_service& io_service)
     :acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), PORT_NUMBER))
 {
     is_accepting_ = false;
-
-    InitializeCriticalSection(&ct);
 }
 
 tcp_server::~tcp_server()
 {
     for (int i = 0; i < session_list_.size(); i++)
     {
-
         if (session_list_[i]->get_socket().is_open())
             session_list_[i]->get_socket().close();
         
         delete session_list_[i];
     }
-
-    DeleteCriticalSection(&ct);
 }
 
 void tcp_server::init(const int max_session_count)
 {
-    EnterCriticalSection(&ct);
-
     for (int i = 0; i < max_session_count; i++)
     {
         tcp_session* session = new tcp_session(i, acceptor_.get_io_service(), this);
         session_list_.push_back(session);
         session_queue_.push_back(i);
     }
-    LeaveCriticalSection(&ct);
-
 }
 
 void tcp_server::start()
 {
-    EnterCriticalSection(&ct);
-
     std::cout << "Server Start..." << std::endl;
 
     post_accept();
-    LeaveCriticalSection(&ct);
 }
 
 void tcp_server::close_session(const int session_id)
 {
-    EnterCriticalSection(&ct);
-
     std::string user_id = session_list_[session_id]->get_user_id();
     if (connected_session_map_.find(user_id) != connected_session_map_.end())
         connected_session_map_.erase(user_id);
@@ -64,14 +50,10 @@ void tcp_server::close_session(const int session_id)
 
     if (is_accepting_ == false)
         post_accept();
-
-    LeaveCriticalSection(&ct);
 }
 
 void tcp_server::process_packet(const int session_id, const int size, BYTE* packet)
 {
-    EnterCriticalSection(&ct);
-
     MESSAGE_HEADER* message_header = (MESSAGE_HEADER*)packet;
     
     boost::array<BYTE, 1024>* send_data = new boost::array<BYTE, 1024>;
@@ -94,13 +76,60 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             session_list_[session_id]->set_status(lobby);
 
             connected_session_map_.insert(std::pair<std::string, tcp_session*>(redis_value, session_list_[session_id]));
+
+            session_list_[session_id]->post_verify_ans(true);
         }
         else
+        {
+            session_list_[session_id]->post_verify_ans(false);
+
             close_session(session_id);
+        }
     }
         break;
-    case chat_server::MATCH_REQ:
+
+    case chat_server::LOGOUT_REQ:
+    {
+        chat_server::packet_logout_req logout_message;
+        logout_message.ParseFromArray(packet + message_header_size, message_header->size);
+
+        std::string user_id = logout_message.user_id();
+
+        if (user_id == session_list_[session_id]->get_user_id())
+        {
+            session_list_[session_id]->post_logout_ans(true);
+
+            close_session(session_id);
+        }
+        else
+        {
+            // error! error! error! error! error! error!
+        }
+    }
         break;
+
+
+
+    case chat_server::ENTER_MATCH_NTF:
+    {
+        chat_server::packet_enter_match_ntf enter_match_message;
+        enter_match_message.ParseFromArray(packet + message_header_size, message_header->size);
+
+        std::string user_id = enter_match_message.user_id();
+        std::string opponent_id = enter_match_message.opponent_id();
+
+        auto iter = connected_session_map_.find(opponent_id);
+        session_list_[session_id]->set_opponent_session(iter->second);
+    }
+        break;
+
+    case chat_server::LEAVE_MATCH_NTF:
+    {
+        
+    }
+        break;
+
+
 
     case chat_server::NORMAL:
     {
@@ -114,28 +143,30 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         delete[] send_data;
     }
         break;
+
     case chat_server::WHISPER:
         break;
+
     case chat_server::ROOM:
         break;
+
     case chat_server::NOTICE:
         break;
-    }
 
-    LeaveCriticalSection(&ct);
+
+    default:
+        break;
+    }
 }
 
 
 // ---------- private ----------
 bool tcp_server::post_accept()
 {
-    EnterCriticalSection(&ct);
-
     if (session_queue_.empty())
     {
         is_accepting_ = false;
         
-        LeaveCriticalSection(&ct);
         return false;
     }
 
@@ -150,15 +181,11 @@ bool tcp_server::post_accept()
             boost::asio::placeholders::error)
     );
 
-    LeaveCriticalSection(&ct);
-
     return true;
 }
 
 void tcp_server::handle_accept(tcp_session* session, const boost::system::error_code& error)
 {
-    EnterCriticalSection(&ct);
-
     if (!error)
     {
         std::cout << "Client connection successed. session_id: " << session->get_session_id() << std::endl;
@@ -168,6 +195,4 @@ void tcp_server::handle_accept(tcp_session* session, const boost::system::error_
     }
     else
         std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
-
-    LeaveCriticalSection(&ct);
 }

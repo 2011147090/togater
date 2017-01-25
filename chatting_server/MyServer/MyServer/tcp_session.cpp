@@ -12,6 +12,52 @@ tcp_session::~tcp_session()
 {
 }
 
+void tcp_session::post_verify_ans(bool is_successful)
+{
+    chat_server::packet_verify_ans verify_message;
+    verify_message.set_is_successful(is_successful);
+    
+    MESSAGE_HEADER header;
+    
+    header.size = verify_message.ByteSize();
+    header.type = chat_server::VERIFY_REQ;
+
+
+
+    // 이렇게 해도 되나??? delete 언제 해주지??
+    boost::array<BYTE, 1024>* send_buffer = new boost::array<BYTE, 1024>;
+
+    CopyMemory(send_buffer->begin(), (void*)&header, message_header_size);
+    verify_message.SerializeToArray(send_buffer->begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer->begin());
+    // ----------------------------------------
+
+}
+
+void tcp_session::post_logout_ans(bool is_successful)
+{
+    chat_server::packet_logout_ans logout_message;
+    logout_message.set_is_successful(is_successful);
+
+    MESSAGE_HEADER header;
+
+    header.size = logout_message.ByteSize();
+    header.type = chat_server::LOGOUT_REQ;
+
+
+
+    // 이렇게 해도 되나??? delete 언제 해주지??
+    boost::array<BYTE, 1024>* send_buffer = new boost::array<BYTE, 1024>;
+
+    CopyMemory(send_buffer->begin(), (void*)&header, message_header_size);
+    logout_message.SerializeToArray(send_buffer->begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer->begin());
+    // ----------------------------------------
+
+}
+
 void tcp_session::post_send(const bool immediate, const int size, BYTE* data)
 {
     if (immediate == false)
