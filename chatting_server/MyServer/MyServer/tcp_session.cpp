@@ -32,7 +32,6 @@ void tcp_session::post_verify_ans(bool is_successful)
 
     post_send(false, message_header_size + header.size, send_buffer->begin());
     // ----------------------------------------
-
 }
 
 void tcp_session::post_logout_ans(bool is_successful)
@@ -55,7 +54,6 @@ void tcp_session::post_logout_ans(bool is_successful)
 
     post_send(false, message_header_size + header.size, send_buffer->begin());
     // ----------------------------------------
-
 }
 
 void tcp_session::post_send(const bool immediate, const int size, BYTE* data)

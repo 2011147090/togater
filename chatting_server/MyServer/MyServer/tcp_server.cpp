@@ -82,7 +82,8 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         else
         {
             session_list_[session_id]->post_verify_ans(false);
-
+            
+            // verify_ans 메세지가 도착한 이후에 소켓을 닫아야 함!!
             close_session(session_id);
         }
     }
@@ -102,9 +103,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             close_session(session_id);
         }
         else
-        {
-            // error! error! error! error! error! error!
-        }
+            session_list_[session_id]->post_logout_ans(false);
     }
         break;
 
@@ -125,7 +124,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
     case chat_server::LEAVE_MATCH_NTF:
     {
-        
+
     }
         break;
 

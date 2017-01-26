@@ -44,7 +44,7 @@ private:
     void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
     
-    void process_packet(const int size);
+    bool process_packet(const int size);
     
 public:
     tcp_client(boost::asio::io_service& io_service);
