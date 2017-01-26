@@ -23,28 +23,8 @@ int main()
         chat_client.set_key("asdfgh");
     else if (id == "user3")
         chat_client.set_key("zxcvbn");
-    else if (id == "user4")
-        chat_client.set_key("wertyu");
-    else if (id == "user5")
-        chat_client.set_key("sdfghj");
-    else if (id == "user6")
-        chat_client.set_key("xcvbnm");
-    else if (id == "user7")
-        chat_client.set_key("ertyui");
-    else if (id == "user8")
-        chat_client.set_key("dfghjk");
-    else if (id == "user9")
-        chat_client.set_key("cvbnm,");
-    else if (id == "user10")
-        chat_client.set_key("rtyuio");
-    else if (id == "user11")
-        chat_client.set_key("fghjkl");
-    else if (id == "user12")
-        chat_client.set_key("vbnm,.");
-    else if (id == "qwer")
-        chat_client.set_key("mG2n9Z_y7K7ik_4ZXKpwoPzP-p6SAlKW");
     else
-        return 0;
+        chat_client.set_key("no_key");
     // ------temporary end------
     
 

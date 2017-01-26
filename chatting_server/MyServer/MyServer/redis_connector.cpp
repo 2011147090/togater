@@ -43,5 +43,8 @@ void redis_connector::set(std::string key, std::string value)
 
 std::string redis_connector::get(std::string key)
 {
-    return conn_->get(key);
+    if (conn_->get(key).result().is_initialized())
+        return conn_->get(key);
+
+    return "";
 }

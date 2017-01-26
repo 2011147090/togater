@@ -199,7 +199,6 @@ void tcp_client::post_receive()
         boost::bind(&tcp_client::handle_receive, this,
             boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred)
-
     );
 }
 
@@ -207,12 +206,12 @@ void tcp_client::handle_connect(const boost::system::error_code& error)
 {
     if (!error)
     {
-        std::cout << "서버 접속 성공" << std::endl;
+        std::cout << "Server connection successed" << std::endl;
 
         post_receive();
     }
     else
-        std::cout << "서버 접속 실패. error No: " << error.value() << " error Message: " << error.message() << std::endl;
+        std::cout << "Server connection failed. error No: " << error.value() << " error Message: " << error.message() << std::endl;
 }
 
 void tcp_client::handle_write(const boost::system::error_code& error, size_t bytes_transferred)
@@ -230,7 +229,7 @@ void tcp_client::handle_write(const boost::system::error_code& error, size_t byt
     LeaveCriticalSection(&lock_);
     // CRITICAL SECTION END
 
-
+    
     if (data != nullptr)
     {
         MESSAGE_HEADER* header = (MESSAGE_HEADER*)data;
@@ -243,7 +242,7 @@ void tcp_client::handle_receive(const boost::system::error_code& error, size_t b
     if (error)
     {
         if (error == boost::asio::error::eof)
-            std::cout << "클라이언트와 연결이 끊어졌습니다" << std::endl;
+            std::cout << "Disconnected with server" << std::endl;
         else
             std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
 
@@ -251,12 +250,12 @@ void tcp_client::handle_receive(const boost::system::error_code& error, size_t b
     }
     else
     {
-        process_packet(bytes_transferred);
-        post_receive();
+        if (process_packet(bytes_transferred))
+            post_receive();
     }
 }
 
-void tcp_client::process_packet(const int size)
+bool tcp_client::process_packet(const int size)
 {
     CopyMemory(&packet_buffer_, receive_buffer_.data(), size);
 
@@ -265,9 +264,31 @@ void tcp_client::process_packet(const int size)
     switch (message_header->type)
     {
     case chat_server::VERIFY_ANS:
-        break;
+    {
+        chat_server::packet_verify_ans verify_message;
+
+        verify_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+
+        if (!verify_message.is_successful())
+        {
+            std::cout << "Cookie or ID is incorrect." << std::endl;
+            return false;
+        }
+    }
+    break;
 
     case chat_server::LOGOUT_ANS:
+    {
+        chat_server::packet_logout_ans logout_message;
+
+        logout_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+
+        if (!logout_message.is_successful())
+        {
+            std::cout << "Logout Failed" << std::endl;
+            return false;
+        }
+    }
         break;
 
 
@@ -292,4 +313,6 @@ void tcp_client::process_packet(const int size)
     case chat_server::NOTICE:
         break;
     }
+
+    return true;
 }
