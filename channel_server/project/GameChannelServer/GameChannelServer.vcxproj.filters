@@ -84,7 +84,7 @@
     <ClCompile Include="friends_manager.cpp">
       <Filter>소스 파일\server feature</Filter>
     </ClCompile>
-    <ClCompile Include="packet.pb.cc">
+    <ClCompile Include="channel_protobuf.pb.cc">
       <Filter>소스 파일\packet</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,7 +116,7 @@
     <ClInclude Include="friends_manager.h">
       <Filter>헤더 파일\server feature</Filter>
     </ClInclude>
-    <ClInclude Include="packet.pb.h">
+    <ClInclude Include="channel_protobuf.pb.h">
       <Filter>헤더 파일\packet</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,6 @@
 #include "channel_server.h"
 
-namespace ch = channel_serv;
+
 
 tcp_server::tcp_server(boost::asio::io_service & io_service, friends_manager& friends, match_manager& match, packet_handler& packet_handler)
     : acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),PORT_NUMBER))
@@ -98,33 +98,34 @@ void tcp_server::process_packet(const int n_session_id, const char * p_data)
 {
     packet_header *p_header = (packet_header *)p_data;
     session *request_session = get_session(n_session_id);
-    switch (p_header->ID)
+    switch (p_header->type)
     {
-    case ch::MESSAGE_ID::FRIENDS_REQ:
-        {
-        friends_manager_.process_friends_function(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
-        }
-        break;
-    case ch::MESSAGE_ID::PLAY_FRIENDS_REQ:
-        {
+    case message_type::FRIENDS_REQ:
+    {
+        std::cout << "프렌즈 리퀘\n";
+        //friends_manager_.process_friends_function(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
+        return;
+    }
+    case message_type::PLAY_FRIENDS_REL:
+    {
         match_manager_.process_matching_with_friends(request_session, &p_data[packet_header_size], p_header->size);
-        }
-        break;
-    case ch::MESSAGE_ID::PLAY_RANK_REQ:
-        {
+        return;
+    }
+    case message_type::PLAY_RANK_REQ:
+    {
         match_manager_.process_matching(request_session, &p_data[packet_header_size], p_header->size);
-        }
-        break;
-    case ch::MESSAGE_ID::JOIN_REQ:
-        {
+        return;
+    }
+    case message_type::JOIN_REQ:
+    {
         friends_manager_.lobby_login_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
-        }
-        break;
-    case ch::MESSAGE_ID::LOGOUT_NTF:
-        {
+        return;
+    }
+    case message_type::LOGOUT_REQ:
+    {
         friends_manager_.lobby_logout_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
-        }
-        break;
+        return;
+    }
     default:
         // 정의하지 않은 메세지는 로그로 남김
         break;

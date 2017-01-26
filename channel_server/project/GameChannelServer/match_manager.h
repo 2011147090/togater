@@ -14,7 +14,7 @@ public:
     void process_matching(session *request_session, const char *packet, const int data_size);
     void process_matching_with_friends(session *request_session, const char *packet, const int data_size);
 private:
-    void set_matching_que(session *request_session, channel_serv::RATING request_rating);
+    void set_matching_que(session *request_session, rating_name request_rating);
     void get_matching_que(std::deque<session *> &target_que);
 
     inline unsigned int generate_room_info() { return room_number = (room_number + 1) % 5000; }; //shared resource

@@ -22,11 +22,11 @@ match_manager::~match_manager()
 */
 void match_manager::process_matching(session *request_session, const char *packet, const int data_size)
 {
-    channel_serv::play_rank_game_req message;
+    match_request message;
     packet_handler_.decode_message(message, packet, data_size);
-    channel_serv::RATING rating_name = message.mutable_my_info()->rating();
+    rating_name rating_name_ = packet_handler_.check_rating(request_session->get_rating());
 
-    set_matching_que(request_session, rating_name);
+    set_matching_que(request_session, rating_name_);
 }
 
 
@@ -41,25 +41,25 @@ void match_manager::process_matching(session *request_session, const char *packe
 */
 void match_manager::process_matching_with_friends(session *request_session, const char *packet, const int data_size)
 {
-    channel_serv::play_friends_game_req message;
-    channel_serv::error_msg error_message;
+    match_with_friends_relay relay_message;
+    error_report error_report_;
     
-    packet_handler_.decode_message(message, packet, data_size);
-    session *recv_session = friends_manager_.find_id_in_user_map(message.recv_id());
+    packet_handler_.decode_message(relay_message, packet, data_size);
+    session *recv_session = friends_manager_.find_id_in_user_map(relay_message.target_id());
 
-    switch (message.flag_id())
+    switch (relay_message.type())
     {
-    case channel_serv::play_friends_game_req::ACCEPT:
+    case normal_game_accept:
     {
         if (recv_session == nullptr && request_session->get_status() != status::MATCH_RECVER && recv_session->get_status() != status::MATCH_REQUEST)
         {
-            error_message.set_error_message("Not Found");
-            request_session->post_send(false, error_message.ByteSize() + packet_header_size, packet_handler_.incode_message(error_message));
+            error_report_.set_error_string("Not Found");
+            request_session->post_send(false, error_report_.ByteSize() + packet_header_size, packet_handler_.incode_message(error_report_));
             return;
         }
 
-        channel_serv::matching_complete_ans match_message[2];
-        channel_serv::user_info *match_user[2];
+        match_complete match_message[2];
+        user_info *match_user[2];
         session *player[2];
         unsigned int room_num = generate_room_info();
         char redis_room_key[100];
@@ -68,7 +68,7 @@ void match_manager::process_matching_with_friends(session *request_session, cons
 
         for (int i = 0; i < 2; i++)
         {
-            match_message[i].set_room_number(room_num);
+            match_message[i].set_room_key(redis_room_key);
         }
         
         match_user[0] = match_message[1].mutable_opponent_player();
@@ -79,11 +79,13 @@ void match_manager::process_matching_with_friends(session *request_session, cons
 
         for (int i = 0; i < 2; i++)
         {
-            match_user[i]->set_battle_history(player[i]->get_battle_history());
-            match_user[i]->set_lose(player[i]->get_lose());
-            match_user[i]->set_win(player[i]->get_win());
-            match_user[i]->set_user_id(player[i]->get_user_id());
-            match_user[i]->set_rating(packet_handler_.check_rating(player[i]->get_rating()));
+            game_history *history = match_user[i]->mutable_game_history_();
+            basic_info *id = match_user[i]->mutable_basic_info_();
+            history->set_total_games(player[i]->get_battle_history());
+            history->set_lose(player[i]->get_lose());
+            history->set_win(player[i]->get_win());
+            history->set_rating_score(player[i]->get_rating());
+            id->set_id(player[i]->get_user_id());
         }
         
         for (int i = 0; i < 2; i++)
@@ -93,37 +95,37 @@ void match_manager::process_matching_with_friends(session *request_session, cons
         }
     }
         break;
-    case channel_serv::play_friends_game_req::APPLY:
+    case normal_game_apply:
     {
         if (recv_session != nullptr && request_session->get_status() == status::LOGIN && recv_session->get_status() == status::LOGIN)
         {
-            message.set_recv_id(request_session->get_user_id());
+            relay_message.set_target_id(request_session->get_user_id());
             request_session->set_status(status::MATCH_REQUEST);
             recv_session->set_status(status::MATCH_RECVER);
-            recv_session->post_send(false, message.ByteSize() + packet_header_size, packet_handler_.incode_message(message));
+            recv_session->post_send(false, relay_message.ByteSize() + packet_header_size, packet_handler_.incode_message(relay_message));
             return;
         }
         else
         {
-            error_message.set_error_message("Not Found or already request, receive");
-            request_session->post_send(false, error_message.ByteSize() + packet_header_size, packet_handler_.incode_message(error_message));
+            error_report_.set_error_string("Not Found or already request, receive");
+            request_session->post_send(false, error_report_.ByteSize() + packet_header_size, packet_handler_.incode_message(error_report_));
         }
     }
         break;
-    case channel_serv::play_friends_game_req::DENY:
+    case normal_game_deny:
     {
         if (recv_session != nullptr && request_session->get_status() == status::MATCH_RECVER && recv_session->get_status() == status::MATCH_REQUEST)
         {
-            message.set_recv_id(request_session->get_user_id());
+            relay_message.set_target_id(request_session->get_user_id());
             request_session->set_status(status::LOGIN);
             recv_session->set_status(status::LOGIN);
-            recv_session->post_send(false, message.ByteSize() + packet_header_size, packet_handler_.incode_message(message));
+            recv_session->post_send(false, relay_message.ByteSize() + packet_header_size, packet_handler_.incode_message(relay_message));
             return;
         }
         else
         {
-            error_message.set_error_message("Not Found or You do not have permission");
-            request_session->post_send(false, error_message.ByteSize() + packet_header_size, packet_handler_.incode_message(error_message));
+            error_report_.set_error_string("Not Found or You do not have permission");
+            request_session->post_send(false, error_report_.ByteSize() + packet_header_size, packet_handler_.incode_message(error_report_));
         }
     }
         break;
@@ -134,35 +136,35 @@ void match_manager::process_matching_with_friends(session *request_session, cons
 
 
 
-void match_manager::set_matching_que(session * request_session, channel_serv::RATING request_rating)
+void match_manager::set_matching_que(session * request_session, rating_name request_rating)
 {
     switch (request_rating)
     {
-    case channel_serv::RATING::BRONZE:
+    case bronze:
         bronze_que.push_back(request_session);
         get_matching_que(bronze_que);
         break;
-    case channel_serv::RATING::SILVER:
+    case silver:
         silver_que.push_back(request_session);
         get_matching_que(silver_que);
         break;
-    case channel_serv::RATING::GOLD:
+    case gold:
         gold_que.push_back(request_session);
         get_matching_que(gold_que);
         break;
-    case channel_serv::RATING::PLATINUM:
+    case platinum:
         platinum_que.push_back(request_session);
         get_matching_que(platinum_que);
         break;
-    case channel_serv::RATING::DIAMOND:
+    case diamond:
         diamond_que.push_back(request_session);
         get_matching_que(diamond_que);
         break;
-    case channel_serv::RATING::MASTER:
+    case master:
         master_que.push_back(request_session);
         get_matching_que(master_que);
         break;
-    case channel_serv::RATING::CHAL:
+    case challenger:
         challenger_que.push_back(request_session);
         get_matching_que(challenger_que);
         break;
@@ -179,38 +181,39 @@ void match_manager::get_matching_que(std::deque<session *> &target_que) //shared
 
         player[0] = target_que.front();
         target_que.pop_front();
-        if (player[0]->get_status() == status::LOGOUT)
+        if (player[0]->get_socket().is_open() && player[0]->get_status() != status::MATCH_REQUEST)
         {
             return;
         }
         player[1] = target_que.front();
         target_que.pop_front();
-        if (player[1]->get_status() == status::LOGOUT)
+        if (player[0]->get_socket().is_open() && player[1]->get_status() != status::MATCH_REQUEST)
         {
-            target_que.push_back(player[0]);
+            target_que.push_front(player[0]);
             return;
         }
 
-        channel_serv::matching_complete_ans message[2];
-        channel_serv::user_info *player_info[2];
+        match_complete message[2];
+        user_info *match_info[2];
         unsigned room_num = generate_room_info();
         char redis_room_key[100];
         sprintf(redis_room_key, "Room:%d", room_num);
         redis_connection_.set(redis_room_key, "0");
 
-        message[0].set_room_number(room_num);
-        message[1].set_room_number(room_num);
         
-        player_info[0] = message[1].mutable_opponent_player();
-        player_info[1] = message[0].mutable_opponent_player();
+        match_info[0] = message[1].mutable_opponent_player();
+        match_info[1] = message[0].mutable_opponent_player();
 
         for (int i = 0; i < 2; i++)
         {
-            player_info[i]->set_battle_history(player[i]->get_battle_history());
-            player_info[i]->set_lose(player[i]->get_lose());
-            player_info[i]->set_win(player[i]->get_win());
-            player_info[i]->set_user_id(player[i]->get_user_id());
-            player_info[i]->set_rating(packet_handler_.check_rating(player[i]->get_rating()));
+            message[i].set_room_key(redis_room_key);
+            game_history *history = match_info[i]->mutable_game_history_();
+            basic_info *id = match_info[i]->mutable_basic_info_();
+            history->set_total_games(player[i]->get_battle_history());
+            history->set_lose(player[i]->get_lose());
+            history->set_win(player[i]->get_win());
+            history->set_rating_score(packet_handler_.check_rating(player[i]->get_rating()));
+            id->set_id(player[i]->get_user_id());
         }
 
         for (int i = 0; i < 2; i++)

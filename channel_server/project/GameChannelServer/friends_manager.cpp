@@ -18,39 +18,39 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
 {
     if (request_session->get_socket().is_open())
     {
-        channel_serv::join_req message;
+        join_request message;
         packet_handler_.decode_message(message, packet, packet_size);
         std::string token = message.token();
         auto user_id = redis_connector_.get(token);
         if (user_id.result().is_initialized())
         {
+            join_response response_message;
+            game_history *history = response_message.mutable_history();
             /* DB query 대체 */
             int rating = 0;
             int battle_history = 0;
             int win = 0;
             int lose = 0;
-            // friends list 받아와서 넣어주기 (id 만) string
             int friends_count = 0;
+            std::string name = user_id.result().value() + "0001";
+            // friends list 받아와서 넣어주기 (id 만) string
+            
             request_session->set_user_info(rating,battle_history,win,lose,user_id.result().value());
             request_session->set_token(token.c_str());
 
-            if (friends_count > 0)
+            for (int i = 0; i < friends_count; i++)
             {
-                //친구목록 어떻게 할건지 1. chunk 로 묶어서 보내기 or 2. 따로따로 보내기 (1번으로 할경우 프로토콜 버퍼 메세지 포맷 수정해야함)
+               basic_info *friends_id = response_message.add_friends_list();
+               friends_id->set_id(name);
             }
             add_id_in_user_map(request_session, request_session->get_user_id());
-
-            channel_serv::join_ans answer_message;
-            channel_serv::user_info *user = answer_message.mutable_my_info();
-                        
-            user->set_battle_history(battle_history);
-            user->set_rating(packet_handler_.check_rating(rating));
-            user->set_win(win);
-            user->set_lose(lose);
-            user->set_user_id(request_session->get_user_id());
+            history->set_total_games(battle_history);
+            history->set_rating_score(packet_handler_.check_rating(rating));
+            history->set_win(win);
+            history->set_lose(lose);
             //friends string list
-            unsigned char incoding_size = packet_header_size + answer_message.ByteSize();
-            char *incoding_data = packet_handler_.incode_message(answer_message);
+            unsigned char incoding_size = packet_header_size + response_message.ByteSize();
+            char *incoding_data = packet_handler_.incode_message(response_message);
             request_session->post_send(false, incoding_size, incoding_data);
             request_session->set_status(status::LOGIN);
             return true;
@@ -75,14 +75,15 @@ void friends_manager::del_redis_token(std::string token)
 
 bool friends_manager::lobby_logout_process(session *request_session, const char *packet, const int packet_size)
 {
-    channel_serv::logout_ntf message;
-    packet_handler_.decode_message(message, packet, packet_size);
-    auto user_id = redis_connector_.get(message.token()); 
+    auto user_id = redis_connector_.get(request_session->get_token()); 
     if (user_id.result().is_initialized())
     {
-        redis_connector_.del(message.token());
+        logout_response response_message;
+        redis_connector_.del(request_session->get_token());
         request_session->set_status(status::LOGOUT);
         del_id_in_user_map(request_session->get_user_id());
+
+        request_session->post_send(false, response_message.ByteSize() + packet_header_size, packet_handler_.incode_message(response_message));
         return true;
     }
     else
@@ -94,7 +95,7 @@ bool friends_manager::lobby_logout_process(session *request_session, const char 
 
 void friends_manager::search_user(session * request_session, std::string target_id)
 {
-    channel_serv::friends_ans message;
+    friends_response message;
     
     session *target_session = find_id_in_user_map(target_id);
     if ( target_session == nullptr)
@@ -110,12 +111,14 @@ void friends_manager::search_user(session * request_session, std::string target_
     else
     {
         message.set_online(true);
-        channel_serv::user_info  *target_user_info = message.mutable_user_information();
-        target_user_info->set_battle_history(target_session->get_battle_history());
-        target_user_info->set_lose(target_session->get_lose());
-        target_user_info->set_win(target_session->get_win());
-        target_user_info->set_rating(packet_handler_.check_rating(target_session->get_rating()));
-        target_user_info->set_user_id(target_session->get_user_id());
+        user_info  *target_user_info = message.mutable_friends_info();
+        game_history *history = target_user_info->mutable_game_history_();
+        basic_info *id = target_user_info->mutable_basic_info_();
+        history->set_total_games(target_session->get_battle_history());
+        history->set_lose(target_session->get_lose());
+        history->set_win(target_session->get_win());
+        history->set_rating_score(packet_handler_.check_rating(target_session->get_rating()));
+        id->set_id(target_session->get_user_id());
     }
 
     request_session->post_send(false, message.ByteSize() + packet_header_size, packet_handler_.incode_message(message));
@@ -138,23 +141,23 @@ void friends_manager::del_friends(session * request_session, std::string target_
 
 void friends_manager::process_friends_function(session * request_session, const char * packet, const int packet_size)
 {
-    channel_serv::friends_req message;
+    friends_request message;
     packet_handler_.decode_message(message, packet, packet_size);
-    switch (message.req())
+    switch (message.type())
     {
-    case channel_serv::friends_req::ADD:
+    case friends_add:
     {
-        add_friends(request_session, message.user_id());
+        add_friends(request_session, message.mutable_target_info()->id());
         return;
     }
-    case channel_serv::friends_req::DEL:
+    case friends_del:
     {
-        del_friends(request_session, message.user_id());
+        del_friends(request_session, message.mutable_target_info()->id());
         return;
     }
-    case channel_serv::friends_req::SEARCH:
+    case friends_search:
     {
-        search_user(request_session, message.user_id());
+        search_user(request_session, message.mutable_target_info()->id());
         return;
     }
     default:

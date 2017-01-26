@@ -67,6 +67,11 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
     delete[] send_data_queue_.front();
     send_data_queue_.pop_front();
 
+    if (stat_ == status::MATCH_COMPLETE || stat_ == status::LOGOUT) {
+        send_data_queue_.clear();
+        socket_.close();
+    }
+
     if (send_data_queue_.empty() == false)
     {
         char *p_data = send_data_queue_.front();
