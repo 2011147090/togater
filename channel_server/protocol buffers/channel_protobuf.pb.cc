@@ -184,10 +184,9 @@ void protobuf_AssignDesc_channel_5fprotobuf_2eproto() {
       sizeof(packet_logout_ans),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_logout_ans, _internal_metadata_));
   packet_friends_req_descriptor_ = file->message_type(7);
-  static const int packet_friends_req_offsets_[3] = {
+  static const int packet_friends_req_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_friends_req, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_friends_req, target_info_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_friends_req, is_online_state_),
   };
   packet_friends_req_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
@@ -427,32 +426,31 @@ void protobuf_AddDesc_channel_5fprotobuf_2eproto_impl() {
     "o\",\n\017packet_join_req\022\r\n\005token\030\001 \002(\t\022\n\n\002i"
     "d\030\002 \002(\t\"\'\n\021packet_logout_req\022\022\n\004none\030\001 \001"
     "(\010:\004true\"\'\n\021packet_logout_ans\022\022\n\004none\030\001 "
-    "\001(\010:\004true\"\303\001\n\022packet_friends_req\0229\n\004type"
+    "\001(\010:\004true\"\252\001\n\022packet_friends_req\0229\n\004type"
     "\030\001 \002(\0162+.channel_server.packet_friends_r"
     "eq.req_type\022/\n\013target_info\030\002 \002(\0132\032.chann"
-    "el_server.basic_info\022\027\n\017is_online_state\030"
-    "\003 \002(\010\"(\n\010req_type\022\007\n\003ADD\020\001\022\007\n\003DEL\020\002\022\n\n\006S"
-    "EARCH\020\003\"U\n\022packet_friends_ans\022/\n\014friends"
-    "_info\030\001 \002(\0132\031.channel_server.user_info\022\016"
-    "\n\006online\030\002 \002(\010\"/\n\031packet_play_rank_game_"
-    "req\022\022\n\004none\030\001 \001(\010:\004true\",\n\031packet_play_r"
-    "ank_game_ans\022\017\n\007success\030\001 \002(\010\"\243\001\n\034packet"
-    "_play_friends_game_rel\022C\n\004type\030\001 \002(\01625.c"
-    "hannel_server.packet_play_friends_game_r"
-    "el.req_type\022\021\n\ttarget_id\030\003 \002(\t\"+\n\010req_ty"
-    "pe\022\t\n\005APPLY\020\000\022\n\n\006ACCEPT\020\001\022\010\n\004DENY\020\002\"d\n\034p"
-    "acket_matching_complete_ans\022\020\n\010room_key\030"
-    "\001 \002(\t\0222\n\017opponent_player\030\002 \002(\0132\031.channel"
-    "_server.user_info\",\n\024packet_error_messag"
-    "e\022\024\n\014error_string\030\001 \002(\t*\313\001\n\014message_type"
-    "\022\017\n\013FRIENDS_REQ\020\000\022\017\n\013FRIENDS_ANS\020\001\022\021\n\rPL"
-    "AY_RANK_REQ\020\002\022\021\n\rPLAY_RANK_ANS\020\003\022\024\n\020PLAY"
-    "_FRIENDS_REL\020\004\022\022\n\016MATCH_COMPLETE\020\005\022\r\n\tER"
-    "ROR_MSG\020\006\022\014\n\010JOIN_REQ\020\007\022\014\n\010JOIN_ANS\020\010\022\016\n"
-    "\nLOGOUT_REQ\020\t\022\016\n\nLOGOUT_ANS\020\n*a\n\006rating\022"
-    "\n\n\006bronze\020\000\022\n\n\006silver\020\001\022\010\n\004gold\020\002\022\014\n\010pla"
-    "tinum\020\003\022\013\n\007diamond\020\004\022\n\n\006master\020\005\022\016\n\nchal"
-    "lenger\020\006", 1528);
+    "el_server.basic_info\"(\n\010req_type\022\007\n\003ADD\020"
+    "\001\022\007\n\003DEL\020\002\022\n\n\006SEARCH\020\003\"U\n\022packet_friends"
+    "_ans\022/\n\014friends_info\030\001 \002(\0132\031.channel_ser"
+    "ver.user_info\022\016\n\006online\030\002 \002(\010\"/\n\031packet_"
+    "play_rank_game_req\022\022\n\004none\030\001 \001(\010:\004true\","
+    "\n\031packet_play_rank_game_ans\022\017\n\007success\030\001"
+    " \002(\010\"\243\001\n\034packet_play_friends_game_rel\022C\n"
+    "\004type\030\001 \002(\01625.channel_server.packet_play"
+    "_friends_game_rel.req_type\022\021\n\ttarget_id\030"
+    "\003 \002(\t\"+\n\010req_type\022\t\n\005APPLY\020\000\022\n\n\006ACCEPT\020\001"
+    "\022\010\n\004DENY\020\002\"d\n\034packet_matching_complete_a"
+    "ns\022\020\n\010room_key\030\001 \002(\t\0222\n\017opponent_player\030"
+    "\002 \002(\0132\031.channel_server.user_info\",\n\024pack"
+    "et_error_message\022\024\n\014error_string\030\001 \002(\t*\313"
+    "\001\n\014message_type\022\017\n\013FRIENDS_REQ\020\000\022\017\n\013FRIE"
+    "NDS_ANS\020\001\022\021\n\rPLAY_RANK_REQ\020\002\022\021\n\rPLAY_RAN"
+    "K_ANS\020\003\022\024\n\020PLAY_FRIENDS_REL\020\004\022\022\n\016MATCH_C"
+    "OMPLETE\020\005\022\r\n\tERROR_MSG\020\006\022\014\n\010JOIN_REQ\020\007\022\014"
+    "\n\010JOIN_ANS\020\010\022\016\n\nLOGOUT_REQ\020\t\022\016\n\nLOGOUT_A"
+    "NS\020\n*a\n\006rating\022\n\n\006bronze\020\000\022\n\n\006silver\020\001\022\010"
+    "\n\004gold\020\002\022\014\n\010platinum\020\003\022\013\n\007diamond\020\004\022\n\n\006m"
+    "aster\020\005\022\016\n\nchallenger\020\006", 1503);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "channel_protobuf.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_channel_5fprotobuf_2eproto);
@@ -3280,7 +3278,6 @@ const int packet_friends_req::req_type_ARRAYSIZE;
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int packet_friends_req::kTypeFieldNumber;
 const int packet_friends_req::kTargetInfoFieldNumber;
-const int packet_friends_req::kIsOnlineStateFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_friends_req::packet_friends_req()
@@ -3306,7 +3303,6 @@ packet_friends_req::packet_friends_req(const packet_friends_req& from)
 void packet_friends_req::SharedCtor() {
   _cached_size_ = 0;
   target_info_ = NULL;
-  is_online_state_ = false;
   type_ = 1;
 }
 
@@ -3348,12 +3344,11 @@ packet_friends_req* packet_friends_req::New(::google::protobuf::Arena* arena) co
 
 void packet_friends_req::Clear() {
 // @@protoc_insertion_point(message_clear_start:channel_server.packet_friends_req)
-  if (_has_bits_[0 / 32] & 7u) {
+  if (_has_bits_[0 / 32] & 3u) {
     type_ = 1;
     if (has_target_info()) {
       if (target_info_ != NULL) target_info_->::channel_server::basic_info::Clear();
     }
-    is_online_state_ = false;
   }
   _has_bits_.Clear();
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3399,21 +3394,6 @@ bool packet_friends_req::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(24)) goto parse_is_online_state;
-        break;
-      }
-
-      // required bool is_online_state = 3;
-      case 3: {
-        if (tag == 24) {
-         parse_is_online_state:
-          set_has_is_online_state();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &is_online_state_)));
-        } else {
-          goto handle_unusual;
-        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -3455,11 +3435,6 @@ void packet_friends_req::SerializeWithCachedSizes(
       2, *this->target_info_, output);
   }
 
-  // required bool is_online_state = 3;
-  if (has_is_online_state()) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->is_online_state(), output);
-  }
-
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -3482,11 +3457,6 @@ void packet_friends_req::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageNoVirtualToArray(
         2, *this->target_info_, false, target);
-  }
-
-  // required bool is_online_state = 3;
-  if (has_is_online_state()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->is_online_state(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3514,18 +3484,13 @@ size_t packet_friends_req::RequiredFieldsByteSizeFallback() const {
         *this->target_info_);
   }
 
-  if (has_is_online_state()) {
-    // required bool is_online_state = 3;
-    total_size += 1 + 1;
-  }
-
   return total_size;
 }
 size_t packet_friends_req::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:channel_server.packet_friends_req)
   size_t total_size = 0;
 
-  if (((_has_bits_[0] & 0x00000007) ^ 0x00000007) == 0) {  // All required fields are present.
+  if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
     // required .channel_server.packet_friends_req.req_type type = 1;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
@@ -3534,9 +3499,6 @@ size_t packet_friends_req::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
         *this->target_info_);
-
-    // required bool is_online_state = 3;
-    total_size += 1 + 1;
 
   } else {
     total_size += RequiredFieldsByteSizeFallback();
@@ -3586,9 +3548,6 @@ void packet_friends_req::UnsafeMergeFrom(const packet_friends_req& from) {
     if (from.has_target_info()) {
       mutable_target_info()->::channel_server::basic_info::MergeFrom(from.target_info());
     }
-    if (from.has_is_online_state()) {
-      set_is_online_state(from.is_online_state());
-    }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
@@ -3611,7 +3570,7 @@ void packet_friends_req::CopyFrom(const packet_friends_req& from) {
 }
 
 bool packet_friends_req::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
 
   if (has_target_info()) {
     if (!this->target_info_->IsInitialized()) return false;
@@ -3626,7 +3585,6 @@ void packet_friends_req::Swap(packet_friends_req* other) {
 void packet_friends_req::InternalSwap(packet_friends_req* other) {
   std::swap(type_, other->type_);
   std::swap(target_info_, other->target_info_);
-  std::swap(is_online_state_, other->is_online_state_);
   std::swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -3711,30 +3669,6 @@ void packet_friends_req::set_allocated_target_info(::channel_server::basic_info*
     clear_has_target_info();
   }
   // @@protoc_insertion_point(field_set_allocated:channel_server.packet_friends_req.target_info)
-}
-
-// required bool is_online_state = 3;
-bool packet_friends_req::has_is_online_state() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-void packet_friends_req::set_has_is_online_state() {
-  _has_bits_[0] |= 0x00000004u;
-}
-void packet_friends_req::clear_has_is_online_state() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-void packet_friends_req::clear_is_online_state() {
-  is_online_state_ = false;
-  clear_has_is_online_state();
-}
-bool packet_friends_req::is_online_state() const {
-  // @@protoc_insertion_point(field_get:channel_server.packet_friends_req.is_online_state)
-  return is_online_state_;
-}
-void packet_friends_req::set_is_online_state(bool value) {
-  set_has_is_online_state();
-  is_online_state_ = value;
-  // @@protoc_insertion_point(field_set:channel_server.packet_friends_req.is_online_state)
 }
 
 inline const packet_friends_req* packet_friends_req::internal_default_instance() {

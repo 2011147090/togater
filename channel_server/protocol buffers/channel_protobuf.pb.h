@@ -1051,21 +1051,12 @@ class packet_friends_req : public ::google::protobuf::Message /* @@protoc_insert
   ::channel_server::basic_info* release_target_info();
   void set_allocated_target_info(::channel_server::basic_info* target_info);
 
-  // required bool is_online_state = 3;
-  bool has_is_online_state() const;
-  void clear_is_online_state();
-  static const int kIsOnlineStateFieldNumber = 3;
-  bool is_online_state() const;
-  void set_is_online_state(bool value);
-
   // @@protoc_insertion_point(class_scope:channel_server.packet_friends_req)
  private:
   inline void set_has_type();
   inline void clear_has_type();
   inline void set_has_target_info();
   inline void clear_has_target_info();
-  inline void set_has_is_online_state();
-  inline void clear_has_is_online_state();
 
   // helper for ByteSizeLong()
   size_t RequiredFieldsByteSizeFallback() const;
@@ -1074,7 +1065,6 @@ class packet_friends_req : public ::google::protobuf::Message /* @@protoc_insert
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::channel_server::basic_info* target_info_;
-  bool is_online_state_;
   int type_;
   friend void  protobuf_InitDefaults_channel_5fprotobuf_2eproto_impl();
   friend void  protobuf_AddDesc_channel_5fprotobuf_2eproto_impl();
@@ -2379,30 +2369,6 @@ inline void packet_friends_req::set_allocated_target_info(::channel_server::basi
     clear_has_target_info();
   }
   // @@protoc_insertion_point(field_set_allocated:channel_server.packet_friends_req.target_info)
-}
-
-// required bool is_online_state = 3;
-inline bool packet_friends_req::has_is_online_state() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void packet_friends_req::set_has_is_online_state() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void packet_friends_req::clear_has_is_online_state() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void packet_friends_req::clear_is_online_state() {
-  is_online_state_ = false;
-  clear_has_is_online_state();
-}
-inline bool packet_friends_req::is_online_state() const {
-  // @@protoc_insertion_point(field_get:channel_server.packet_friends_req.is_online_state)
-  return is_online_state_;
-}
-inline void packet_friends_req::set_is_online_state(bool value) {
-  set_has_is_online_state();
-  is_online_state_ = value;
-  // @@protoc_insertion_point(field_set:channel_server.packet_friends_req.is_online_state)
 }
 
 inline const packet_friends_req* packet_friends_req::internal_default_instance() {

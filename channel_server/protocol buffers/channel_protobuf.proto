@@ -69,7 +69,6 @@ message packet_friends_req {
 	}
 	required req_type type          = 1;	
 	required basic_info target_info = 2;
-	required bool is_online_state   = 3;
 }
 
 message packet_friends_ans {
