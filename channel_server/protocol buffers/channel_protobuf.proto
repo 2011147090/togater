@@ -9,11 +9,12 @@ enum message_type {
 	PLAY_RANK_ANS    = 3;
 	PLAY_FRIENDS_REL = 4;
 	MATCH_COMPLETE   = 5;
-	ERROR_MSG        = 6;
-	JOIN_REQ         = 7;
-	JOIN_ANS         = 8;
-	LOGOUT_REQ       = 9;
-	LOGOUT_ANS       = 10;
+	MATCH_CONFIRM    = 6;
+	ERROR_MSG        = 7;
+	JOIN_REQ         = 8;
+	JOIN_ANS         = 9;
+	LOGOUT_REQ       = 10;
+	LOGOUT_ANS       = 11;
 }
 
 enum rating {
@@ -97,6 +98,10 @@ message packet_play_friends_game_rel {
 message packet_matching_complete_ans {
 	required string room_key            = 1;
 	required user_info opponent_player  = 2;
+}
+
+message packet_matching_confirm {
+	optional bool none = 1 [default = true];
 }
 
 message packet_error_message {

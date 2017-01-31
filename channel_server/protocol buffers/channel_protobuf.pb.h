@@ -48,6 +48,7 @@ class packet_join_req;
 class packet_logout_ans;
 class packet_logout_req;
 class packet_matching_complete_ans;
+class packet_matching_confirm;
 class packet_play_friends_game_rel;
 class packet_play_rank_game_ans;
 class packet_play_rank_game_req;
@@ -100,11 +101,12 @@ enum message_type {
   PLAY_RANK_ANS = 3,
   PLAY_FRIENDS_REL = 4,
   MATCH_COMPLETE = 5,
-  ERROR_MSG = 6,
-  JOIN_REQ = 7,
-  JOIN_ANS = 8,
-  LOGOUT_REQ = 9,
-  LOGOUT_ANS = 10
+  MATCH_CONFIRM = 6,
+  ERROR_MSG = 7,
+  JOIN_REQ = 8,
+  JOIN_ANS = 9,
+  LOGOUT_REQ = 10,
+  LOGOUT_ANS = 11
 };
 bool message_type_IsValid(int value);
 const message_type message_type_MIN = FRIENDS_REQ;
@@ -1648,6 +1650,104 @@ extern ::google::protobuf::internal::ExplicitlyConstructed<packet_matching_compl
 
 // -------------------------------------------------------------------
 
+class packet_matching_confirm : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:channel_server.packet_matching_confirm) */ {
+ public:
+  packet_matching_confirm();
+  virtual ~packet_matching_confirm();
+
+  packet_matching_confirm(const packet_matching_confirm& from);
+
+  inline packet_matching_confirm& operator=(const packet_matching_confirm& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const packet_matching_confirm& default_instance();
+
+  static const packet_matching_confirm* internal_default_instance();
+
+  void Swap(packet_matching_confirm* other);
+
+  // implements Message ----------------------------------------------
+
+  inline packet_matching_confirm* New() const { return New(NULL); }
+
+  packet_matching_confirm* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const packet_matching_confirm& from);
+  void MergeFrom(const packet_matching_confirm& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  size_t ByteSizeLong() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(packet_matching_confirm* other);
+  void UnsafeMergeFrom(const packet_matching_confirm& from);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional bool none = 1 [default = true];
+  bool has_none() const;
+  void clear_none();
+  static const int kNoneFieldNumber = 1;
+  bool none() const;
+  void set_none(bool value);
+
+  // @@protoc_insertion_point(class_scope:channel_server.packet_matching_confirm)
+ private:
+  inline void set_has_none();
+  inline void clear_has_none();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  bool none_;
+  friend void  protobuf_InitDefaults_channel_5fprotobuf_2eproto_impl();
+  friend void  protobuf_AddDesc_channel_5fprotobuf_2eproto_impl();
+  friend void protobuf_AssignDesc_channel_5fprotobuf_2eproto();
+  friend void protobuf_ShutdownFile_channel_5fprotobuf_2eproto();
+
+  void InitAsDefaultInstance();
+};
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_matching_confirm> packet_matching_confirm_default_instance_;
+
+// -------------------------------------------------------------------
+
 class packet_error_message : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:channel_server.packet_error_message) */ {
  public:
   packet_error_message();
@@ -2706,6 +2806,37 @@ inline const packet_matching_complete_ans* packet_matching_complete_ans::interna
 }
 // -------------------------------------------------------------------
 
+// packet_matching_confirm
+
+// optional bool none = 1 [default = true];
+inline bool packet_matching_confirm::has_none() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void packet_matching_confirm::set_has_none() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void packet_matching_confirm::clear_has_none() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_matching_confirm::clear_none() {
+  none_ = true;
+  clear_has_none();
+}
+inline bool packet_matching_confirm::none() const {
+  // @@protoc_insertion_point(field_get:channel_server.packet_matching_confirm.none)
+  return none_;
+}
+inline void packet_matching_confirm::set_none(bool value) {
+  set_has_none();
+  none_ = value;
+  // @@protoc_insertion_point(field_set:channel_server.packet_matching_confirm.none)
+}
+
+inline const packet_matching_confirm* packet_matching_confirm::internal_default_instance() {
+  return &packet_matching_confirm_default_instance_.get();
+}
+// -------------------------------------------------------------------
+
 // packet_error_message
 
 // required string error_string = 1;
@@ -2766,6 +2897,8 @@ inline const packet_error_message* packet_error_message::internal_default_instan
   return &packet_error_message_default_instance_.get();
 }
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
