@@ -10,10 +10,17 @@
 
 #include "chat_protocol.h"
 
-enum user_status{
+enum user_status {
     lobby = 0,
     room = 1
 };
+
+enum post_type {
+    verify_ans = 0,
+    logout_ans = 1,
+    chatting = 2
+};
+
 class tcp_server;
 
 class tcp_session
@@ -27,6 +34,7 @@ private:
 
     boost::array<BYTE, 1024> receive_buffer_;
     boost::container::deque<BYTE*> send_data_queue_;
+    boost::container::deque<BYTE*> chat_data_queue_;
 
     tcp_server* server_;
     tcp_session* opponent_session_;
