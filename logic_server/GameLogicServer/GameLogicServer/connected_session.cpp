@@ -29,7 +29,7 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
     boost::system::error_code error;
-    socket_.write_some(boost::asio::buffer(send_buf_), error);
+    socket_.write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
 
     if (error)
         system_log->error(error.message());
