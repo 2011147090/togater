@@ -3,6 +3,8 @@
 #include "main_scene.h"
 #include "logic_session.h"
 #include "ui\UIText.h"
+#include "loading_scene.h"
+#include "channel_session.h"
 
 bool game_manager::init_singleton()
 {
@@ -25,6 +27,9 @@ bool game_manager::release_singleton()
         delete opponent_;
         opponent_ = nullptr;
     }
+
+    public_card_ = nullptr;
+    opponent_card_ = nullptr;
 
     return true;
 }

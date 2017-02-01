@@ -8,6 +8,7 @@
 #include "game_manager.h"
 #include "network_manager.h"
 #include "chat_session.h"
+#include "channel_session.h"
 
 using namespace cocos2d;
 
@@ -225,7 +226,7 @@ bool lobby_scene::init()
             CC_CALLBACK_0(
                 chat_session::connect,
                 network_chat,
-                CHAT_SERVER_IP, "8700"
+                CHAT_SERVER_IP, CHAT_SERVER_PORT
             )
         );
 
@@ -233,6 +234,26 @@ bool lobby_scene::init()
             CC_CALLBACK_0(
                 chat_session::send_packet_verify_req,
                 network_chat,
+                network_mgr->get_player_key(),
+                network_mgr->get_player_id()
+            )
+        );
+    }
+
+    if (!network_lobby->is_run())
+    {
+        this->getScheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                channel_session::connect,
+                network_lobby,
+                CHANNEL_SERVER_IP, CHANNEL_SEFVER_PORT
+            )
+        );
+
+        this->getScheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                channel_session::send_packet_join_req,
+                network_lobby,
                 network_mgr->get_player_key(),
                 network_mgr->get_player_id()
             )

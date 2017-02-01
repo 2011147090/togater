@@ -5,6 +5,7 @@
 #include "logic_server.pb.h"
 
 const std::string LOGIC_SERVER_IP("192.168.1.24");
+const std::string LOGIC_SERVER_PORT("8600");
 
 class logic_session : public network_session {
 private:

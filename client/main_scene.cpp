@@ -8,6 +8,7 @@
 #include "network_manager.h"
 #include "chat_session.h"
 #include "logic_session.h"
+#include "channel_session.h"
 
 USING_NS_CC;
 
@@ -148,6 +149,7 @@ void main_scene::setup_scene()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(keylistener, this);
 
     game_mgr->scene_ = this;
+    game_mgr->scheduler_ = this->getScheduler();
     
     game_mgr->user_ = new player();
     game_mgr->opponent_ = new player();
@@ -190,7 +192,29 @@ void main_scene::setup_scene()
 void main_scene::end()
 {
     network_logic->destroy();
+    network_lobby->create();
+
     game_mgr->release_singleton();
+
+    if (!network_lobby->is_run())
+    {
+        this->getScheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                channel_session::connect,
+                network_lobby,
+                CHANNEL_SERVER_IP, CHANNEL_SEFVER_PORT
+            )
+        );
+
+        this->getScheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                channel_session::send_packet_join_req,
+                network_lobby,
+                network_mgr->get_player_key(),
+                network_mgr->get_player_id()
+            )
+        );
+    }
   
     Director::getInstance()->popScene();
     Director::getInstance()->popScene();

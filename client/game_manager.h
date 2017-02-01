@@ -52,6 +52,7 @@ public:
     void betting();
 
     void check_public_card();
+
     void start_game();
 };
 

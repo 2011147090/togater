@@ -5,6 +5,7 @@
 #include "chat_protobuf.pb.h"
 
 const std::string CHAT_SERVER_IP("192.168.1.202");
+const std::string CHAT_SERVER_PORT("8700");
 
 class chat_session : public network_session {
 private:
@@ -14,7 +15,6 @@ private:
     } MESSAGE_HEADER;
 
     const int message_header_size = sizeof(MESSAGE_HEADER);
-
 
     void handle_send(chat_server::message_type msg_type, const protobuf::Message& message);
 

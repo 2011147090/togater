@@ -8,7 +8,8 @@ bool logic_session::create()
 
     is_connected_ = false;
 
-    socket_ = new tcp::socket(io_service_);
+    if (socket_ == nullptr)
+        socket_ = new tcp::socket(io_service_);
 
     return true;
 }
@@ -24,7 +25,10 @@ bool logic_session::destroy()
     work_thread_->join();
 
     if (socket_ != nullptr)
+    {
         delete socket_;
+        socket_ = nullptr;
+    }
 
     return true;
 }
@@ -44,7 +48,8 @@ void logic_session::handle_send(logic_server::message_type msg_type, const proto
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
-    socket_->write_some(boost::asio::buffer(send_buf_));
+    boost::system::error_code error;
+    socket_->write_some(boost::asio::buffer(send_buf_), error);
 }
 
 void logic_session::handle_read()
@@ -210,8 +215,6 @@ void logic_session::send_packet_enter_req(std::string room_key, std::string play
     enter_req_packet.set_room_key(room_key);
     enter_req_packet.set_player_key(player_key);
 
-    network_mgr->set_room_key(room_key);
-     
     this->handle_send(logic_server::ENTER_REQ, enter_req_packet);
 }
 
