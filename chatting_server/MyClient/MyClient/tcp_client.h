@@ -51,6 +51,7 @@ public:
     ~tcp_client();
     
     bool is_connection() { return socket_.is_open(); }
+    bool is_login() { return is_login_; }
     
     void connect(boost::asio::ip::tcp::endpoint endpoint);
     void close();

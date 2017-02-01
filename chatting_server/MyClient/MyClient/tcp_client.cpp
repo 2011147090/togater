@@ -6,6 +6,7 @@ tcp_client::tcp_client(boost::asio::io_service& io_service)
     :io_service_(io_service), socket_(io_service)
 {
     InitializeCriticalSectionAndSpinCount(&lock_, 4000);
+    is_login_ = false;
 }
 
 tcp_client::~tcp_client()
@@ -84,7 +85,11 @@ void tcp_client::post_verify_req()
     CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
     verify_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
 
-    post_send(false, message_header_size + header.size, send_buffer_.begin());
+    boost::system::error_code error;
+    socket_.write_some(boost::asio::buffer(send_buffer_.begin(), message_header_size + header.size), error);
+    size_t size = socket_.read_some(boost::asio::buffer(receive_buffer_), error);
+
+    process_packet(size);
 }
 
 void tcp_client::post_enter_match(std::string opponent_id)
@@ -252,6 +257,8 @@ void tcp_client::handle_receive(const boost::system::error_code& error, size_t b
     {
         if (process_packet(bytes_transferred))
             post_receive();
+        else
+            return;
     }
 }
 
@@ -264,44 +271,48 @@ bool tcp_client::process_packet(const int size)
     switch (message_header->type)
     {
     case chat_server::VERIFY_ANS:
-    {
-        chat_server::packet_verify_ans verify_message;
-
-        verify_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
-
-        if (!verify_message.is_successful())
         {
-            std::cout << "Cookie or ID is incorrect." << std::endl;
-            return false;
+            chat_server::packet_verify_ans verify_message;
+        
+            verify_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+
+            if (!verify_message.is_successful())
+            {
+                std::cout << "Cookie or ID is incorrect." << std::endl;
+                return false;
+            }
+            else
+                is_login_ = true;
         }
-    }
     break;
 
     case chat_server::LOGOUT_ANS:
-    {
-        chat_server::packet_logout_ans logout_message;
-
-        logout_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
-
-        if (!logout_message.is_successful())
         {
-            std::cout << "Logout Failed" << std::endl;
-            return false;
+            chat_server::packet_logout_ans logout_message;
+
+            logout_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+
+            if (!logout_message.is_successful())
+            {
+                std::cout << "Logout Failed" << std::endl;
+                return true;
+            }
+            else
+                return false;
         }
-    }
         break;
 
 
 
     case chat_server::NORMAL:
-    {
-        chat_server::packet_chat_normal normal_message;
+        {
+            chat_server::packet_chat_normal normal_message;
         
-        normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+            normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
 
-        std::cout << normal_message.user_id() << "> ";
-        std::cout << normal_message.chat_message() << std::endl;
-    }
+            std::cout << normal_message.user_id() << "> ";
+            std::cout << normal_message.chat_message() << std::endl;
+        }
     break;
 
     case chat_server::WHISPER:

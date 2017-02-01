@@ -13,7 +13,7 @@ int main()
 
     // -----temporary start-----
     std::string id;
-    std::cout << "이름? (user1 ~ user12)" << std::endl;
+    std::cout << "이름? (user1 ~ user3)" << std::endl;
     std::cin >> id;
     
     chat_client.set_id(id);
@@ -32,23 +32,21 @@ int main()
     
     boost::thread thread(boost::bind(&boost::asio::io_service::run, &io_service));
     
-
-    // -----temporary start-----
     chat_client.post_verify_req();
-    // ------temporary end------
+    
 
-
-    std::string message;
-    while (std::getline(std::cin, message))
+    while (chat_client.is_login())
     {
+        std::string message;
+        std::getline(std::cin, message);
+
         chat_client.post_normal(message);
     }
     
     io_service.stop();
-
+    thread.join();
     chat_client.close();
 
-    thread.join();
 
     std::cout << "클라이언트를 종료해 주세요" << std::endl;
 
