@@ -15,6 +15,6 @@ public:
     virtual ~redis_connector();
     
     bool check_room(std::string room_key);
-    void remove_room_info(std::string room_key);
-    void remove_player_info(std::string player_key);
+    bool remove_room_info(std::string room_key);
+    bool remove_player_info(std::string player_key);
 };

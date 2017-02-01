@@ -39,6 +39,9 @@
     <Filter Include="소스 파일\system\configurator">
       <UniqueIdentifier>{a32baa1e-6441-43ac-9c25-72e36aa3fcb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\system\database_connector">
+      <UniqueIdentifier>{86d9cb71-0787-4ef1-a78f-f6c9e88bf09f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -73,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="configurator.cpp">
       <Filter>소스 파일\system\configurator</Filter>
+    </ClCompile>
+    <ClCompile Include="db_connector.cpp">
+      <Filter>소스 파일\system\database_connector</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -111,6 +117,9 @@
     </ClInclude>
     <ClInclude Include="configurator.h">
       <Filter>소스 파일\system\configurator</Filter>
+    </ClInclude>
+    <ClInclude Include="db_connector.h">
+      <Filter>소스 파일\system\database_connector</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
