@@ -1,7 +1,7 @@
 #include "tcp_client.h"
+#include <cstdlib>
 
-
-int main()
+int main(int argc, char* argv[])
 {
     boost::asio::io_service io_service;
 
@@ -12,21 +12,11 @@ int main()
     
 
     // -----temporary start-----
-    std::string id;
-    std::cout << "ÀÌ¸§? (user1 ~ user3)" << std::endl;
-    std::cin >> id;
+    std::string id = argv[1];
     chat_client.set_id(id);
-
-    if (id == "user1")
-        chat_client.set_key("qwerty");
-    else if (id == "user2")
-        chat_client.set_key("asdfgh");
-    else if (id == "user3")
-        chat_client.set_key("zxcvbn");
-    else
-        chat_client.set_key("no_key");
+    chat_client.set_key(id);
     // ------temporary end------
-    
+
 
     chat_client.connect(endpoint);
     
@@ -39,10 +29,10 @@ int main()
 
     while (chat_client.is_login())
     {
-        std::string message;
-        std::getline(std::cin, message);
+        //std::string message;
+        //std::getline(std::cin, message);
 
-        chat_client.post_normal(message);
+        chat_client.post_normal("Hi!");
     }
     
     io_service.stop();

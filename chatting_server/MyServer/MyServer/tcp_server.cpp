@@ -152,7 +152,10 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
             auto iter = connected_session_map_.find(whisper_message.target_id());
             if (session_list_[session_id]->get_socket().is_open())
+            {
+                session_list_[session_id]->post_send(false, size, master_data_queue_.back().begin());
                 iter->second->post_send(false, size, master_data_queue_.back().begin());
+            }
         }
         break;
 
@@ -163,8 +166,11 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             CopyMemory(&send_data, packet, size);
             master_data_queue_.push_back(send_data);
 
-            if (session_list_[session_id]->get_socket().is_open() &&  session_list_[session_id]->get_status() == room)
+            if (session_list_[session_id]->get_socket().is_open() && session_list_[session_id]->get_status() == room)
+            {
+                session_list_[session_id]->post_send(false, size, master_data_queue_.back().begin());
                 session_list_[session_id]->get_opponent_session()->post_send(false, size, master_data_queue_.back().begin());
+            }
         }
         break;
     
@@ -186,8 +192,9 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
 
     // 실행될 일 없음
+    // 근데 실행이 되네 ㅅㅂ
     default:
-        std::cout << "process_packet error!" << std::endl;
+        //std::cout << "process_packet error!" << std::endl;
         break;
     }
 }
