@@ -569,22 +569,10 @@ class packet_enter_match_ntf : public ::google::protobuf::Message /* @@protoc_in
 
   // accessors -------------------------------------------------------
 
-  // required string user_id = 1;
-  bool has_user_id() const;
-  void clear_user_id();
-  static const int kUserIdFieldNumber = 1;
-  const ::std::string& user_id() const;
-  void set_user_id(const ::std::string& value);
-  void set_user_id(const char* value);
-  void set_user_id(const char* value, size_t size);
-  ::std::string* mutable_user_id();
-  ::std::string* release_user_id();
-  void set_allocated_user_id(::std::string* user_id);
-
-  // required string opponent_id = 2;
+  // required string opponent_id = 1;
   bool has_opponent_id() const;
   void clear_opponent_id();
-  static const int kOpponentIdFieldNumber = 2;
+  static const int kOpponentIdFieldNumber = 1;
   const ::std::string& opponent_id() const;
   void set_opponent_id(const ::std::string& value);
   void set_opponent_id(const char* value);
@@ -595,18 +583,12 @@ class packet_enter_match_ntf : public ::google::protobuf::Message /* @@protoc_in
 
   // @@protoc_insertion_point(class_scope:chat_server.packet_enter_match_ntf)
  private:
-  inline void set_has_user_id();
-  inline void clear_has_user_id();
   inline void set_has_opponent_id();
   inline void clear_has_opponent_id();
-
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
-  ::google::protobuf::internal::ArenaStringPtr user_id_;
   ::google::protobuf::internal::ArenaStringPtr opponent_id_;
   friend void  protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl();
   friend void  protobuf_AddDesc_chat_5fprotobuf_2eproto_impl();
@@ -690,27 +672,22 @@ class packet_leave_match_ntf : public ::google::protobuf::Message /* @@protoc_in
 
   // accessors -------------------------------------------------------
 
-  // required string user_id = 1;
-  bool has_user_id() const;
-  void clear_user_id();
-  static const int kUserIdFieldNumber = 1;
-  const ::std::string& user_id() const;
-  void set_user_id(const ::std::string& value);
-  void set_user_id(const char* value);
-  void set_user_id(const char* value, size_t size);
-  ::std::string* mutable_user_id();
-  ::std::string* release_user_id();
-  void set_allocated_user_id(::std::string* user_id);
+  // optional bool do_not_use = 1;
+  bool has_do_not_use() const;
+  void clear_do_not_use();
+  static const int kDoNotUseFieldNumber = 1;
+  bool do_not_use() const;
+  void set_do_not_use(bool value);
 
   // @@protoc_insertion_point(class_scope:chat_server.packet_leave_match_ntf)
  private:
-  inline void set_has_user_id();
-  inline void clear_has_user_id();
+  inline void set_has_do_not_use();
+  inline void clear_has_do_not_use();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
-  ::google::protobuf::internal::ArenaStringPtr user_id_;
+  bool do_not_use_;
   friend void  protobuf_InitDefaults_chat_5fprotobuf_2eproto_impl();
   friend void  protobuf_AddDesc_chat_5fprotobuf_2eproto_impl();
   friend void protobuf_AssignDesc_chat_5fprotobuf_2eproto();
@@ -1465,69 +1442,15 @@ inline const packet_logout_ans* packet_logout_ans::internal_default_instance() {
 
 // packet_enter_match_ntf
 
-// required string user_id = 1;
-inline bool packet_enter_match_ntf::has_user_id() const {
+// required string opponent_id = 1;
+inline bool packet_enter_match_ntf::has_opponent_id() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void packet_enter_match_ntf::set_has_user_id() {
+inline void packet_enter_match_ntf::set_has_opponent_id() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void packet_enter_match_ntf::clear_has_user_id() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void packet_enter_match_ntf::clear_user_id() {
-  user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  clear_has_user_id();
-}
-inline const ::std::string& packet_enter_match_ntf::user_id() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_enter_match_ntf.user_id)
-  return user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void packet_enter_match_ntf::set_user_id(const ::std::string& value) {
-  set_has_user_id();
-  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:chat_server.packet_enter_match_ntf.user_id)
-}
-inline void packet_enter_match_ntf::set_user_id(const char* value) {
-  set_has_user_id();
-  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:chat_server.packet_enter_match_ntf.user_id)
-}
-inline void packet_enter_match_ntf::set_user_id(const char* value, size_t size) {
-  set_has_user_id();
-  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_enter_match_ntf.user_id)
-}
-inline ::std::string* packet_enter_match_ntf::mutable_user_id() {
-  set_has_user_id();
-  // @@protoc_insertion_point(field_mutable:chat_server.packet_enter_match_ntf.user_id)
-  return user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* packet_enter_match_ntf::release_user_id() {
-  // @@protoc_insertion_point(field_release:chat_server.packet_enter_match_ntf.user_id)
-  clear_has_user_id();
-  return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void packet_enter_match_ntf::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
-    set_has_user_id();
-  } else {
-    clear_has_user_id();
-  }
-  user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_id);
-  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_enter_match_ntf.user_id)
-}
-
-// required string opponent_id = 2;
-inline bool packet_enter_match_ntf::has_opponent_id() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void packet_enter_match_ntf::set_has_opponent_id() {
-  _has_bits_[0] |= 0x00000002u;
-}
 inline void packet_enter_match_ntf::clear_has_opponent_id() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline void packet_enter_match_ntf::clear_opponent_id() {
   opponent_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -1580,58 +1503,28 @@ inline const packet_enter_match_ntf* packet_enter_match_ntf::internal_default_in
 
 // packet_leave_match_ntf
 
-// required string user_id = 1;
-inline bool packet_leave_match_ntf::has_user_id() const {
+// optional bool do_not_use = 1;
+inline bool packet_leave_match_ntf::has_do_not_use() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void packet_leave_match_ntf::set_has_user_id() {
+inline void packet_leave_match_ntf::set_has_do_not_use() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void packet_leave_match_ntf::clear_has_user_id() {
+inline void packet_leave_match_ntf::clear_has_do_not_use() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void packet_leave_match_ntf::clear_user_id() {
-  user_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  clear_has_user_id();
+inline void packet_leave_match_ntf::clear_do_not_use() {
+  do_not_use_ = false;
+  clear_has_do_not_use();
 }
-inline const ::std::string& packet_leave_match_ntf::user_id() const {
-  // @@protoc_insertion_point(field_get:chat_server.packet_leave_match_ntf.user_id)
-  return user_id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+inline bool packet_leave_match_ntf::do_not_use() const {
+  // @@protoc_insertion_point(field_get:chat_server.packet_leave_match_ntf.do_not_use)
+  return do_not_use_;
 }
-inline void packet_leave_match_ntf::set_user_id(const ::std::string& value) {
-  set_has_user_id();
-  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:chat_server.packet_leave_match_ntf.user_id)
-}
-inline void packet_leave_match_ntf::set_user_id(const char* value) {
-  set_has_user_id();
-  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:chat_server.packet_leave_match_ntf.user_id)
-}
-inline void packet_leave_match_ntf::set_user_id(const char* value, size_t size) {
-  set_has_user_id();
-  user_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:chat_server.packet_leave_match_ntf.user_id)
-}
-inline ::std::string* packet_leave_match_ntf::mutable_user_id() {
-  set_has_user_id();
-  // @@protoc_insertion_point(field_mutable:chat_server.packet_leave_match_ntf.user_id)
-  return user_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* packet_leave_match_ntf::release_user_id() {
-  // @@protoc_insertion_point(field_release:chat_server.packet_leave_match_ntf.user_id)
-  clear_has_user_id();
-  return user_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void packet_leave_match_ntf::set_allocated_user_id(::std::string* user_id) {
-  if (user_id != NULL) {
-    set_has_user_id();
-  } else {
-    clear_has_user_id();
-  }
-  user_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_id);
-  // @@protoc_insertion_point(field_set_allocated:chat_server.packet_leave_match_ntf.user_id)
+inline void packet_leave_match_ntf::set_do_not_use(bool value) {
+  set_has_do_not_use();
+  do_not_use_ = value;
+  // @@protoc_insertion_point(field_set:chat_server.packet_leave_match_ntf.do_not_use)
 }
 
 inline const packet_leave_match_ntf* packet_leave_match_ntf::internal_default_instance() {

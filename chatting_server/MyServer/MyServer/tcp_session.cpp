@@ -90,8 +90,6 @@ void tcp_session::handle_write(const boost::system::error_code& error, size_t by
 
             if (socket_.is_open() && !(verify_message.is_successful()))
                 server_->close_session(session_id_);
-
-            delete[] send_data_queue_.front();
         }
         break;
 
@@ -102,27 +100,20 @@ void tcp_session::handle_write(const boost::system::error_code& error, size_t by
 
             if (socket_.is_open() && logout_message.is_successful())
                 server_->close_session(session_id_);
-
-            delete[] send_data_queue_.front();
         }
         break;
 
 
     case chat_server::WHISPER:
-        delete[] send_data_queue_.front();
-
         break;
 
     case chat_server::ROOM:
-        delete[] send_data_queue_.front();
-
         break;
 
     case chat_server::NORMAL:
-    case chat_server::NOTICE:
-        if (false)
-            delete[] send_data_queue_.front();
+        break;
 
+    case chat_server::NOTICE:
         break;
     }
 

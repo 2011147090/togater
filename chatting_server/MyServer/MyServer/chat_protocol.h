@@ -7,6 +7,7 @@ using namespace google;
 
 const int PORT_NUMBER = 8700;
 const int MAX_RECEIVE_BUFFER_LEN = 1024;
+const int MAX_MASTER_BUFFER_LEN = 1024;
 
 typedef struct _MESSAGE_HEADER {
     protobuf::uint32 size;

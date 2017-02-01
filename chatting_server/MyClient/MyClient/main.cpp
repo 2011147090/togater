@@ -15,8 +15,8 @@ int main()
     std::string id;
     std::cout << "ÀÌ¸§? (user1 ~ user3)" << std::endl;
     std::cin >> id;
-    
     chat_client.set_id(id);
+
     if (id == "user1")
         chat_client.set_key("qwerty");
     else if (id == "user2")
@@ -34,6 +34,8 @@ int main()
     
     chat_client.post_verify_req();
     
+    chat_client.post_leave_match();
+
 
     while (chat_client.is_login())
     {

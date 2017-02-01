@@ -7,6 +7,7 @@ tcp_server::tcp_server(boost::asio::io_service& io_service)
     :acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), PORT_NUMBER))
 {
     is_accepting_ = false;
+    master_data_queue_.set_capacity(MAX_MASTER_BUFFER_LEN);
 }
 
 tcp_server::~tcp_server()
@@ -126,17 +127,16 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
     // 일반 채팅
     case chat_server::NORMAL:
         {
-            boost::array<BYTE, 1024>* send_data = new boost::array<BYTE, 1024>;
-            CopyMemory(send_data, packet, size);
+            boost::array<BYTE, 1024> send_data;
+            CopyMemory(&send_data, packet, size);
+            master_data_queue_.push_back(send_data);
 
             auto iter = connected_session_map_.begin();
             for (iter = connected_session_map_.begin(); iter != connected_session_map_.end(); ++iter)
             {
                 if (iter->second->get_socket().is_open() && iter->second->get_status() == lobby)
-                    iter->second->post_send(false, size, send_data->begin());
+                    iter->second->post_send(false, size, master_data_queue_.back().begin());
             }
-
-            //delete[] send_data;
         }
         break;
 
@@ -146,39 +146,41 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             chat_server::packet_chat_whisper whisper_message;
             whisper_message.ParseFromArray(packet + message_header_size, message_header->size);
 
-            boost::array<BYTE, 1024>* send_data = new boost::array<BYTE, 1024>;
-            CopyMemory(send_data, packet, size);
+            boost::array<BYTE, 1024> send_data;
+            CopyMemory(&send_data, packet, size);
+            master_data_queue_.push_back(send_data);
 
             auto iter = connected_session_map_.find(whisper_message.target_id());
             if (session_list_[session_id]->get_socket().is_open())
-                iter->second->post_send(false, size, send_data->begin());
+                iter->second->post_send(false, size, master_data_queue_.back().begin());
         }
         break;
 
     // 방 채팅
     case chat_server::ROOM:
         {
-            boost::array<BYTE, 1024>* send_data = new boost::array<BYTE, 1024>;
-            CopyMemory(send_data, packet, size);
+            boost::array<BYTE, 1024> send_data;
+            CopyMemory(&send_data, packet, size);
+            master_data_queue_.push_back(send_data);
 
             if (session_list_[session_id]->get_socket().is_open() &&  session_list_[session_id]->get_status() == room)
-                session_list_[session_id]->get_opponent_session()->post_send(false, size, send_data->begin());
+                session_list_[session_id]->get_opponent_session()->post_send(false, size, master_data_queue_.back().begin());
         }
         break;
     
     // 공지사항
     case chat_server::NOTICE:
         {
-            boost::array<BYTE, 1024>* send_data = new boost::array<BYTE, 1024>;
-            CopyMemory(send_data, packet, size);
+            boost::array<BYTE, 1024> send_data;
+            CopyMemory(&send_data, packet, size);
+            master_data_queue_.push_back(send_data);
 
             auto iter = connected_session_map_.begin();
             for (iter = connected_session_map_.begin(); iter != connected_session_map_.end(); ++iter)
             {
                 if (iter->second->get_socket().is_open())
-                    iter->second->post_send(false, size, send_data->begin());
+                    iter->second->post_send(false, size, master_data_queue_.back().begin());
             }
-            //delete[] send_data;
         }
         break;
 

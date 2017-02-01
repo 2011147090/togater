@@ -95,7 +95,6 @@ void tcp_client::post_verify_req()
 void tcp_client::post_enter_match(std::string opponent_id)
 {
     chat_server::packet_enter_match_ntf enter_match_message;
-    enter_match_message.set_user_id(user_id_);
     enter_match_message.set_opponent_id(opponent_id);
 
     MESSAGE_HEADER header;
@@ -112,7 +111,6 @@ void tcp_client::post_enter_match(std::string opponent_id)
 void tcp_client::post_leave_match()
 {
     chat_server::packet_leave_match_ntf leave_match_message;
-    leave_match_message.set_user_id(user_id_);
 
     MESSAGE_HEADER header;
 

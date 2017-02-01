@@ -8,6 +8,7 @@
 #include <boost/bind.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/circular_buffer.hpp>
 
 #include "tcp_session.h"
 
@@ -18,10 +19,11 @@ private:
 
     boost::asio::ip::tcp::acceptor acceptor_;
     
-    boost::container::vector<tcp_session*> session_list_;
-    
     boost::container::deque<int> session_queue_;
+    boost::container::vector<tcp_session*> session_list_;
     boost::unordered_map<std::string, tcp_session*> connected_session_map_;
+
+    boost::circular_buffer<boost::array<BYTE, 1024>> master_data_queue_;
 
     bool post_accept();
     void handle_accept(tcp_session* session, const boost::system::error_code& error);

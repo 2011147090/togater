@@ -34,7 +34,6 @@ private:
 
     boost::array<BYTE, 1024> receive_buffer_;
     boost::container::deque<BYTE*> send_data_queue_;
-    boost::container::deque<BYTE*> chat_data_queue_;
 
     tcp_server* server_;
     tcp_session* opponent_session_;
