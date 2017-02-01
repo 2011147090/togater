@@ -8,6 +8,7 @@
 #include "network_manager.h"
 #include "chat_session.h"
 #include "logic_session.h"
+#include "channel_session.h"
 
 USING_NS_CC;
 
@@ -34,6 +35,7 @@ bool main_scene::init()
 
 void main_scene::setup_scene()
 {
+#pragma region Init_UI
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -48,17 +50,6 @@ void main_scene::setup_scene()
     back->setScale(1.0f, 1.0);
     back->setAnchorPoint(Vec2(0.5, 0.5));
     back->setPosition(Vec2(visibleSize.width - 100, 100));
-    back->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
-        switch (type)
-        {
-        case ui::Widget::TouchEventType::ENDED:
-            network_logic->send_packet_disconnect_room_ntf();
-            break;
-        }
-    });
-
-    this->addChild(back, 1);
-
 
     auto background = Sprite::create("background.jpg");
     background->setScale(0.8f);
@@ -85,15 +76,11 @@ void main_scene::setup_scene()
     bet_coin_user->setPosition(cocos2d::Vec2(visibleSize.width - 100, 150));
     this->addChild(bet_coin_user, 1);
 
-    game_mgr->user_bet_text_ = bet_coin_user;
-
     auto opponent_info = cocos2d::Label::createWithTTF("ID : Temp\nWin : 0, Defeat : 0\nRating : 1200\nBet : 0", "fonts/arial.ttf", 15);
     opponent_info->setColor(cocos2d::Color3B::RED);
     opponent_info->setPosition(cocos2d::Vec2(visibleSize.width - 100, visibleSize.height - 100));
     this->addChild(opponent_info, 1);
-
-    game_mgr->opponent_info_text_ = opponent_info;
-
+    
     auto card_pack = Sprite::create("card_pack.png");
     card_pack->setScale(1.0f);
     card_pack->setPosition(middle_pos - Vec2(150, 110));
@@ -118,6 +105,19 @@ void main_scene::setup_scene()
 
     this->addChild(room_chat_field, 5);
 
+    auto chat_list = ui::ListView::create();
+    chat_list->setDirection(ui::ListView::Direction::VERTICAL);
+    chat_list->setClippingEnabled(true);
+    chat_list->setTouchEnabled(true);
+    chat_list->setContentSize(Size(210, 260));
+    chat_list->setAnchorPoint(Vec2(0.5, 1));
+    chat_list->setBounceEnabled(false);
+    chat_list->setScrollBarEnabled(true);
+    chat_list->setScrollBarPositionFromCorner(Vec2(0, 0));
+    chat_list->setItemsMargin(2.0f);
+    chat_list->setPosition(Vec2(30, visibleSize.height - 50));
+    this->addChild(chat_list, 5);
+    
     auto chat_button = ui::Button::create("button3_normal.png", "button3_pressed.png");
 
     chat_button->setTitleText("");
@@ -127,53 +127,19 @@ void main_scene::setup_scene()
     chat_button->setScale(0.6f, 0.6f);
     chat_button->setAnchorPoint(Vec2(0.5, 0.5));
     chat_button->setPosition(Vec2(140, 13));
-    chat_button->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
-        switch (type)
-        {
-        case ui::Widget::TouchEventType::ENDED:
-            network_chat->send_packet_chat_normal(
-                network_mgr->get_player_id(),
-                room_chat_field->getString()
-            );
-
-            room_chat_field->setText("");
-            break;
-        }
-    });
-
-    this->addChild(chat_button, 6);
-
-    auto keylistener = EventListenerKeyboard::create();
-    keylistener->onKeyReleased = CC_CALLBACK_2(main_scene::on_key_released, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(keylistener, this);
-
-    game_mgr->scene_ = this;
-    
-    game_mgr->user_ = new player();
-    game_mgr->opponent_ = new player();
-
-    game_mgr->user_->init(true);
-    game_mgr->opponent_->init(false);
 
     auto bet_button = ui::Button::create("bet_button_normal.png", "bet_button_pressed.png", "bet_button_disable.png");
-
-    game_mgr->bet_button_ = bet_button;
-
     bet_button->setTitleText("BET");
     bet_button->setTitleFontSize(20);
     bet_button->setEnabled(false);
     bet_button->setPosition(Vec2(visibleSize.width - 100, visibleSize.height / 2));
-    bet_button->addTouchEventListener([&](Ref* sender, cocos2d::ui::Widget::TouchEventType type) {
-        switch (type)
-        {
-        case ui::Widget::TouchEventType::ENDED:
-            game_mgr->betting();
-            break;
-        }
-    });
 
-    this->addChild(bet_button);
+#pragma endregion
 
+#pragma region Listener Event Settings
+    auto keylistener = EventListenerKeyboard::create();
+    keylistener->onKeyReleased = CC_CALLBACK_2(main_scene::on_key_released, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(keylistener, this);
 
     auto listener = EventListenerTouchOneByOne::create();
 
@@ -185,15 +151,108 @@ void main_scene::setup_scene()
     listener->onTouchEnded = CC_CALLBACK_2(main_scene::on_touch_ended, this);
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
+    bet_button->addTouchEventListener([&](Ref* sender, cocos2d::ui::Widget::TouchEventType type) {
+        switch (type)
+        {
+        case ui::Widget::TouchEventType::ENDED:
+            game_mgr->betting();
+            break;
+        }
+    });
+
+    this->addChild(bet_button);
+
+    chat_button->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
+        switch (type)
+        {
+        case ui::Widget::TouchEventType::ENDED:
+            network_chat->send_packet_chat_room(
+                network_mgr->get_player_id(),
+                room_chat_field->getString()
+            );
+
+            room_chat_field->setText("");
+            break;
+        }
+    });
+
+    this->addChild(chat_button, 6);
+
+    back->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
+        switch (type)
+        {
+        case ui::Widget::TouchEventType::ENDED:
+            network_logic->send_packet_disconnect_room_ntf();
+            break;
+        }
+    });
+
+    this->addChild(back, 1);
+#pragma endregion
+
+#pragma region GameManager Member Settings
+
+    game_mgr->scene_ = this;
+    game_mgr->scheduler_[game_manager::ROOM] = this->getScheduler();
+
+    game_mgr->room_chat_list_ = chat_list;
+    game_mgr->set_scene_status(game_manager::SCENE_TYPE::ROOM);
+    
+    game_mgr->user_ = new player();
+    game_mgr->opponent_ = new player();
+
+    game_mgr->user_->init(true);
+    game_mgr->opponent_->init(false);
+
+    game_mgr->bet_button_ = bet_button;
+
+    game_mgr->user_bet_text_ = bet_coin_user;
+    game_mgr->opponent_info_text_ = opponent_info;
+    
+    opponent_info->setString(game_mgr->opponent_info_);
+
+#pragma endregion 
 }
 
 void main_scene::end()
 {
     network_logic->destroy();
+    network_lobby->create();
+
     game_mgr->release_singleton();
+
+    if (!network_lobby->is_run())
+    {
+        this->getScheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                channel_session::connect,
+                network_lobby,
+                CHANNEL_SERVER_IP, CHANNEL_SEFVER_PORT
+            )
+        );
+
+        this->getScheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                channel_session::send_packet_join_req,
+                network_lobby,
+                network_mgr->get_player_key(),
+                network_mgr->get_player_id()
+            )
+        );
+    }
+
+    this->getScheduler()->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            chat_session::send_packet_leave_match_ntf,
+            network_chat
+        )
+    );
   
     Director::getInstance()->popScene();
     Director::getInstance()->popScene();
+
+    game_mgr->set_scene_status(game_manager::SCENE_TYPE::LOBBY);
 }
 
 void main_scene::on_key_released(EventKeyboard::KeyCode keyCode, Event* event)
@@ -205,20 +264,6 @@ void main_scene::on_key_released(EventKeyboard::KeyCode keyCode, Event* event)
         break;
     }
 }
-
-bool main_scene::on_touch_begin(cocos2d::Touch *touch, cocos2d::Event *unused_event)
-{
-    return true;
-}
-
-void main_scene::on_touch_moved(cocos2d::Touch *touch, cocos2d::Event *unused_event)
-{
-}
-
-void main_scene::on_touch_cancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event)
-{
-}
-
 
 void main_scene::on_touch_ended(cocos2d::Touch* touch, Event *unused_event)
 {
@@ -271,3 +316,7 @@ void main_scene::menu_close_callback(Ref* sender)
     exit(0);
 #endif
 }
+
+bool main_scene::on_touch_begin(cocos2d::Touch *touch, cocos2d::Event *unused_event) { return true; }
+void main_scene::on_touch_moved(cocos2d::Touch *touch, cocos2d::Event *unused_event) {}
+void main_scene::on_touch_cancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event) {}

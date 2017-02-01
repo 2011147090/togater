@@ -8,7 +8,8 @@ bool logic_session::create()
 
     is_connected_ = false;
 
-    socket_ = new tcp::socket(io_service_);
+    if (socket_ == nullptr)
+        socket_ = new tcp::socket(io_service_);
 
     return true;
 }
@@ -24,7 +25,10 @@ bool logic_session::destroy()
     work_thread_->join();
 
     if (socket_ != nullptr)
+    {
         delete socket_;
+        socket_ = nullptr;
+    }
 
     return true;
 }
@@ -44,7 +48,8 @@ void logic_session::handle_send(logic_server::message_type msg_type, const proto
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
-    socket_->write_some(boost::asio::buffer(send_buf_));
+    boost::system::error_code error;
+    socket_->write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
 }
 
 void logic_session::handle_read()
@@ -143,7 +148,7 @@ void logic_session::process_packet_process_turn_req(logic_server::packet_process
 {
     thread_sync sync;
 
-    game_mgr->scheduler_->performFunctionInCocosThread(
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::opponent_turn_end, game_mgr,
             packet.my_money(),
@@ -156,7 +161,7 @@ void logic_session::process_packet_process_turn_ntf(logic_server::packet_process
 {
     thread_sync sync;
 
-    game_mgr->scheduler_->performFunctionInCocosThread(
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::new_turn, game_mgr,
             packet.public_card_number_1(),
@@ -173,7 +178,7 @@ void logic_session::process_packet_process_check_card_ntf(logic_server::packet_p
 {
     thread_sync sync;
 
-    game_mgr->scheduler_->performFunctionInCocosThread(
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::check_public_card, game_mgr,
             )
@@ -186,7 +191,7 @@ void logic_session::process_packet_game_state_ntf(logic_server::packet_game_stat
 
     if (packet.state() == 1)
     {
-        game_mgr->scheduler_->performFunctionInCocosThread(
+        game_mgr->get_scheduler()->performFunctionInCocosThread(
             CC_CALLBACK_0(
                 game_manager::start_game, game_mgr,
                 )
@@ -194,7 +199,7 @@ void logic_session::process_packet_game_state_ntf(logic_server::packet_game_stat
     }
     else if (packet.state() == 2)
     {
-        game_mgr->scheduler_->performFunctionInCocosThread(
+        game_mgr->get_scheduler()->performFunctionInCocosThread(
             CC_CALLBACK_0(
                 main_scene::end, game_mgr->scene_,
                 )
@@ -210,8 +215,6 @@ void logic_session::send_packet_enter_req(std::string room_key, std::string play
     enter_req_packet.set_room_key(room_key);
     enter_req_packet.set_player_key(player_key);
 
-    network_mgr->set_room_key(room_key);
-     
     this->handle_send(logic_server::ENTER_REQ, enter_req_packet);
 }
 

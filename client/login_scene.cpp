@@ -36,7 +36,6 @@ bool login_scene::init()
     background->setScale(1.28f);
     this->addChild(background, 0);
 
-
     auto login_button = ui::Button::create("button_normal.png", "button_pressed.png");
 
     login_button->setTitleText("LOGIN");
@@ -77,15 +76,10 @@ bool login_scene::init()
 
 void login_scene::login_game()
 {
-    /*auto scene = lobby_scene::createScene();
-    Director::getInstance()->pushScene(TransitionSlideInR::create(1, scene));
-
     network_mgr->set_player_id(id_field->getString());
-    network_mgr->set_player_key(id_field->getString());*/
 
-    network_mgr->set_player_id(id_field->getString());
     cocos2d::network::HttpRequest* request = new cocos2d::network::HttpRequest();
-    request->setUrl("http://192.168.1.18:3000/login");
+    request->setUrl("http://192.168.1.203:3000/login");
     std::string data = "id=";
     data += id_field->getString();
     data += "&password=";
@@ -126,8 +120,6 @@ void login_scene::http_request_complete(cocos2d::network::HttpClient *sender, co
 
         for (int i = 3; i < data.size() - 1; i++)
             sub.push_back(data[i]);
-
-        //sub.push_back('\0');
 
         network_mgr->set_player_key(sub);
 

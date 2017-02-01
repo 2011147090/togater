@@ -84,7 +84,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // run
     director->runWithScene(login);
 
-    game_mgr->scheduler_ = Director::getInstance()->getScheduler();
+    game_mgr->scheduler_[game_manager::LOGIN] = Director::getInstance()->getScheduler();
 
     return true;
 }
