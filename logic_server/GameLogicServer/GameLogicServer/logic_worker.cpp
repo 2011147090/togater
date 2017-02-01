@@ -643,13 +643,15 @@ void logic_worker::process_queue()
                         );
                     }
 
+                    destroy_room(iter->first);
                     iter = room_hashs_.erase(iter);
                 }
             }
             break;
             }
 
-            iter++;
+            if (iter != room_hashs_.end())
+                iter++;
         }
     }
 }
@@ -694,10 +696,21 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
             );
         }
 
-        room_hashs_.erase(iter);
+        destroy_room(iter->first);
+        iter = room_hashs_.erase(iter);
 
         return true;
     }
+
+    return false;
+}
+
+bool logic_worker::destroy_room(std::string room_key)
+{
+    thread_sync sync;
+
+    if (redis_connector::get_instance()->remove_room_info(room_key))
+        return true;
 
     return false;
 }

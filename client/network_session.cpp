@@ -3,12 +3,12 @@
 network_session::network_session()
 {
     is_connected_ = false;
+
+    socket_ = nullptr;
+    work_thread_ = nullptr;
 }
 
-network_session::~network_session()
-{
-
-}
+network_session::~network_session() {}
 
 bool network_session::is_run()
 {
@@ -56,6 +56,9 @@ void network_session::disconnect()
 bool network_session::is_socket_open()
 {
     thread_sync sync;
+
+    if (socket_ == nullptr)
+        return false;
 
     if (!socket_->is_open() && is_connected_)
     {

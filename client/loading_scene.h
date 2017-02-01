@@ -6,6 +6,9 @@
 
 class loading_scene : public cocos2d::LayerColor
 {
+private:
+    float timer;
+
 public:
     static cocos2d::Scene* createScene();
 

@@ -6,6 +6,7 @@
 #include "loading_scene.h"
 #include "network_manager.h"
 #include "game_manager.h"
+#include "channel_session.h"
 #include "logic_session.h"
 
 using namespace cocos2d;
@@ -46,6 +47,20 @@ bool loading_scene::init()
     progress_bar->setScale(0.5f);
     this->addChild(progress_bar, 1);
 
+    timer = 0;
+
+    network_logic->create();
+
+    this->getScheduler()->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            logic_session::connect,
+            network_logic,
+            LOGIC_SERVER_IP, LOGIC_SERVER_PORT
+        )
+    );
+
+    game_mgr->scheduler_ = this->getScheduler();
+    
     scheduleUpdate();
 
     return true;
@@ -59,21 +74,6 @@ void loading_scene::update(float delta)
     if (delta > 300)
         delta = 0;
 
-    progress_bar->setRotation(depth);
-
-    static float timer = 0;
-
-    if (timer == 0)
-    {
-        this->getScheduler()->performFunctionInCocosThread(
-            CC_CALLBACK_0(
-                logic_session::connect, 
-                network_logic,
-                LOGIC_SERVER_IP, "8600"
-            )
-        );
-    }
-
     if (timer < 3)
         timer += delta;
 
@@ -81,12 +81,9 @@ void loading_scene::update(float delta)
     {
         timer = 3;
 
-        if (network_logic->is_run())
-        {
-            network_logic->send_packet_enter_req(
-                "temp",
-                network_mgr->get_player_key()
-            );
-        }
+        network_lobby->send_packet_rank_game_req(false);  
     }
+
+    progress_bar->setRotation(depth);
+
 }
