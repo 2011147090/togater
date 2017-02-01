@@ -59,7 +59,8 @@ bool loading_scene::init()
         )
     );
 
-    game_mgr->scheduler_ = this->getScheduler();
+    game_mgr->scheduler_[game_manager::LOADING] = this->getScheduler();
+    game_mgr->set_scene_status(game_manager::SCENE_TYPE::LOADING);
     
     scheduleUpdate();
 

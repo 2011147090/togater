@@ -5,6 +5,7 @@
 #include "ui\UIText.h"
 #include "loading_scene.h"
 #include "channel_session.h"
+#include "chat_session.h"
 
 bool game_manager::init_singleton()
 {
@@ -41,6 +42,7 @@ game_manager::game_manager()
 
 void game_manager::set_opponent_info(std::string id, int win, int defeat, int rating)
 {
+    opponent_id_ = id;
     opponent_info_ = "ID : ";
     opponent_info_ += id;
     opponent_info_ += "\nWin : " + win;
@@ -148,9 +150,27 @@ void game_manager::start_game()
     ((main_scene*)scene)->setup_scene();
     
     cocos2d::Director::getInstance()->pushScene(cocos2d::TransitionFade::create(1, scene));
+
+    this->scheduler_[(int)scene_type_]->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            chat_session::send_packet_enter_match_ntf,
+            network_chat,
+            opponent_id_
+        )
+    );
 }
 
-void game_manager::add_lobby_chat(std::string id, std::string str)
+cocos2d::Scheduler* game_manager::get_scheduler()
+{
+    return scheduler_[(int)scene_type_];
+}
+
+void game_manager::set_scene_status(SCENE_TYPE status)
+{
+    scene_type_ = status;
+}
+
+void game_manager::update_chat(std::string id, std::string str)
 {
     std::string message = id;
     message += " : ";
@@ -159,5 +179,36 @@ void game_manager::add_lobby_chat(std::string id, std::string str)
     auto label = cocos2d::ui::Text::create(message, "fonts/D2Coding.ttf", 15);
     label->setTextColor(cocos2d::Color4B::BLACK);
     label->setTouchEnabled(true);
-    this->lobby_chat_list_->pushBackCustomItem(label);
+
+    if (scene_type_ == LOBBY)
+        this->lobby_chat_list_->pushBackCustomItem(label);
+    else if (scene_type_ == ROOM)
+        this->room_chat_list_->pushBackCustomItem(label);
+}
+
+void game_manager::set_friend_text_field(std::string text)
+{
+    friend_text_field->setString(text);
+}
+
+void game_manager::add_friend_in_list(std::string id)
+{
+    auto label = cocos2d::ui::Text::create(id, "fonts/D2Coding.ttf", 15);
+    label->setTextColor(cocos2d::Color4B::BLACK);
+    label->setTouchEnabled(true);
+    friend_list_->pushBackCustomItem(label);
+}
+
+void game_manager::del_friend_in_list(std::string id)
+{
+    auto items = friend_list_->getItems();
+
+    int index = -1;
+
+    for (int i = 0; i < items.size(); i++)
+        if (((cocos2d::ui::Text*)items.at(i))->getString() == id)
+            index = i;
+
+    if (index != -1)
+        friend_list_->removeItem(index);
 }

@@ -9,6 +9,7 @@
 #include "ui\UIButton.h"
 #include "ui\UITextField.h"
 #include "ui\UIListView.h"
+#include "ui\UIText.h"
 
 class game_manager : public singleton<game_manager>
 {
@@ -17,6 +18,17 @@ public:
     virtual bool release_singleton();
 
     game_manager();
+
+    // friend ui
+    cocos2d::ui::ListView* friend_list_;
+    cocos2d::ui::TextField* friend_text_field;
+
+    void set_friend_text_field(std::string text);
+    void add_friend_in_list(std::string id);
+    void del_friend_in_list(std::string id);
+
+
+    // game play
 
     int total_money_;
     int batting_money_;
@@ -29,23 +41,33 @@ public:
     holdem_card* opponent_card_;
 
     cocos2d::Label* opponent_info_text_;
-    
     cocos2d::Label* user_bet_text_;
     
     std::string opponent_info_;
-    void set_opponent_info(std::string id, int win, int defeat, int rating);
+    std::string opponent_id_;
 
-    cocos2d::Scheduler* scheduler_;
+    cocos2d::Scheduler* scheduler_[4];
     
     cocos2d::ui::Button* bet_button_;
     cocos2d::ui::TextField* text_field_;
 
     cocos2d::ui::ListView* lobby_chat_list_;
-    void add_lobby_chat(std::string id, std::string str);
-
+    cocos2d::ui::ListView* room_chat_list_;
+        
     main_scene* scene_;
-    
     bool hide_card_;
+
+    enum SCENE_TYPE { LOGIN = 0, LOBBY, LOADING, ROOM };
+    SCENE_TYPE scene_type_;
+
+
+    // function
+    
+    void set_scene_status(SCENE_TYPE status);
+    cocos2d::Scheduler* get_scheduler();
+
+    void set_opponent_info(std::string id, int win, int defeat, int rating);
+    void update_chat(std::string id, std::string str);
 
     void new_turn(int public_card_1, int public_card_2, int opponent_card, int remain_money, int my_money, int opponent_money);
     void opponent_turn_end(int my_money, int opponent_money);

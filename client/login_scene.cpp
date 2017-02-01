@@ -36,7 +36,6 @@ bool login_scene::init()
     background->setScale(1.28f);
     this->addChild(background, 0);
 
-
     auto login_button = ui::Button::create("button_normal.png", "button_pressed.png");
 
     login_button->setTitleText("LOGIN");

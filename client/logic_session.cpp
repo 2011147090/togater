@@ -49,7 +49,7 @@ void logic_session::handle_send(logic_server::message_type msg_type, const proto
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
     boost::system::error_code error;
-    socket_->write_some(boost::asio::buffer(send_buf_), error);
+    socket_->write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
 }
 
 void logic_session::handle_read()
@@ -148,7 +148,7 @@ void logic_session::process_packet_process_turn_req(logic_server::packet_process
 {
     thread_sync sync;
 
-    game_mgr->scheduler_->performFunctionInCocosThread(
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::opponent_turn_end, game_mgr,
             packet.my_money(),
@@ -161,7 +161,7 @@ void logic_session::process_packet_process_turn_ntf(logic_server::packet_process
 {
     thread_sync sync;
 
-    game_mgr->scheduler_->performFunctionInCocosThread(
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::new_turn, game_mgr,
             packet.public_card_number_1(),
@@ -178,7 +178,7 @@ void logic_session::process_packet_process_check_card_ntf(logic_server::packet_p
 {
     thread_sync sync;
 
-    game_mgr->scheduler_->performFunctionInCocosThread(
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::check_public_card, game_mgr,
             )
@@ -191,7 +191,7 @@ void logic_session::process_packet_game_state_ntf(logic_server::packet_game_stat
 
     if (packet.state() == 1)
     {
-        game_mgr->scheduler_->performFunctionInCocosThread(
+        game_mgr->get_scheduler()->performFunctionInCocosThread(
             CC_CALLBACK_0(
                 game_manager::start_game, game_mgr,
                 )
@@ -199,7 +199,7 @@ void logic_session::process_packet_game_state_ntf(logic_server::packet_game_stat
     }
     else if (packet.state() == 2)
     {
-        game_mgr->scheduler_->performFunctionInCocosThread(
+        game_mgr->get_scheduler()->performFunctionInCocosThread(
             CC_CALLBACK_0(
                 main_scene::end, game_mgr->scene_,
                 )

@@ -46,7 +46,7 @@ message user_info {
 message packet_join_ans {
 	required bool success            = 1;
 	optional game_history history    = 2;
-	repeated basic_info friends_list = 3; 
+	repeated basic_info friends_list = 3;
 }
 
 message packet_join_req {
@@ -68,13 +68,22 @@ message packet_friends_req {
 		DEL      = 2;
 		SEARCH   = 3;
 	}
-	required req_type type          = 1;	
+	required req_type type          = 1;
 	required basic_info target_info = 2;
 }
 
 message packet_friends_ans {
-	required user_info friends_info     = 1;
-	required bool online                = 2;
+  enum ans_type {
+  	ADD_SUCCESS    = 1;
+		DEL_SUCCESS    = 3;
+		ADD_FAIL       = 2;
+		DEL_FAIL       = 4;
+		SEARCH_SUCCESS = 5;
+		SEARCH_FAIL    = 6;
+	}
+	required ans_type type              = 1;
+	optional user_info friends_info     = 2;
+	optional bool online                = 3;
 }
 
 message packet_play_rank_game_req {
