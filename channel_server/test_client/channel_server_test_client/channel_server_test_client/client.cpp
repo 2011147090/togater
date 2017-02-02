@@ -25,75 +25,69 @@ void client::client_connect(boost::asio::ip::tcp::endpoint &endpoint)
 
 void client::post_join_message(const char *token)
 {
-    channel_serv::join_req message;
+    join_request message;
     message.set_token(token);
+    message.set_id("kain");
     post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_logout_message(const char * token)
 {
-    channel_serv::logout_ntf message;
-    message.set_token(token);
+    logout_request message;
     post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_play_message()
 {
-    channel_serv::play_rank_game_req message;
-    channel_serv::user_info *my_info = message.mutable_my_info();
-    my_info->set_battle_history(get_battle_history());
-    my_info->set_win(get_win());
-    my_info->set_lose(get_lose());
-    my_info->set_rating(packet_handler_.check_rating(get_rating()));
-    my_info->set_user_id(get_user_id());
+    match_request message;
     post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_play_with_friends_message(const char *user_id)
 {
-    channel_serv::play_friends_game_req message;
-    message.set_flag_id(channel_serv::play_friends_game_req::APPLY);
-    message.set_recv_id(user_id);
+    match_with_friends_relay message;
+    message.set_type(match_with_friends_relay::APPLY);
+    message.set_target_id(user_id);
+    
     post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_search_message(const char *user_id)
 {
-    channel_serv::friends_req message;
-    message.set_req(channel_serv::friends_req::SEARCH);
-    message.set_user_id(user_id);
+    friends_request message;
+    message.set_type(friends_request::SEARCH);
+    message.mutable_target_info()->set_id(user_id);
+    
     post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_add_message(const char *user_id)
 {
-    channel_serv::friends_req message;
-    message.set_req(channel_serv::friends_req::ADD);
-    message.set_user_id(user_id);
+    friends_request message;
+    message.set_type(friends_request::ADD);
+    message.mutable_target_info()->set_id(user_id);
     post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_del_message(const char *user_id)
 {
-    channel_serv::friends_req message;
-    message.set_req(channel_serv::friends_req::DEL);
-    message.set_user_id(user_id);
+    friends_request message;
+    message.set_type(friends_request::DEL);
+    message.mutable_target_info()->set_id(user_id);
     post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_accept_message()
 {
-    channel_serv::play_friends_game_req message;
-    message.set_flag_id(channel_serv::play_friends_game_req::ACCEPT);
-    message.set_recv_id(target_id);
+    match_with_friends_relay message;
+    message.set_type(match_with_friends_relay::ACCEPT);
     post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
 void client::post_deny_message()
 {
-    channel_serv::play_friends_game_req message;
-    message.set_flag_id(channel_serv::play_friends_game_req::DENY);
-    message.set_recv_id(target_id);
+    match_with_friends_relay message;
+    message.set_type(match_with_friends_relay::DENY);
     post_send(false, packet_handler_.incode_message(message), message.ByteSize() + packet_header_size);
 }
 
@@ -175,21 +169,21 @@ void client::connect_handle(const boost::system::error_code &error)
 void client::process_packet(char * data, int nsize)
 {
     packet_header *header = (packet_header *)data;
-    switch (header->ID)
+    switch (header->type)
     {
-    case channel_serv::MESSAGE_ID::JOIN_ANS:
+    case message_type::JOIN_ANS:
         process_join(&data[packet_header_size],header->size);
         break;
-    case channel_serv::MESSAGE_ID::FRIENDS_ANS:
+    case message_type::FRIENDS_ANS:
         process_friends(&data[packet_header_size], header->size);
         break;
-    case channel_serv::MESSAGE_ID::MATCH_COMPLETE:
+    case message_type::MATCH_COMPLETE:
         process_game(&data[packet_header_size], header->size);
         break;
-    case channel_serv::MESSAGE_ID::PLAY_FRIENDS_REQ:
+    case message_type::PLAY_FRIENDS_REL:
         process_game_with_friends(&data[packet_header_size], header->size);
         break;
-    case channel_serv::MESSAGE_ID::ERROR_MSG:
+    case message_type::ERROR_MSG:
         process_error(&data[packet_header_size], header->size);
         break;
     default:
@@ -199,61 +193,74 @@ void client::process_packet(char * data, int nsize)
 
 void client::process_friends(char * data, int nsize)
 {
-    channel_serv::friends_ans ans;
-    ans.ParseFromArray(data, nsize);
-    std::cout << "\n\n친구 찾음 : " << (ans.mutable_user_information())->user_id() << std::endl;
+    friends_response  message;
+    message.ParseFromArray(data, nsize);
+    switch (message.type())
+    {
+        case friends_response::ADD_SUCCESS:
+        {
+            std::cout<<"ADD SUCCESS"<<std::endl;
+            return;
+        }
+        case friends_response::ADD_FAIL:
+        {
+            std::cout << "ADD FAIL" << std::endl;
+            return;
+        }
+        case friends_response::DEL_SUCCESS:
+        {
+            std::cout << "DEL SUCCESS" << std::endl;
+            return;
+        }
+        case friends_response::DEL_FAIL:
+        {
+            std::cout << "DEL FAIL" << std::endl;
+            return;
+        }
+        case friends_response::SEARCH_SUCCESS:
+        {
+            std::cout << "SEARCH SUCCESS" << std::endl;
+            return;
+        }
+        case friends_response::SEARCH_FAIL:
+        {
+            std::cout << "SEARCH FAIL" << std::endl;
+            return;
+        }
+    }
 }
 
 void client::process_join(char * data, int nsize)
 {
-    channel_serv::join_ans ans;
-    channel_serv::user_info *info;
-    ans = packet_handler_.decode_join_ans_message(data, nsize);
-    info = ans.mutable_my_info();
-    if (ans.friends_id_list_size() > 0)
+    join_response message;
+    message.ParseFromArray(data, nsize);
+    game_history *history = message.mutable_history();
+    std::vector<std::string> list;
+    
+    
+    
+    win = history->win();
+    lose = history->lose();
+    rating = history->rating_score();
+    std::cout << "win : " << win << " lost : " << lose << " rating score : " << rating << std::endl;
+    std::cout << "my friends" << std::endl;
+    for (int i = 0; i < message.friends_list_size(); i++)
     {
-
+        const basic_info &p = message.friends_list(i);
+        std::cout << p.id() << std::endl;
     }
-    battle_history = info->battle_history();
-    win = info->win();
-    lose = info->lose();
-    rating = info->rating();
-    user_id = info->user_id();
-    std::cout << " 내 아이디 : " << user_id << std::endl;
     token_flag = true;
 }
 
 void client::process_game(char * data, int nsize)
 {
-    channel_serv::matching_complete_ans ans;
-    channel_serv::user_info *op_player;
-    ans.ParseFromArray(data, nsize);
-    op_player = ans.mutable_opponent_player();
-    std::cout << "\n\n 방정보 : " << ans.room_number();
-    std::cout << "\n상대방 아이디 : "<<op_player->user_id()<<"\n";
 }
 
 void client::process_game_with_friends(char * data, int size)
 {
-    channel_serv::play_friends_game_req ans;
-    ans.ParseFromArray(data, size);
-    target_id.clear();
-    target_id = ans.recv_id();
-    switch (ans.flag_id())
-    {
-    case channel_serv::play_friends_game_req::APPLY:
-        std::cout<<ans.recv_id() << "가 게임신청하심" << std::endl;
-        return;
-    case channel_serv::play_friends_game_req::DENY:
-        std::cout << ans.recv_id() << "가 거절하심" << std::endl;
-        return;
-    }
 }
 
 void client::process_error(char * data, int nsize)
 {
-    channel_serv::error_msg ans;
-    ans.ParseFromArray(data, nsize);
-    std::cout << "error : " << ans.error_message() << "\n";
 }
 

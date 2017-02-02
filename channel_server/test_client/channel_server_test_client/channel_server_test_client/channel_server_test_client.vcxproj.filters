@@ -21,7 +21,7 @@
     <ClCompile Include="client_main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="packet.pb.cc">
+    <ClCompile Include="channel_protobuf.pb.cc">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,10 +29,10 @@
     <ClInclude Include="client.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="packet.pb.h">
+    <ClInclude Include="protocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="protocol.h">
+    <ClInclude Include="channel_protobuf.pb.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
