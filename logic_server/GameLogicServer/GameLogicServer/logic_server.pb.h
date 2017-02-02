@@ -39,6 +39,7 @@ void protobuf_AssignDesc_logic_5fserver_2eproto();
 void protobuf_ShutdownFile_logic_5fserver_2eproto();
 
 class packet_disconnect_room_ntf;
+class packet_echo_ntf;
 class packet_enter_ans;
 class packet_enter_req;
 class packet_game_state_ntf;
@@ -55,11 +56,12 @@ enum message_type {
   PROCESS_TURN_ANS = 4,
   PROCESS_TURN_NTF = 5,
   PROCESS_CHECK_CARD_NTF = 6,
-  DISCONNECT_ROOM = 7
+  DISCONNECT_ROOM = 7,
+  ECHO_NTF = 8
 };
 bool message_type_IsValid(int value);
 const message_type message_type_MIN = ENTER_REQ;
-const message_type message_type_MAX = DISCONNECT_ROOM;
+const message_type message_type_MAX = ECHO_NTF;
 const int message_type_ARRAYSIZE = message_type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* message_type_descriptor();
@@ -103,7 +105,7 @@ class packet_enter_req : public ::google::protobuf::Message /* @@protoc_insertio
 
   // implements Message ----------------------------------------------
 
-  inline packet_enter_req* New() const { return New(nullptr); }
+  inline packet_enter_req* New() const { return New(NULL); }
 
   packet_enter_req* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -224,7 +226,7 @@ class packet_enter_ans : public ::google::protobuf::Message /* @@protoc_insertio
 
   // implements Message ----------------------------------------------
 
-  inline packet_enter_ans* New() const { return New(nullptr); }
+  inline packet_enter_ans* New() const { return New(NULL); }
 
   packet_enter_ans* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -322,7 +324,7 @@ class packet_game_state_ntf : public ::google::protobuf::Message /* @@protoc_ins
 
   // implements Message ----------------------------------------------
 
-  inline packet_game_state_ntf* New() const { return New(nullptr); }
+  inline packet_game_state_ntf* New() const { return New(NULL); }
 
   packet_game_state_ntf* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -438,7 +440,7 @@ class packet_process_turn_req : public ::google::protobuf::Message /* @@protoc_i
 
   // implements Message ----------------------------------------------
 
-  inline packet_process_turn_req* New() const { return New(nullptr); }
+  inline packet_process_turn_req* New() const { return New(NULL); }
 
   packet_process_turn_req* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -549,7 +551,7 @@ class packet_process_turn_ans : public ::google::protobuf::Message /* @@protoc_i
 
   // implements Message ----------------------------------------------
 
-  inline packet_process_turn_ans* New() const { return New(nullptr); }
+  inline packet_process_turn_ans* New() const { return New(NULL); }
 
   packet_process_turn_ans* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -647,7 +649,7 @@ class packet_process_turn_ntf : public ::google::protobuf::Message /* @@protoc_i
 
   // implements Message ----------------------------------------------
 
-  inline packet_process_turn_ntf* New() const { return New(nullptr); }
+  inline packet_process_turn_ntf* New() const { return New(NULL); }
 
   packet_process_turn_ntf* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -798,7 +800,7 @@ class packet_process_check_card_ntf : public ::google::protobuf::Message /* @@pr
 
   // implements Message ----------------------------------------------
 
-  inline packet_process_check_card_ntf* New() const { return New(nullptr); }
+  inline packet_process_check_card_ntf* New() const { return New(NULL); }
 
   packet_process_check_card_ntf* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -896,7 +898,7 @@ class packet_disconnect_room_ntf : public ::google::protobuf::Message /* @@proto
 
   // implements Message ----------------------------------------------
 
-  inline packet_disconnect_room_ntf* New() const { return New(nullptr); }
+  inline packet_disconnect_room_ntf* New() const { return New(NULL); }
 
   packet_disconnect_room_ntf* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
@@ -968,6 +970,109 @@ class packet_disconnect_room_ntf : public ::google::protobuf::Message /* @@proto
 };
 extern ::google::protobuf::internal::ExplicitlyConstructed<packet_disconnect_room_ntf> packet_disconnect_room_ntf_default_instance_;
 
+// -------------------------------------------------------------------
+
+class packet_echo_ntf : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:logic_server.packet_echo_ntf) */ {
+ public:
+  packet_echo_ntf();
+  virtual ~packet_echo_ntf();
+
+  packet_echo_ntf(const packet_echo_ntf& from);
+
+  inline packet_echo_ntf& operator=(const packet_echo_ntf& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const packet_echo_ntf& default_instance();
+
+  static const packet_echo_ntf* internal_default_instance();
+
+  void Swap(packet_echo_ntf* other);
+
+  // implements Message ----------------------------------------------
+
+  inline packet_echo_ntf* New() const { return New(NULL); }
+
+  packet_echo_ntf* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const packet_echo_ntf& from);
+  void MergeFrom(const packet_echo_ntf& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  size_t ByteSizeLong() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(packet_echo_ntf* other);
+  void UnsafeMergeFrom(const packet_echo_ntf& from);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string str = 1;
+  bool has_str() const;
+  void clear_str();
+  static const int kStrFieldNumber = 1;
+  const ::std::string& str() const;
+  void set_str(const ::std::string& value);
+  void set_str(const char* value);
+  void set_str(const char* value, size_t size);
+  ::std::string* mutable_str();
+  ::std::string* release_str();
+  void set_allocated_str(::std::string* str);
+
+  // @@protoc_insertion_point(class_scope:logic_server.packet_echo_ntf)
+ private:
+  inline void set_has_str();
+  inline void clear_has_str();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  ::google::protobuf::internal::ArenaStringPtr str_;
+  friend void  protobuf_InitDefaults_logic_5fserver_2eproto_impl();
+  friend void  protobuf_AddDesc_logic_5fserver_2eproto_impl();
+  friend void protobuf_AssignDesc_logic_5fserver_2eproto();
+  friend void protobuf_ShutdownFile_logic_5fserver_2eproto();
+
+  void InitAsDefaultInstance();
+};
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_echo_ntf> packet_echo_ntf_default_instance_;
+
 // ===================================================================
 
 
@@ -1021,7 +1126,7 @@ inline ::std::string* packet_enter_req::release_player_key() {
   return player_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_enter_req::set_allocated_player_key(::std::string* player_key) {
-  if (player_key != nullptr) {
+  if (player_key != NULL) {
     set_has_player_key();
   } else {
     clear_has_player_key();
@@ -1075,7 +1180,7 @@ inline ::std::string* packet_enter_req::release_room_key() {
   return room_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_enter_req::set_allocated_room_key(::std::string* room_key) {
-  if (room_key != nullptr) {
+  if (room_key != NULL) {
     set_has_room_key();
   } else {
     clear_has_room_key();
@@ -1191,7 +1296,7 @@ inline ::std::string* packet_game_state_ntf::release_win_player_key() {
   return win_player_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_game_state_ntf::set_allocated_win_player_key(::std::string* win_player_key) {
-  if (win_player_key != nullptr) {
+  if (win_player_key != NULL) {
     set_has_win_player_key();
   } else {
     clear_has_win_player_key();
@@ -1520,7 +1625,7 @@ inline ::std::string* packet_disconnect_room_ntf::release_room_key() {
   return room_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void packet_disconnect_room_ntf::set_allocated_room_key(::std::string* room_key) {
-  if (room_key != nullptr) {
+  if (room_key != NULL) {
     set_has_room_key();
   } else {
     clear_has_room_key();
@@ -1532,7 +1637,70 @@ inline void packet_disconnect_room_ntf::set_allocated_room_key(::std::string* ro
 inline const packet_disconnect_room_ntf* packet_disconnect_room_ntf::internal_default_instance() {
   return &packet_disconnect_room_ntf_default_instance_.get();
 }
+// -------------------------------------------------------------------
+
+// packet_echo_ntf
+
+// required string str = 1;
+inline bool packet_echo_ntf::has_str() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void packet_echo_ntf::set_has_str() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void packet_echo_ntf::clear_has_str() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_echo_ntf::clear_str() {
+  str_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_str();
+}
+inline const ::std::string& packet_echo_ntf::str() const {
+  // @@protoc_insertion_point(field_get:logic_server.packet_echo_ntf.str)
+  return str_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_echo_ntf::set_str(const ::std::string& value) {
+  set_has_str();
+  str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:logic_server.packet_echo_ntf.str)
+}
+inline void packet_echo_ntf::set_str(const char* value) {
+  set_has_str();
+  str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:logic_server.packet_echo_ntf.str)
+}
+inline void packet_echo_ntf::set_str(const char* value, size_t size) {
+  set_has_str();
+  str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:logic_server.packet_echo_ntf.str)
+}
+inline ::std::string* packet_echo_ntf::mutable_str() {
+  set_has_str();
+  // @@protoc_insertion_point(field_mutable:logic_server.packet_echo_ntf.str)
+  return str_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* packet_echo_ntf::release_str() {
+  // @@protoc_insertion_point(field_release:logic_server.packet_echo_ntf.str)
+  clear_has_str();
+  return str_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void packet_echo_ntf::set_allocated_str(::std::string* str) {
+  if (str != NULL) {
+    set_has_str();
+  } else {
+    clear_has_str();
+  }
+  str_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), str);
+  // @@protoc_insertion_point(field_set_allocated:logic_server.packet_echo_ntf.str)
+}
+
+inline const packet_echo_ntf* packet_echo_ntf::internal_default_instance() {
+  return &packet_echo_ntf_default_instance_.get();
+}
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

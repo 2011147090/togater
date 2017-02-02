@@ -21,31 +21,34 @@ namespace logic_server {
 
 namespace {
 
-const ::google::protobuf::Descriptor* packet_enter_req_descriptor_ = nullptr;
+const ::google::protobuf::Descriptor* packet_enter_req_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_enter_req_reflection_ = nullptr;
-const ::google::protobuf::Descriptor* packet_enter_ans_descriptor_ = nullptr;
+  packet_enter_req_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_enter_ans_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_enter_ans_reflection_ = nullptr;
-const ::google::protobuf::Descriptor* packet_game_state_ntf_descriptor_ = nullptr;
+  packet_enter_ans_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_game_state_ntf_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_game_state_ntf_reflection_ = nullptr;
-const ::google::protobuf::Descriptor* packet_process_turn_req_descriptor_ = nullptr;
+  packet_game_state_ntf_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_process_turn_req_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_process_turn_req_reflection_ = nullptr;
-const ::google::protobuf::Descriptor* packet_process_turn_ans_descriptor_ = nullptr;
+  packet_process_turn_req_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_process_turn_ans_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_process_turn_ans_reflection_ = nullptr;
-const ::google::protobuf::Descriptor* packet_process_turn_ntf_descriptor_ = nullptr;
+  packet_process_turn_ans_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_process_turn_ntf_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_process_turn_ntf_reflection_ = nullptr;
-const ::google::protobuf::Descriptor* packet_process_check_card_ntf_descriptor_ = nullptr;
+  packet_process_turn_ntf_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_process_check_card_ntf_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_process_check_card_ntf_reflection_ = nullptr;
-const ::google::protobuf::Descriptor* packet_disconnect_room_ntf_descriptor_ = nullptr;
+  packet_process_check_card_ntf_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_disconnect_room_ntf_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  packet_disconnect_room_ntf_reflection_ = nullptr;
-const ::google::protobuf::EnumDescriptor* message_type_descriptor_ = nullptr;
+  packet_disconnect_room_ntf_reflection_ = NULL;
+const ::google::protobuf::Descriptor* packet_echo_ntf_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  packet_echo_ntf_reflection_ = NULL;
+const ::google::protobuf::EnumDescriptor* message_type_descriptor_ = NULL;
 
 }  // namespace
 
@@ -56,7 +59,7 @@ void protobuf_AssignDesc_logic_5fserver_2eproto() {
   const ::google::protobuf::FileDescriptor* file =
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "logic_server.proto");
-  GOOGLE_CHECK(file != nullptr);
+  GOOGLE_CHECK(file != NULL);
   packet_enter_req_descriptor_ = file->message_type(0);
   static const int packet_enter_req_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_enter_req, player_key_),
@@ -177,6 +180,20 @@ void protobuf_AssignDesc_logic_5fserver_2eproto() {
       -1,
       sizeof(packet_disconnect_room_ntf),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_disconnect_room_ntf, _internal_metadata_));
+  packet_echo_ntf_descriptor_ = file->message_type(8);
+  static const int packet_echo_ntf_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_echo_ntf, str_),
+  };
+  packet_echo_ntf_reflection_ =
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+      packet_echo_ntf_descriptor_,
+      packet_echo_ntf::internal_default_instance(),
+      packet_echo_ntf_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_echo_ntf, _has_bits_),
+      -1,
+      -1,
+      sizeof(packet_echo_ntf),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(packet_echo_ntf, _internal_metadata_));
   message_type_descriptor_ = file->enum_type(0);
 }
 
@@ -207,6 +224,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
       packet_process_check_card_ntf_descriptor_, packet_process_check_card_ntf::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       packet_disconnect_room_ntf_descriptor_, packet_disconnect_room_ntf::internal_default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+      packet_echo_ntf_descriptor_, packet_echo_ntf::internal_default_instance());
 }
 
 }  // namespace
@@ -228,6 +247,8 @@ void protobuf_ShutdownFile_logic_5fserver_2eproto() {
   delete packet_process_check_card_ntf_reflection_;
   packet_disconnect_room_ntf_default_instance_.Shutdown();
   delete packet_disconnect_room_ntf_reflection_;
+  packet_echo_ntf_default_instance_.Shutdown();
+  delete packet_echo_ntf_reflection_;
 }
 
 void protobuf_InitDefaults_logic_5fserver_2eproto_impl() {
@@ -244,6 +265,8 @@ void protobuf_InitDefaults_logic_5fserver_2eproto_impl() {
   packet_process_check_card_ntf_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::GetEmptyString();
   packet_disconnect_room_ntf_default_instance_.DefaultConstruct();
+  ::google::protobuf::internal::GetEmptyString();
+  packet_echo_ntf_default_instance_.DefaultConstruct();
   packet_enter_req_default_instance_.get_mutable()->InitAsDefaultInstance();
   packet_enter_ans_default_instance_.get_mutable()->InitAsDefaultInstance();
   packet_game_state_ntf_default_instance_.get_mutable()->InitAsDefaultInstance();
@@ -252,6 +275,7 @@ void protobuf_InitDefaults_logic_5fserver_2eproto_impl() {
   packet_process_turn_ntf_default_instance_.get_mutable()->InitAsDefaultInstance();
   packet_process_check_card_ntf_default_instance_.get_mutable()->InitAsDefaultInstance();
   packet_disconnect_room_ntf_default_instance_.get_mutable()->InitAsDefaultInstance();
+  packet_echo_ntf_default_instance_.get_mutable()->InitAsDefaultInstance();
 }
 
 GOOGLE_PROTOBUF_DECLARE_ONCE(protobuf_InitDefaults_logic_5fserver_2eproto_once_);
@@ -278,12 +302,13 @@ void protobuf_AddDesc_logic_5fserver_2eproto_impl() {
     "\002(\005\022\020\n\010my_money\030\005 \002(\005\022\026\n\016opponent_money\030"
     "\006 \002(\005\"/\n\035packet_process_check_card_ntf\022\016"
     "\n\006result\030\001 \002(\005\".\n\032packet_disconnect_room"
-    "_ntf\022\020\n\010room_key\030\001 \002(\t*\263\001\n\014message_type\022"
-    "\r\n\tENTER_REQ\020\000\022\r\n\tENTER_ANS\020\001\022\022\n\016GAME_ST"
-    "ATE_NTF\020\002\022\024\n\020PROCESS_TURN_REQ\020\003\022\024\n\020PROCE"
-    "SS_TURN_ANS\020\004\022\024\n\020PROCESS_TURN_NTF\020\005\022\032\n\026P"
-    "ROCESS_CHECK_CARD_NTF\020\006\022\023\n\017DISCONNECT_RO"
-    "OM\020\007", 764);
+    "_ntf\022\020\n\010room_key\030\001 \002(\t\"\036\n\017packet_echo_nt"
+    "f\022\013\n\003str\030\001 \002(\t*\301\001\n\014message_type\022\r\n\tENTER"
+    "_REQ\020\000\022\r\n\tENTER_ANS\020\001\022\022\n\016GAME_STATE_NTF\020"
+    "\002\022\024\n\020PROCESS_TURN_REQ\020\003\022\024\n\020PROCESS_TURN_"
+    "ANS\020\004\022\024\n\020PROCESS_TURN_NTF\020\005\022\032\n\026PROCESS_C"
+    "HECK_CARD_NTF\020\006\022\023\n\017DISCONNECT_ROOM\020\007\022\014\n\010"
+    "ECHO_NTF\020\010", 810);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "logic_server.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_logic_5fserver_2eproto);
@@ -314,6 +339,7 @@ bool message_type_IsValid(int value) {
     case 5:
     case 6:
     case 7:
+    case 8:
       return true;
     default:
       return false;
@@ -339,7 +365,7 @@ const int packet_enter_req::kRoomKeyFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_enter_req::packet_enter_req()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_logic_5fserver_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:logic_server.packet_enter_req)
@@ -350,7 +376,7 @@ void packet_enter_req::InitAsDefaultInstance() {
 
 packet_enter_req::packet_enter_req(const packet_enter_req& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(nullptr) {
+    _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:logic_server.packet_enter_req)
@@ -391,7 +417,7 @@ const packet_enter_req& packet_enter_req::default_instance() {
 
 packet_enter_req* packet_enter_req::New(::google::protobuf::Arena* arena) const {
   packet_enter_req* n = new packet_enter_req;
-  if (arena != nullptr) {
+  if (arena != NULL) {
     arena->Own(n);
   }
   return n;
@@ -598,7 +624,7 @@ void packet_enter_req::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_enter_req* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_enter_req>(
           &from);
-  if (source == nullptr) {
+  if (source == NULL) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:logic_server.packet_enter_req)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -722,7 +748,7 @@ void packet_enter_req::set_player_key(const char* value, size_t size) {
   return player_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_enter_req::set_allocated_player_key(::std::string* player_key) {
-  if (player_key != nullptr) {
+  if (player_key != NULL) {
     set_has_player_key();
   } else {
     clear_has_player_key();
@@ -776,7 +802,7 @@ void packet_enter_req::set_room_key(const char* value, size_t size) {
   return room_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_enter_req::set_allocated_room_key(::std::string* room_key) {
-  if (room_key != nullptr) {
+  if (room_key != NULL) {
     set_has_room_key();
   } else {
     clear_has_room_key();
@@ -797,7 +823,7 @@ const int packet_enter_ans::kResultFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_enter_ans::packet_enter_ans()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_logic_5fserver_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:logic_server.packet_enter_ans)
@@ -808,7 +834,7 @@ void packet_enter_ans::InitAsDefaultInstance() {
 
 packet_enter_ans::packet_enter_ans(const packet_enter_ans& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(nullptr) {
+    _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:logic_server.packet_enter_ans)
@@ -846,7 +872,7 @@ const packet_enter_ans& packet_enter_ans::default_instance() {
 
 packet_enter_ans* packet_enter_ans::New(::google::protobuf::Arena* arena) const {
   packet_enter_ans* n = new packet_enter_ans;
-  if (arena != nullptr) {
+  if (arena != NULL) {
     arena->Own(n);
   }
   return n;
@@ -967,7 +993,7 @@ void packet_enter_ans::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_enter_ans* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_enter_ans>(
           &from);
-  if (source == nullptr) {
+  if (source == NULL) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:logic_server.packet_enter_ans)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1077,7 +1103,7 @@ const int packet_game_state_ntf::kWinPlayerKeyFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_game_state_ntf::packet_game_state_ntf()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_logic_5fserver_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:logic_server.packet_game_state_ntf)
@@ -1088,7 +1114,7 @@ void packet_game_state_ntf::InitAsDefaultInstance() {
 
 packet_game_state_ntf::packet_game_state_ntf(const packet_game_state_ntf& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(nullptr) {
+    _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:logic_server.packet_game_state_ntf)
@@ -1128,7 +1154,7 @@ const packet_game_state_ntf& packet_game_state_ntf::default_instance() {
 
 packet_game_state_ntf* packet_game_state_ntf::New(::google::protobuf::Arena* arena) const {
   packet_game_state_ntf* n = new packet_game_state_ntf;
-  if (arena != nullptr) {
+  if (arena != NULL) {
     arena->Own(n);
   }
   return n;
@@ -1320,7 +1346,7 @@ void packet_game_state_ntf::MergeFrom(const ::google::protobuf::Message& from) {
   const packet_game_state_ntf* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_game_state_ntf>(
           &from);
-  if (source == nullptr) {
+  if (source == NULL) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:logic_server.packet_game_state_ntf)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1467,7 +1493,7 @@ void packet_game_state_ntf::set_win_player_key(const char* value, size_t size) {
   return win_player_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_game_state_ntf::set_allocated_win_player_key(::std::string* win_player_key) {
-  if (win_player_key != nullptr) {
+  if (win_player_key != NULL) {
     set_has_win_player_key();
   } else {
     clear_has_win_player_key();
@@ -1489,7 +1515,7 @@ const int packet_process_turn_req::kOpponentMoneyFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_process_turn_req::packet_process_turn_req()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_logic_5fserver_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:logic_server.packet_process_turn_req)
@@ -1500,7 +1526,7 @@ void packet_process_turn_req::InitAsDefaultInstance() {
 
 packet_process_turn_req::packet_process_turn_req(const packet_process_turn_req& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(nullptr) {
+    _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:logic_server.packet_process_turn_req)
@@ -1539,7 +1565,7 @@ const packet_process_turn_req& packet_process_turn_req::default_instance() {
 
 packet_process_turn_req* packet_process_turn_req::New(::google::protobuf::Arena* arena) const {
   packet_process_turn_req* n = new packet_process_turn_req;
-  if (arena != nullptr) {
+  if (arena != NULL) {
     arena->Own(n);
   }
   return n;
@@ -1733,7 +1759,7 @@ void packet_process_turn_req::MergeFrom(const ::google::protobuf::Message& from)
   const packet_process_turn_req* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_process_turn_req>(
           &from);
-  if (source == nullptr) {
+  if (source == NULL) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:logic_server.packet_process_turn_req)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1870,7 +1896,7 @@ const int packet_process_turn_ans::kMoneyFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_process_turn_ans::packet_process_turn_ans()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_logic_5fserver_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:logic_server.packet_process_turn_ans)
@@ -1881,7 +1907,7 @@ void packet_process_turn_ans::InitAsDefaultInstance() {
 
 packet_process_turn_ans::packet_process_turn_ans(const packet_process_turn_ans& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(nullptr) {
+    _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:logic_server.packet_process_turn_ans)
@@ -1919,7 +1945,7 @@ const packet_process_turn_ans& packet_process_turn_ans::default_instance() {
 
 packet_process_turn_ans* packet_process_turn_ans::New(::google::protobuf::Arena* arena) const {
   packet_process_turn_ans* n = new packet_process_turn_ans;
-  if (arena != nullptr) {
+  if (arena != NULL) {
     arena->Own(n);
   }
   return n;
@@ -2040,7 +2066,7 @@ void packet_process_turn_ans::MergeFrom(const ::google::protobuf::Message& from)
   const packet_process_turn_ans* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_process_turn_ans>(
           &from);
-  if (source == nullptr) {
+  if (source == NULL) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:logic_server.packet_process_turn_ans)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -2154,7 +2180,7 @@ const int packet_process_turn_ntf::kOpponentMoneyFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_process_turn_ntf::packet_process_turn_ntf()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_logic_5fserver_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:logic_server.packet_process_turn_ntf)
@@ -2165,7 +2191,7 @@ void packet_process_turn_ntf::InitAsDefaultInstance() {
 
 packet_process_turn_ntf::packet_process_turn_ntf(const packet_process_turn_ntf& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(nullptr) {
+    _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:logic_server.packet_process_turn_ntf)
@@ -2204,7 +2230,7 @@ const packet_process_turn_ntf& packet_process_turn_ntf::default_instance() {
 
 packet_process_turn_ntf* packet_process_turn_ntf::New(::google::protobuf::Arena* arena) const {
   packet_process_turn_ntf* n = new packet_process_turn_ntf;
-  if (arena != nullptr) {
+  if (arena != NULL) {
     arena->Own(n);
   }
   return n;
@@ -2546,7 +2572,7 @@ void packet_process_turn_ntf::MergeFrom(const ::google::protobuf::Message& from)
   const packet_process_turn_ntf* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_process_turn_ntf>(
           &from);
-  if (source == nullptr) {
+  if (source == NULL) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:logic_server.packet_process_turn_ntf)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -2795,7 +2821,7 @@ const int packet_process_check_card_ntf::kResultFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_process_check_card_ntf::packet_process_check_card_ntf()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_logic_5fserver_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:logic_server.packet_process_check_card_ntf)
@@ -2806,7 +2832,7 @@ void packet_process_check_card_ntf::InitAsDefaultInstance() {
 
 packet_process_check_card_ntf::packet_process_check_card_ntf(const packet_process_check_card_ntf& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(nullptr) {
+    _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:logic_server.packet_process_check_card_ntf)
@@ -2844,7 +2870,7 @@ const packet_process_check_card_ntf& packet_process_check_card_ntf::default_inst
 
 packet_process_check_card_ntf* packet_process_check_card_ntf::New(::google::protobuf::Arena* arena) const {
   packet_process_check_card_ntf* n = new packet_process_check_card_ntf;
-  if (arena != nullptr) {
+  if (arena != NULL) {
     arena->Own(n);
   }
   return n;
@@ -2965,7 +2991,7 @@ void packet_process_check_card_ntf::MergeFrom(const ::google::protobuf::Message&
   const packet_process_check_card_ntf* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_process_check_card_ntf>(
           &from);
-  if (source == nullptr) {
+  if (source == NULL) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:logic_server.packet_process_check_card_ntf)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -3074,7 +3100,7 @@ const int packet_disconnect_room_ntf::kRoomKeyFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 packet_disconnect_room_ntf::packet_disconnect_room_ntf()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_logic_5fserver_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:logic_server.packet_disconnect_room_ntf)
@@ -3085,7 +3111,7 @@ void packet_disconnect_room_ntf::InitAsDefaultInstance() {
 
 packet_disconnect_room_ntf::packet_disconnect_room_ntf(const packet_disconnect_room_ntf& from)
   : ::google::protobuf::Message(),
-    _internal_metadata_(nullptr) {
+    _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:logic_server.packet_disconnect_room_ntf)
@@ -3124,7 +3150,7 @@ const packet_disconnect_room_ntf& packet_disconnect_room_ntf::default_instance()
 
 packet_disconnect_room_ntf* packet_disconnect_room_ntf::New(::google::protobuf::Arena* arena) const {
   packet_disconnect_room_ntf* n = new packet_disconnect_room_ntf;
-  if (arena != nullptr) {
+  if (arena != NULL) {
     arena->Own(n);
   }
   return n;
@@ -3260,7 +3286,7 @@ void packet_disconnect_room_ntf::MergeFrom(const ::google::protobuf::Message& fr
   const packet_disconnect_room_ntf* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const packet_disconnect_room_ntf>(
           &from);
-  if (source == nullptr) {
+  if (source == NULL) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:logic_server.packet_disconnect_room_ntf)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -3379,7 +3405,7 @@ void packet_disconnect_room_ntf::set_room_key(const char* value, size_t size) {
   return room_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 void packet_disconnect_room_ntf::set_allocated_room_key(::std::string* room_key) {
-  if (room_key != nullptr) {
+  if (room_key != NULL) {
     set_has_room_key();
   } else {
     clear_has_room_key();
@@ -3390,6 +3416,332 @@ void packet_disconnect_room_ntf::set_allocated_room_key(::std::string* room_key)
 
 inline const packet_disconnect_room_ntf* packet_disconnect_room_ntf::internal_default_instance() {
   return &packet_disconnect_room_ntf_default_instance_.get();
+}
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int packet_echo_ntf::kStrFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+packet_echo_ntf::packet_echo_ntf()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_logic_5fserver_2eproto();
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:logic_server.packet_echo_ntf)
+}
+
+void packet_echo_ntf::InitAsDefaultInstance() {
+}
+
+packet_echo_ntf::packet_echo_ntf(const packet_echo_ntf& from)
+  : ::google::protobuf::Message(),
+    _internal_metadata_(NULL) {
+  SharedCtor();
+  UnsafeMergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:logic_server.packet_echo_ntf)
+}
+
+void packet_echo_ntf::SharedCtor() {
+  _cached_size_ = 0;
+  str_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+packet_echo_ntf::~packet_echo_ntf() {
+  // @@protoc_insertion_point(destructor:logic_server.packet_echo_ntf)
+  SharedDtor();
+}
+
+void packet_echo_ntf::SharedDtor() {
+  str_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void packet_echo_ntf::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* packet_echo_ntf::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return packet_echo_ntf_descriptor_;
+}
+
+const packet_echo_ntf& packet_echo_ntf::default_instance() {
+  protobuf_InitDefaults_logic_5fserver_2eproto();
+  return *internal_default_instance();
+}
+
+::google::protobuf::internal::ExplicitlyConstructed<packet_echo_ntf> packet_echo_ntf_default_instance_;
+
+packet_echo_ntf* packet_echo_ntf::New(::google::protobuf::Arena* arena) const {
+  packet_echo_ntf* n = new packet_echo_ntf;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void packet_echo_ntf::Clear() {
+// @@protoc_insertion_point(message_clear_start:logic_server.packet_echo_ntf)
+  if (has_str()) {
+    str_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  _has_bits_.Clear();
+  if (_internal_metadata_.have_unknown_fields()) {
+    mutable_unknown_fields()->Clear();
+  }
+}
+
+bool packet_echo_ntf::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:logic_server.packet_echo_ntf)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required string str = 1;
+      case 1: {
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_str()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->str().data(), this->str().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "logic_server.packet_echo_ntf.str");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:logic_server.packet_echo_ntf)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:logic_server.packet_echo_ntf)
+  return false;
+#undef DO_
+}
+
+void packet_echo_ntf::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:logic_server.packet_echo_ntf)
+  // required string str = 1;
+  if (has_str()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->str().data(), this->str().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "logic_server.packet_echo_ntf.str");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->str(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:logic_server.packet_echo_ntf)
+}
+
+::google::protobuf::uint8* packet_echo_ntf::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:logic_server.packet_echo_ntf)
+  // required string str = 1;
+  if (has_str()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->str().data(), this->str().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "logic_server.packet_echo_ntf.str");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->str(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:logic_server.packet_echo_ntf)
+  return target;
+}
+
+size_t packet_echo_ntf::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:logic_server.packet_echo_ntf)
+  size_t total_size = 0;
+
+  // required string str = 1;
+  if (has_str()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->str());
+  }
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void packet_echo_ntf::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:logic_server.packet_echo_ntf)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const packet_echo_ntf* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const packet_echo_ntf>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:logic_server.packet_echo_ntf)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:logic_server.packet_echo_ntf)
+    UnsafeMergeFrom(*source);
+  }
+}
+
+void packet_echo_ntf::MergeFrom(const packet_echo_ntf& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:logic_server.packet_echo_ntf)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void packet_echo_ntf::UnsafeMergeFrom(const packet_echo_ntf& from) {
+  GOOGLE_DCHECK(&from != this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_str()) {
+      set_has_str();
+      str_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.str_);
+    }
+  }
+  if (from._internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
+  }
+}
+
+void packet_echo_ntf::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:logic_server.packet_echo_ntf)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void packet_echo_ntf::CopyFrom(const packet_echo_ntf& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:logic_server.packet_echo_ntf)
+  if (&from == this) return;
+  Clear();
+  UnsafeMergeFrom(from);
+}
+
+bool packet_echo_ntf::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+
+  return true;
+}
+
+void packet_echo_ntf::Swap(packet_echo_ntf* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void packet_echo_ntf::InternalSwap(packet_echo_ntf* other) {
+  str_.Swap(&other->str_);
+  std::swap(_has_bits_[0], other->_has_bits_[0]);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata packet_echo_ntf::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = packet_echo_ntf_descriptor_;
+  metadata.reflection = packet_echo_ntf_reflection_;
+  return metadata;
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// packet_echo_ntf
+
+// required string str = 1;
+bool packet_echo_ntf::has_str() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void packet_echo_ntf::set_has_str() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void packet_echo_ntf::clear_has_str() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void packet_echo_ntf::clear_str() {
+  str_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_str();
+}
+const ::std::string& packet_echo_ntf::str() const {
+  // @@protoc_insertion_point(field_get:logic_server.packet_echo_ntf.str)
+  return str_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void packet_echo_ntf::set_str(const ::std::string& value) {
+  set_has_str();
+  str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:logic_server.packet_echo_ntf.str)
+}
+void packet_echo_ntf::set_str(const char* value) {
+  set_has_str();
+  str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:logic_server.packet_echo_ntf.str)
+}
+void packet_echo_ntf::set_str(const char* value, size_t size) {
+  set_has_str();
+  str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:logic_server.packet_echo_ntf.str)
+}
+::std::string* packet_echo_ntf::mutable_str() {
+  set_has_str();
+  // @@protoc_insertion_point(field_mutable:logic_server.packet_echo_ntf.str)
+  return str_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+::std::string* packet_echo_ntf::release_str() {
+  // @@protoc_insertion_point(field_release:logic_server.packet_echo_ntf.str)
+  clear_has_str();
+  return str_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void packet_echo_ntf::set_allocated_str(::std::string* str) {
+  if (str != NULL) {
+    set_has_str();
+  } else {
+    clear_has_str();
+  }
+  str_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), str);
+  // @@protoc_insertion_point(field_set_allocated:logic_server.packet_echo_ntf.str)
+}
+
+inline const packet_echo_ntf* packet_echo_ntf::internal_default_instance() {
+  return &packet_echo_ntf_default_instance_.get();
 }
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 

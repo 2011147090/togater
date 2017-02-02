@@ -31,3 +31,8 @@ void connected_session::process_packet_disconnect_room_ntf(logic_server::packet_
     if (logic_worker::get_instance()->disconnect_room(room_key_, this->get_player_key()))
         return;
 }
+
+void connected_session::process_packet_echo_ntf(logic_server::packet_echo_ntf packet)
+{
+    this->handle_send(logic_server::ECHO_NTF, packet);
+}
