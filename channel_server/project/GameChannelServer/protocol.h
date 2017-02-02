@@ -8,8 +8,16 @@ using namespace google;
 using namespace channel_server;
 /* redis */
 #define REDIS_SERVER_IP "192.168.1.201"
+//#define REDIS_SERVER_IP "127.0.0.1"
 #define REDIS_PORT "6379"
 #define REDIS_PWD "password"
+
+/* my sql */
+#define MYSQL_SERVER_IP "192.168.1.203"
+#define MYSQL_PORT 3306
+#define MYSQL_ID "root"
+#define MYSQL_PASSWORD "123123"
+#define MYSQL_DB_NAME "game"
 
 /* server */
 #define MAX_RECEIVE_BUFFER_LEN 256
@@ -27,6 +35,7 @@ typedef enum session_status
     , MATCH_RECVER
     , MATCH_COMPLETE
 } status;
+
 /* protobuf struct */
 typedef rating rating_name;
 /* packet about join */
@@ -42,10 +51,19 @@ const unsigned char friends_add = packet_friends_req::ADD;
 const unsigned char friends_del = packet_friends_req::DEL;
 const unsigned char friends_search = packet_friends_req::SEARCH;
 
+typedef packet_friends_ans_ans_type friends_reponse_type;
+const unsigned char add_success = packet_friends_ans::ADD_SUCCESS;
+const unsigned char add_fail = packet_friends_ans::ADD_FAIL;
+const unsigned char del_success = packet_friends_ans::DEL_SUCCESS;
+const unsigned char del_fail = packet_friends_ans::DEL_FAIL;
+const unsigned char search_success = packet_friends_ans::SEARCH_SUCCESS;
+const unsigned char search_fail = packet_friends_ans::SEARCH_FAIL;
+
 /* packet about game */
 typedef packet_play_rank_game_req match_request;
 typedef packet_play_rank_game_ans match_response;
 typedef packet_matching_complete_ans match_complete;
+typedef packet_matching_confirm match_confirm;
 typedef packet_play_friends_game_rel match_with_friends_relay;
 const unsigned char normal_game_apply = packet_play_friends_game_rel::APPLY;
 const unsigned char normal_game_accept = packet_play_friends_game_rel::ACCEPT;
@@ -109,6 +127,11 @@ public:
         return incoding(message_type::MATCH_COMPLETE, message);
     }
 
+    char* incode_message(const match_confirm& message)
+    {
+        return incoding(message_type::MATCH_CONFIRM, message);
+    }
+
     char* incode_message(const error_report& message)
     {
         return incoding(message_type::ERROR_MSG, message);
@@ -150,6 +173,11 @@ public:
     }
 
     inline void decode_message(match_complete &message, const char *decoding_data, const int data_size)
+    {
+        message.ParseFromArray(decoding_data, data_size);
+    }
+
+    inline void decode_message(match_confirm &message, const char *decoding_data, const int data_size)
     {
         message.ParseFromArray(decoding_data, data_size);
     }

@@ -55,7 +55,8 @@ void session::post_send(const bool immediately, const int send_data_size, char *
     boost::asio::async_write(
         socket_, boost::asio::buffer(send_data, send_data_size),   
         boost::bind(
-            &session::handle_write, this,
+            &session::handle_write,
+            this,
             boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred
         )
@@ -67,7 +68,8 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
     delete[] send_data_queue_.front();
     send_data_queue_.pop_front();
 
-    if (stat_ == status::MATCH_COMPLETE || stat_ == status::LOGOUT) {
+    if (stat_ == status::MATCH_COMPLETE || stat_ == status::LOGOUT) 
+    {
         send_data_queue_.clear();
         socket_.close();
     }
@@ -96,7 +98,7 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
         }
         else
         {
-            std::cout << "Recv error No: " << error.value() << "error Message: " << error.message() << std::endl;
+            //std::cout << "Recv error No: " << error.value() << "error Message: " << error.message() << std::endl;
             channel_serv_->close_session(session_id_);
         }
     }

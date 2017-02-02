@@ -76,8 +76,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(BOOST_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(PROTOBUF_DIR);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(JSON_SPIRIT_DIR)\lib\debug;$(BOOST_DIR)\lib64-msvc-14.0;$(PROTOBUF_DIR);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MYSQL_DIR)\include;$(BOOST_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(PROTOBUF_DIR);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(MYSQL_DIR)\lib;$(JSON_SPIRIT_DIR)\lib\debug;$(BOOST_DIR)\lib64-msvc-14.0;$(PROTOBUF_DIR);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -86,8 +86,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(BOOST_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(PROTOBUF_DIR);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(JSON_SPIRIT_DIR)\lib\release;$(BOOST_DIR)\lib64-msvc-14.0;$(PROTOBUF_DIR);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MYSQL_DIR)\include;$(BOOST_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(PROTOBUF_DIR);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(MYSQL_DIR)\lib;$(JSON_SPIRIT_DIR)\lib\release;$(BOOST_DIR)\lib64-msvc-14.0;$(PROTOBUF_DIR);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,7 +116,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libprotobufd.lib;json_spirit_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmysql.lib;libprotobufd.lib;json_spirit_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -154,7 +154,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libprotobuf.lib;json_spirit_release.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmysql.lib;libprotobuf.lib;json_spirit_release.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

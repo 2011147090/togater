@@ -48,6 +48,7 @@ class packet_join_req;
 class packet_logout_ans;
 class packet_logout_req;
 class packet_matching_complete_ans;
+class packet_matching_confirm;
 class packet_play_friends_game_rel;
 class packet_play_rank_game_ans;
 class packet_play_rank_game_req;
@@ -72,6 +73,29 @@ inline bool packet_friends_req_req_type_Parse(
     const ::std::string& name, packet_friends_req_req_type* value) {
   return ::google::protobuf::internal::ParseNamedEnum<packet_friends_req_req_type>(
     packet_friends_req_req_type_descriptor(), name, value);
+}
+enum packet_friends_ans_ans_type {
+  packet_friends_ans_ans_type_ADD_SUCCESS = 1,
+  packet_friends_ans_ans_type_DEL_SUCCESS = 3,
+  packet_friends_ans_ans_type_ADD_FAIL = 2,
+  packet_friends_ans_ans_type_DEL_FAIL = 4,
+  packet_friends_ans_ans_type_SEARCH_SUCCESS = 5,
+  packet_friends_ans_ans_type_SEARCH_FAIL = 6
+};
+bool packet_friends_ans_ans_type_IsValid(int value);
+const packet_friends_ans_ans_type packet_friends_ans_ans_type_ans_type_MIN = packet_friends_ans_ans_type_ADD_SUCCESS;
+const packet_friends_ans_ans_type packet_friends_ans_ans_type_ans_type_MAX = packet_friends_ans_ans_type_SEARCH_FAIL;
+const int packet_friends_ans_ans_type_ans_type_ARRAYSIZE = packet_friends_ans_ans_type_ans_type_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* packet_friends_ans_ans_type_descriptor();
+inline const ::std::string& packet_friends_ans_ans_type_Name(packet_friends_ans_ans_type value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    packet_friends_ans_ans_type_descriptor(), value);
+}
+inline bool packet_friends_ans_ans_type_Parse(
+    const ::std::string& name, packet_friends_ans_ans_type* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<packet_friends_ans_ans_type>(
+    packet_friends_ans_ans_type_descriptor(), name, value);
 }
 enum packet_play_friends_game_rel_req_type {
   packet_play_friends_game_rel_req_type_APPLY = 0,
@@ -100,11 +124,12 @@ enum message_type {
   PLAY_RANK_ANS = 3,
   PLAY_FRIENDS_REL = 4,
   MATCH_COMPLETE = 5,
-  ERROR_MSG = 6,
-  JOIN_REQ = 7,
-  JOIN_ANS = 8,
-  LOGOUT_REQ = 9,
-  LOGOUT_ANS = 10
+  MATCH_CONFIRM = 6,
+  ERROR_MSG = 7,
+  JOIN_REQ = 8,
+  JOIN_ANS = 9,
+  LOGOUT_REQ = 10,
+  LOGOUT_ANS = 11
 };
 bool message_type_IsValid(int value);
 const message_type message_type_MIN = FRIENDS_REQ;
@@ -1146,39 +1171,80 @@ class packet_friends_ans : public ::google::protobuf::Message /* @@protoc_insert
 
   // nested types ----------------------------------------------------
 
+  typedef packet_friends_ans_ans_type ans_type;
+  static const ans_type ADD_SUCCESS =
+    packet_friends_ans_ans_type_ADD_SUCCESS;
+  static const ans_type DEL_SUCCESS =
+    packet_friends_ans_ans_type_DEL_SUCCESS;
+  static const ans_type ADD_FAIL =
+    packet_friends_ans_ans_type_ADD_FAIL;
+  static const ans_type DEL_FAIL =
+    packet_friends_ans_ans_type_DEL_FAIL;
+  static const ans_type SEARCH_SUCCESS =
+    packet_friends_ans_ans_type_SEARCH_SUCCESS;
+  static const ans_type SEARCH_FAIL =
+    packet_friends_ans_ans_type_SEARCH_FAIL;
+  static inline bool ans_type_IsValid(int value) {
+    return packet_friends_ans_ans_type_IsValid(value);
+  }
+  static const ans_type ans_type_MIN =
+    packet_friends_ans_ans_type_ans_type_MIN;
+  static const ans_type ans_type_MAX =
+    packet_friends_ans_ans_type_ans_type_MAX;
+  static const int ans_type_ARRAYSIZE =
+    packet_friends_ans_ans_type_ans_type_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  ans_type_descriptor() {
+    return packet_friends_ans_ans_type_descriptor();
+  }
+  static inline const ::std::string& ans_type_Name(ans_type value) {
+    return packet_friends_ans_ans_type_Name(value);
+  }
+  static inline bool ans_type_Parse(const ::std::string& name,
+      ans_type* value) {
+    return packet_friends_ans_ans_type_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
-  // required .channel_server.user_info friends_info = 1;
+  // required .channel_server.packet_friends_ans.ans_type type = 1;
+  bool has_type() const;
+  void clear_type();
+  static const int kTypeFieldNumber = 1;
+  ::channel_server::packet_friends_ans_ans_type type() const;
+  void set_type(::channel_server::packet_friends_ans_ans_type value);
+
+  // optional .channel_server.user_info friends_info = 2;
   bool has_friends_info() const;
   void clear_friends_info();
-  static const int kFriendsInfoFieldNumber = 1;
+  static const int kFriendsInfoFieldNumber = 2;
   const ::channel_server::user_info& friends_info() const;
   ::channel_server::user_info* mutable_friends_info();
   ::channel_server::user_info* release_friends_info();
   void set_allocated_friends_info(::channel_server::user_info* friends_info);
 
-  // required bool online = 2;
+  // optional bool online = 3;
   bool has_online() const;
   void clear_online();
-  static const int kOnlineFieldNumber = 2;
+  static const int kOnlineFieldNumber = 3;
   bool online() const;
   void set_online(bool value);
 
   // @@protoc_insertion_point(class_scope:channel_server.packet_friends_ans)
  private:
+  inline void set_has_type();
+  inline void clear_has_type();
   inline void set_has_friends_info();
   inline void clear_has_friends_info();
   inline void set_has_online();
   inline void clear_has_online();
-
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::channel_server::user_info* friends_info_;
   bool online_;
+  int type_;
   friend void  protobuf_InitDefaults_channel_5fprotobuf_2eproto_impl();
   friend void  protobuf_AddDesc_channel_5fprotobuf_2eproto_impl();
   friend void protobuf_AssignDesc_channel_5fprotobuf_2eproto();
@@ -1645,6 +1711,104 @@ class packet_matching_complete_ans : public ::google::protobuf::Message /* @@pro
   void InitAsDefaultInstance();
 };
 extern ::google::protobuf::internal::ExplicitlyConstructed<packet_matching_complete_ans> packet_matching_complete_ans_default_instance_;
+
+// -------------------------------------------------------------------
+
+class packet_matching_confirm : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:channel_server.packet_matching_confirm) */ {
+ public:
+  packet_matching_confirm();
+  virtual ~packet_matching_confirm();
+
+  packet_matching_confirm(const packet_matching_confirm& from);
+
+  inline packet_matching_confirm& operator=(const packet_matching_confirm& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const packet_matching_confirm& default_instance();
+
+  static const packet_matching_confirm* internal_default_instance();
+
+  void Swap(packet_matching_confirm* other);
+
+  // implements Message ----------------------------------------------
+
+  inline packet_matching_confirm* New() const { return New(NULL); }
+
+  packet_matching_confirm* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const packet_matching_confirm& from);
+  void MergeFrom(const packet_matching_confirm& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  size_t ByteSizeLong() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(packet_matching_confirm* other);
+  void UnsafeMergeFrom(const packet_matching_confirm& from);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional bool none = 1 [default = true];
+  bool has_none() const;
+  void clear_none();
+  static const int kNoneFieldNumber = 1;
+  bool none() const;
+  void set_none(bool value);
+
+  // @@protoc_insertion_point(class_scope:channel_server.packet_matching_confirm)
+ private:
+  inline void set_has_none();
+  inline void clear_has_none();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  bool none_;
+  friend void  protobuf_InitDefaults_channel_5fprotobuf_2eproto_impl();
+  friend void  protobuf_AddDesc_channel_5fprotobuf_2eproto_impl();
+  friend void protobuf_AssignDesc_channel_5fprotobuf_2eproto();
+  friend void protobuf_ShutdownFile_channel_5fprotobuf_2eproto();
+
+  void InitAsDefaultInstance();
+};
+extern ::google::protobuf::internal::ExplicitlyConstructed<packet_matching_confirm> packet_matching_confirm_default_instance_;
 
 // -------------------------------------------------------------------
 
@@ -2378,15 +2542,40 @@ inline const packet_friends_req* packet_friends_req::internal_default_instance()
 
 // packet_friends_ans
 
-// required .channel_server.user_info friends_info = 1;
-inline bool packet_friends_ans::has_friends_info() const {
+// required .channel_server.packet_friends_ans.ans_type type = 1;
+inline bool packet_friends_ans::has_type() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void packet_friends_ans::set_has_friends_info() {
+inline void packet_friends_ans::set_has_type() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void packet_friends_ans::clear_has_friends_info() {
+inline void packet_friends_ans::clear_has_type() {
   _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_friends_ans::clear_type() {
+  type_ = 1;
+  clear_has_type();
+}
+inline ::channel_server::packet_friends_ans_ans_type packet_friends_ans::type() const {
+  // @@protoc_insertion_point(field_get:channel_server.packet_friends_ans.type)
+  return static_cast< ::channel_server::packet_friends_ans_ans_type >(type_);
+}
+inline void packet_friends_ans::set_type(::channel_server::packet_friends_ans_ans_type value) {
+  assert(::channel_server::packet_friends_ans_ans_type_IsValid(value));
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:channel_server.packet_friends_ans.type)
+}
+
+// optional .channel_server.user_info friends_info = 2;
+inline bool packet_friends_ans::has_friends_info() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void packet_friends_ans::set_has_friends_info() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void packet_friends_ans::clear_has_friends_info() {
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void packet_friends_ans::clear_friends_info() {
   if (friends_info_ != NULL) friends_info_->::channel_server::user_info::Clear();
@@ -2423,15 +2612,15 @@ inline void packet_friends_ans::set_allocated_friends_info(::channel_server::use
   // @@protoc_insertion_point(field_set_allocated:channel_server.packet_friends_ans.friends_info)
 }
 
-// required bool online = 2;
+// optional bool online = 3;
 inline bool packet_friends_ans::has_online() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void packet_friends_ans::set_has_online() {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00000004u;
 }
 inline void packet_friends_ans::clear_has_online() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void packet_friends_ans::clear_online() {
   online_ = false;
@@ -2706,6 +2895,37 @@ inline const packet_matching_complete_ans* packet_matching_complete_ans::interna
 }
 // -------------------------------------------------------------------
 
+// packet_matching_confirm
+
+// optional bool none = 1 [default = true];
+inline bool packet_matching_confirm::has_none() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void packet_matching_confirm::set_has_none() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void packet_matching_confirm::clear_has_none() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void packet_matching_confirm::clear_none() {
+  none_ = true;
+  clear_has_none();
+}
+inline bool packet_matching_confirm::none() const {
+  // @@protoc_insertion_point(field_get:channel_server.packet_matching_confirm.none)
+  return none_;
+}
+inline void packet_matching_confirm::set_none(bool value) {
+  set_has_none();
+  none_ = value;
+  // @@protoc_insertion_point(field_set:channel_server.packet_matching_confirm.none)
+}
+
+inline const packet_matching_confirm* packet_matching_confirm::internal_default_instance() {
+  return &packet_matching_confirm_default_instance_.get();
+}
+// -------------------------------------------------------------------
+
 // packet_error_message
 
 // required string error_string = 1;
@@ -2792,6 +3012,8 @@ inline const packet_error_message* packet_error_message::internal_default_instan
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -2805,6 +3027,11 @@ template <> struct is_proto_enum< ::channel_server::packet_friends_req_req_type>
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::channel_server::packet_friends_req_req_type>() {
   return ::channel_server::packet_friends_req_req_type_descriptor();
+}
+template <> struct is_proto_enum< ::channel_server::packet_friends_ans_ans_type> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::channel_server::packet_friends_ans_ans_type>() {
+  return ::channel_server::packet_friends_ans_ans_type_descriptor();
 }
 template <> struct is_proto_enum< ::channel_server::packet_play_friends_game_rel_req_type> : ::google::protobuf::internal::true_type {};
 template <>

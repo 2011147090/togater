@@ -66,9 +66,6 @@
     <ClCompile Include="server_main.cpp">
       <Filter>소스 파일\server</Filter>
     </ClCompile>
-    <ClCompile Include="server_session.cpp">
-      <Filter>소스 파일\server</Filter>
-    </ClCompile>
     <ClCompile Include="redispp.cpp">
       <Filter>소스 파일\DB\memcache</Filter>
     </ClCompile>
@@ -86,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="channel_protobuf.pb.cc">
       <Filter>소스 파일\packet</Filter>
+    </ClCompile>
+    <ClCompile Include="server_session.cpp">
+      <Filter>소스 파일\server feature</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

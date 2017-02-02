@@ -6,7 +6,7 @@ match_manager::match_manager(packet_handler & packet_handler, friends_manager & 
     : packet_handler_(packet_handler)
     , friends_manager_(friends_manager)
     , redis_connection_(redis_connection)
-{ room_number = 0;}
+{ room_number = 3000;}
 
 match_manager::~match_manager()
 { }
@@ -42,22 +42,22 @@ void match_manager::process_matching(session *request_session, const char *packe
 void match_manager::process_matching_with_friends(session *request_session, const char *packet, const int data_size)
 {
     match_with_friends_relay relay_message;
-    error_report error_report_;
+    error_report error_message;
     
     packet_handler_.decode_message(relay_message, packet, data_size);
     session *recv_session = friends_manager_.find_id_in_user_map(relay_message.target_id());
 
     switch (relay_message.type())
     {
-    case normal_game_accept:
+    case match_with_friends_relay::ACCEPT:
     {
         if (recv_session == nullptr && request_session->get_status() != status::MATCH_RECVER && recv_session->get_status() != status::MATCH_REQUEST)
         {
-            error_report_.set_error_string("Not Found");
-            request_session->post_send(false, error_report_.ByteSize() + packet_header_size, packet_handler_.incode_message(error_report_));
+            relay_message.set_type(match_with_friends_relay::DENY);
+            request_session->post_send(false, relay_message.ByteSize() + packet_header_size, packet_handler_.incode_message(relay_message));
             return;
         }
-
+        std::cout << request_session->get_user_id() << " 가 " << recv_session->get_user_id() << " 의 신청을 수락 " << std::endl;
         match_complete match_message[2];
         user_info *match_user[2];
         session *player[2];
@@ -93,12 +93,14 @@ void match_manager::process_matching_with_friends(session *request_session, cons
             player[i]->set_status(status::MATCH_COMPLETE);
             player[i]->post_send(false, match_message[i].ByteSize() + packet_header_size, packet_handler_.incode_message(match_message[i]));
         }
+        std::cout << request_session->get_user_id() << " 와 " << recv_session->get_user_id() << " 가 대결 시작 " << std::endl;
     }
         break;
-    case normal_game_apply:
+    case match_with_friends_relay::APPLY:
     {
         if (recv_session != nullptr && request_session->get_status() == status::LOGIN && recv_session->get_status() == status::LOGIN)
         {
+            std::cout << request_session->get_user_id() << " 가 " << recv_session->get_user_id() << " 에게 대결 신청 " << std::endl;
             relay_message.set_target_id(request_session->get_user_id());
             request_session->set_status(status::MATCH_REQUEST);
             recv_session->set_status(status::MATCH_RECVER);
@@ -107,15 +109,16 @@ void match_manager::process_matching_with_friends(session *request_session, cons
         }
         else
         {
-            error_report_.set_error_string("Not Found or already request, receive");
-            request_session->post_send(false, error_report_.ByteSize() + packet_header_size, packet_handler_.incode_message(error_report_));
+            relay_message.set_type(match_with_friends_relay::DENY);
+            request_session->post_send(false, error_message.ByteSize() + packet_header_size, packet_handler_.incode_message(error_message));
         }
     }
         break;
-    case normal_game_deny:
+    case match_with_friends_relay::DENY:
     {
         if (recv_session != nullptr && request_session->get_status() == status::MATCH_RECVER && recv_session->get_status() == status::MATCH_REQUEST)
         {
+            std::cout << request_session->get_user_id() << " 가 " << recv_session->get_user_id() << " 에게 대결 거절 " << std::endl;
             relay_message.set_target_id(request_session->get_user_id());
             request_session->set_status(status::LOGIN);
             recv_session->set_status(status::LOGIN);
@@ -124,8 +127,8 @@ void match_manager::process_matching_with_friends(session *request_session, cons
         }
         else
         {
-            error_report_.set_error_string("Not Found or You do not have permission");
-            request_session->post_send(false, error_report_.ByteSize() + packet_header_size, packet_handler_.incode_message(error_report_));
+            error_message.set_error_string("Not Found or You do not have permission");
+            request_session->post_send(false, error_message.ByteSize() + packet_header_size, packet_handler_.incode_message(error_message));
         }
     }
         break;
@@ -138,6 +141,8 @@ void match_manager::process_matching_with_friends(session *request_session, cons
 
 void match_manager::set_matching_que(session * request_session, rating_name request_rating)
 {
+    request_session->set_status(status::MATCH_REQUEST);
+    std::cout << "[MATCH_REQ] [USER ID : " << request_session->get_user_id() << " ] " << std::endl;
     switch (request_rating)
     {
     case bronze:
@@ -181,13 +186,14 @@ void match_manager::get_matching_que(std::deque<session *> &target_que) //shared
 
         player[0] = target_que.front();
         target_que.pop_front();
-        if (player[0]->get_socket().is_open() && player[0]->get_status() != status::MATCH_REQUEST)
+        if (!(player[0]->get_socket().is_open()) || (player[0]->get_status() != status::MATCH_REQUEST))
         {
             return;
         }
+
         player[1] = target_que.front();
         target_que.pop_front();
-        if (player[0]->get_socket().is_open() && player[1]->get_status() != status::MATCH_REQUEST)
+        if (!(player[1]->get_socket().is_open()) || (player[1]->get_status() != status::MATCH_REQUEST))
         {
             target_que.push_front(player[0]);
             return;
@@ -198,6 +204,8 @@ void match_manager::get_matching_que(std::deque<session *> &target_que) //shared
         unsigned room_num = generate_room_info();
         char redis_room_key[100];
         sprintf(redis_room_key, "Room:%d", room_num);
+
+        std::cout << redis_room_key << std::endl;
         redis_connection_.set(redis_room_key, "0");
 
         
