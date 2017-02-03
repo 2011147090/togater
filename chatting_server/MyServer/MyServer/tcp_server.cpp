@@ -4,7 +4,10 @@
 
 // ---------- public ----------
 tcp_server::tcp_server(boost::asio::io_service& io_service)
-    :acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), PORT_NUMBER))
+    :io_service_(io_service),
+        acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), PORT_NUMBER)),
+        strand_accept_(io_service), strand_close_(io_service)
+        //, strand_receive_(io_service),  strand_send_(io_service)
 {
     is_accepting_ = false;
     master_data_queue_.set_capacity(MAX_MASTER_BUFFER_LEN);
@@ -35,7 +38,14 @@ void tcp_server::start()
 {
     std::cout << "Server Start..." << std::endl;
 
-    post_accept();
+    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
+    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
+    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
+    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
+    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
+    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
+    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
+    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
 }
 
 void tcp_server::close_session(const int session_id)
@@ -165,6 +175,9 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             boost::array<BYTE, 1024> send_data;
             CopyMemory(&send_data, packet, size);
             master_data_queue_.push_back(send_data);
+            
+            if (master_data_queue_.size() >= MAX_MASTER_BUFFER_LEN)
+                std::cout << "FULL!" << std::endl;
 
             if (session_list_[session_id]->get_socket().is_open() && session_list_[session_id]->get_status() == room)
             {
@@ -191,10 +204,9 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         break;
 
 
-    // 실행될 일 없음
-    // 근데 실행이 되네 ㅅㅂ
+    // 실행될 일 없음???
     default:
-        //std::cout << "process_packet error!" << std::endl;
+        std::cout << message_header->type << std::endl;
         break;
     }
 }
@@ -203,7 +215,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 // ---------- private ----------
 bool tcp_server::post_accept()
 {
-    if (session_queue_.empty())
+   if (session_queue_.empty())
     {
         is_accepting_ = false;
         
@@ -220,7 +232,7 @@ bool tcp_server::post_accept()
             session_list_[session_id],
             boost::asio::placeholders::error)
     );
-
+    
     return true;
 }
 
@@ -228,11 +240,14 @@ void tcp_server::handle_accept(tcp_session* session, const boost::system::error_
 {
     if (!error)
     {
-        std::cout << "Client connection successed. session_id: " << session->get_session_id() << std::endl;
-
+        //std::cout << "Client connection successed. session_id: " << session->get_session_id() << std::endl;
+        
         session->post_receive();
-        post_accept();
+        io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
     }
     else
+    {
         std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
+        io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
+    }
 }
