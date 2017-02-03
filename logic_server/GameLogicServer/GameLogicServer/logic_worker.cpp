@@ -12,7 +12,7 @@ _PLAYER_INFO::_PLAYER_INFO()
 
 _ROOM_INFO::_ROOM_INFO(PLAYER_INFO player_info)
 {
-    ready_player_num_ = 1;
+    ready_player_num_ = 0;
     time_ = 0;
     turn_count_ = 0;
     hide_card_ = true;
@@ -102,8 +102,6 @@ bool logic_worker::enter_room_player(connected_session* session, std::string roo
     
     if (iter != room_hashs_.end())
     {
-        iter->second.ready_player_num_++;
-
         PLAYER_INFO player_info;
         player_info.remain_money_ = 20;
         player_info.submit_money_ = 0;
@@ -154,8 +152,24 @@ bool comp(int const& a, int const& b) {
     return false;
 }
 
+bool logic_worker::ready_for_game(std::string room_key)
+{
+    thread_sync sync;
+
+    auto iter = room_hashs_.find(room_key);
+
+    if (iter != room_hashs_.end())
+        iter->second.ready_player_num_++;
+    else
+        return false;
+
+    return true;
+}
+
 logic_worker::HOLDEM_HANDS logic_worker::check_card_mix(int i, int j, int k)
 {
+    thread_sync sync;
+
     if (i == j)
         if (i == k)
             return HOLDEM_HANDS::TRIPLE;

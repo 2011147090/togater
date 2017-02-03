@@ -7,6 +7,8 @@ connected_session::connected_session(boost::asio::io_service& io_service) : sock
 
 bool connected_session::handle_check_keep_alive()
 {
+    thread_sync sync;
+
     boost::system::error_code error;
 
     if (error)
@@ -17,6 +19,8 @@ bool connected_session::handle_check_keep_alive()
 
 void connected_session::handle_send(logic_server::message_type msg_type, const protobuf::Message& message)
 {
+    thread_sync sync;
+
     MESSAGE_HEADER header;
     header.size = message.ByteSize();
     header.type = msg_type;
@@ -34,17 +38,30 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
 
 void connected_session::shut_down()
 {
+    thread_sync sync;
+
     socket_.shutdown(boost::asio::socket_base::shutdown_receive);
     socket_.close();
 }
 
 std::string connected_session::get_player_key()
 {
+    thread_sync sync;
+
     return player_key_;
+}
+
+std::string connected_session::get_room_key()
+{
+    thread_sync sync;
+
+    return room_key_;
 }
 
 void connected_session::handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/)
 {
+    thread_sync sync;
+
     if (!error)
     {
         socket_.async_read_some(boost::asio::buffer(recv_buf_),
@@ -68,6 +85,17 @@ void connected_session::handle_read(const boost::system::error_code& error, size
             process_packet_enter_req(message);
         }
         break;
+
+        case logic_server::GAME_STATE_NTF:
+        {
+            logic_server::packet_game_state_ntf message;
+        
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
+
+            porcess_packet_game_state_ntf(message);
+        }
+        break;          
 
         case logic_server::PROCESS_TURN_ANS:
         {
@@ -109,6 +137,8 @@ void connected_session::handle_read(const boost::system::error_code& error, size
 
 bool connected_session::is_connected()
 {
+    thread_sync sync;
+
     if (socket_.is_open())
         return true;
 
@@ -117,16 +147,22 @@ bool connected_session::is_connected()
 
 connected_session::pointer connected_session::create(boost::asio::io_service& io_service)
 {
+    thread_sync sync;
+
     return connected_session::pointer(new connected_session(io_service));
 }
 
 tcp::socket& connected_session::get_socket()
 {
+    thread_sync sync;
+
     return socket_;
 }
 
 void connected_session::start()
 {
+    thread_sync sync;
+
     socket_.async_read_some(boost::asio::buffer(recv_buf_),
         boost::bind(&connected_session::handle_read, shared_from_this(),
             boost::asio::placeholders::error,

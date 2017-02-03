@@ -15,8 +15,6 @@ void connected_session::process_packet_enter_req(logic_server::packet_enter_req 
     else
         recevie_packet.set_result(0);
     
-    recevie_packet.SerializeToArray(send_buf_.c_array(), recevie_packet.ByteSize());
-
     handle_send(logic_server::ENTER_ANS, recevie_packet);
 }
 
@@ -35,4 +33,9 @@ void connected_session::process_packet_disconnect_room_ntf(logic_server::packet_
 void connected_session::process_packet_echo_ntf(logic_server::packet_echo_ntf packet)
 {
     this->handle_send(logic_server::ECHO_NTF, packet);
+}
+
+void connected_session::porcess_packet_game_state_ntf(logic_server::packet_game_state_ntf packet)
+{
+    logic_worker::get_instance()->ready_for_game(room_key_);
 }

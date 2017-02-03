@@ -55,6 +55,7 @@ public:
     bool process_turn(std::string room_key, std::string player_key, int money);
     bool disconnect_room(std::string room_key, std::string player_key);
     bool destroy_room(std::string room_key);
+    bool ready_for_game(std::string room_key);
 
     void process_queue();
 
