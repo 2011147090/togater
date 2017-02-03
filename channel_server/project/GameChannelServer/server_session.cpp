@@ -111,6 +111,7 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
 
         while (n_packet_data > 0) 
         {
+            //std::cout << "session_id[" << session_id_ << "]" << " : " << n_packet_data << std::endl;
             if (n_packet_data < packet_header_size)
             {
                 break;

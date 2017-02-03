@@ -87,6 +87,9 @@
     <ClCompile Include="server_session.cpp">
       <Filter>소스 파일\server feature</Filter>
     </ClCompile>
+    <ClCompile Include="singletone.cpp">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log_manager.h">

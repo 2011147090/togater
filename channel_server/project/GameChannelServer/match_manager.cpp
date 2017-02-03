@@ -17,7 +17,7 @@ match_manager::~match_manager()
  레이팅 점수값을 매칭큐에 삽입 (매칭큐는 레이팅 점수를 토대로 몇가지 구간을 나누어 구분한다)
  각 구간 매칭큐에 매칭을 요구하는 세션이 삽입되면 해당 큐에 이미 대기자가 있으면 바로 꺼내서 매칭을 시켜준다.
  매칭 프로세스는 먼저 룸을 개설하고 개설한 룸번호롤 레디스에 입력 
- 이때 각 사용자에게 매칭이 완료되었다는 패킷을 보낸다. 매칭완료 패킷은 방번호와 
+ 이때 각 사용자에게 매칭이 완료되었다는 패킷을 보낸다. 매칭완료 패킷은 방번호와 상대방 정보 송신
 
 */
 void match_manager::process_matching(session *request_session, const char *packet, const int data_size)
@@ -61,9 +61,9 @@ void match_manager::process_matching_with_friends(session *request_session, cons
         match_complete match_message[2];
         user_info *match_user[2];
         session *player[2];
-        unsigned int room_num = generate_room_info();
-        char redis_room_key[100];
-        sprintf(redis_room_key, "Room:%d", room_num);
+        
+        std::string redis_room_key = generate_room_key();
+        
         redis_connection_.set(redis_room_key, "0");
 
         for (int i = 0; i < 2; i++)
@@ -201,9 +201,7 @@ void match_manager::get_matching_que(std::deque<session *> &target_que) //shared
 
         match_complete message[2];
         user_info *match_info[2];
-        unsigned room_num = generate_room_info();
-        char redis_room_key[100];
-        sprintf(redis_room_key, "Room:%d", room_num);
+        std::string redis_room_key = generate_room_key();
 
         std::cout << redis_room_key << std::endl;
         redis_connection_.set(redis_room_key, "0");

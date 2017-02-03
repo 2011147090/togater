@@ -168,6 +168,7 @@
     <ClCompile Include="server_main.cpp" />
     <ClCompile Include="server_session.cpp" />
     <ClCompile Include="friends_manager.cpp" />
+    <ClCompile Include="singletone.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="channel_protobuf.pb.h" />
