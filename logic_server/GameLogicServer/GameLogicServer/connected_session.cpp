@@ -21,9 +21,6 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
     header.size = message.ByteSize();
     header.type = msg_type;
 
-    int buf_size = 0;
-    buf_size = message_header_size + message.ByteSize();
-
     CopyMemory(send_buf_.begin(), (void*)&header, message_header_size);
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
@@ -91,6 +88,17 @@ void connected_session::handle_read(const boost::system::error_code& error, size
                 break;
 
             process_packet_disconnect_room_ntf(message);
+        }
+        break;
+
+        case logic_server::ECHO_NTF:
+        {
+            logic_server::packet_echo_ntf message;
+
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
+
+            process_packet_echo_ntf(message);
         }
         break;
         }

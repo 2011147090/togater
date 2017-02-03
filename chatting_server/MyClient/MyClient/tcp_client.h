@@ -37,6 +37,8 @@ private:
 
     bool is_login_;
 
+    int TEMP_COUNT;
+
     
     void post_receive();
 

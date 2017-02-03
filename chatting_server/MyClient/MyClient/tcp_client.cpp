@@ -7,6 +7,7 @@ tcp_client::tcp_client(boost::asio::io_service& io_service)
 {
     InitializeCriticalSectionAndSpinCount(&lock_, 4000);
     is_login_ = false;
+    TEMP_COUNT = 0;
 }
 
 tcp_client::~tcp_client()
@@ -310,6 +311,13 @@ bool tcp_client::process_packet(const int size)
 
             std::cout << normal_message.user_id() << "> ";
             std::cout << normal_message.chat_message() << std::endl;
+
+            //TEMP_COUNT++;
+            //if (TEMP_COUNT >= 100)
+            //{
+            //    std::cout << user_id_ << " / 100" << std::endl;
+            //    TEMP_COUNT = 0;
+            //}
         }
     break;
 

@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameLogicServer", "GameLogicServer\GameLogicServer.vcxproj", "{C3E1C12A-BC99-4759-83AD-A7AF715E0E4F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EchoClient", "EchoClient\EchoClient.vcxproj", "{2B75D2E1-F35A-4851-B700-838243B70AD7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{C3E1C12A-BC99-4759-83AD-A7AF715E0E4F}.Release|x64.Build.0 = Release|x64
 		{C3E1C12A-BC99-4759-83AD-A7AF715E0E4F}.Release|x86.ActiveCfg = Release|Win32
 		{C3E1C12A-BC99-4759-83AD-A7AF715E0E4F}.Release|x86.Build.0 = Release|Win32
+		{2B75D2E1-F35A-4851-B700-838243B70AD7}.Debug|x64.ActiveCfg = Debug|x64
+		{2B75D2E1-F35A-4851-B700-838243B70AD7}.Debug|x64.Build.0 = Debug|x64
+		{2B75D2E1-F35A-4851-B700-838243B70AD7}.Debug|x86.ActiveCfg = Debug|Win32
+		{2B75D2E1-F35A-4851-B700-838243B70AD7}.Debug|x86.Build.0 = Debug|Win32
+		{2B75D2E1-F35A-4851-B700-838243B70AD7}.Release|x64.ActiveCfg = Release|x64
+		{2B75D2E1-F35A-4851-B700-838243B70AD7}.Release|x64.Build.0 = Release|x64
+		{2B75D2E1-F35A-4851-B700-838243B70AD7}.Release|x86.ActiveCfg = Release|Win32
+		{2B75D2E1-F35A-4851-B700-838243B70AD7}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -29,6 +29,7 @@ private:
     void handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/);
     bool handle_check_keep_alive();
         
+    void process_packet_echo_ntf(logic_server::packet_echo_ntf packet);
     void process_packet_enter_req(logic_server::packet_enter_req packet);
     void process_packet_process_turn_ans(logic_server::packet_process_turn_ans packet);
     void process_packet_disconnect_room_ntf(logic_server::packet_disconnect_room_ntf packet);
