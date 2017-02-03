@@ -30,11 +30,6 @@ bool main_scene::init()
     if (!Layer::init())
         return false;
 
-    return true;
-}
-
-void main_scene::setup_scene()
-{
 #pragma region Init_UI
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -80,7 +75,7 @@ void main_scene::setup_scene()
     opponent_info->setColor(cocos2d::Color3B::RED);
     opponent_info->setPosition(cocos2d::Vec2(visibleSize.width - 100, visibleSize.height - 100));
     this->addChild(opponent_info, 1);
-    
+
     auto card_pack = Sprite::create("card_pack.png");
     card_pack->setScale(1.0f);
     card_pack->setPosition(middle_pos - Vec2(150, 110));
@@ -117,7 +112,7 @@ void main_scene::setup_scene()
     chat_list->setItemsMargin(2.0f);
     chat_list->setPosition(Vec2(30, visibleSize.height - 50));
     this->addChild(chat_list, 5);
-    
+
     auto chat_button = ui::Button::create("button3_normal.png", "button3_pressed.png");
 
     chat_button->setTitleText("");
@@ -198,7 +193,7 @@ void main_scene::setup_scene()
 
     game_mgr->room_chat_list_ = chat_list;
     game_mgr->set_scene_status(game_manager::SCENE_TYPE::ROOM);
-    
+
     game_mgr->user_ = new player();
     game_mgr->opponent_ = new player();
 
@@ -209,14 +204,24 @@ void main_scene::setup_scene()
 
     game_mgr->user_bet_text_ = bet_coin_user;
     game_mgr->opponent_info_text_ = opponent_info;
-    
+
     opponent_info->setString(game_mgr->opponent_info_);
 
+    network_logic->create();
+    network_logic->connect(LOGIC_SERVER_IP, LOGIC_SERVER_PORT);
+
+    network_logic->send_packet_enter_req(network_mgr->get_room_key(), network_mgr->get_player_key());
 #pragma endregion 
+
+    return true;
 }
 
 void main_scene::end()
 {
+    game_mgr->send_friend_match_ = false;
+    game_mgr->accept_friend_match_ = false;
+    game_mgr->friend_list_->removeAllItems();
+
     network_logic->destroy();
     network_lobby->create();
 

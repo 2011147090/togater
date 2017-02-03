@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "player.h"
 #include "main_scene.h"
+#include "lobby_scene.h"
 #include "singleton.h"
 #include "holdem_card.h"
 #include "ui\UIButton.h"
@@ -29,7 +30,6 @@ public:
 
 
     // game play
-
     int total_money_;
     int batting_money_;
     bool wait_turn;
@@ -55,6 +55,11 @@ public:
     cocos2d::ui::ListView* room_chat_list_;
         
     main_scene* scene_;
+    lobby_scene* lobby_scene_;
+
+    bool send_friend_match_;
+    bool accept_friend_match_;
+    std::string friend_match_id_;
     bool hide_card_;
 
     enum SCENE_TYPE { LOGIN = 0, LOBBY, LOADING, ROOM };

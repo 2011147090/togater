@@ -11,6 +11,8 @@ bool game_manager::init_singleton()
 {
     public_card_ = nullptr;
     opponent_card_ = nullptr;
+    send_friend_match_ = false;
+    accept_friend_match_ = false;
 
     return true;
 }
@@ -146,8 +148,6 @@ void game_manager::check_public_card()
 void game_manager::start_game()
 {
     auto scene = main_scene::createScene();
-
-    ((main_scene*)scene)->setup_scene();
     
     cocos2d::Director::getInstance()->pushScene(cocos2d::TransitionFade::create(1, scene));
 

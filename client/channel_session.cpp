@@ -197,29 +197,30 @@ void channel_session::process_packet_friend_ans(channel_server::packet_friends_a
     thread_sync sync;
 
     const channel_server::user_info& friend_info = packet.friends_info();
-
     const channel_server::game_history& friend_history = friend_info.game_history_();
-
+    const channel_server::basic_info& friend_basic_info = friend_info.basic_info_();
+    
     friend_history.rating_score();
     friend_history.total_games();
     friend_history.win();
     friend_history.lose();
-
-    const channel_server::basic_info& friend_basic_info = friend_info.basic_info_();
-
-
+    
     switch (packet.type())
     {
     case channel_server::packet_friends_ans_ans_type::packet_friends_ans_ans_type_SEARCH_SUCCESS:
-        this->send_packet_friend_req(channel_server::packet_friends_req_req_type_ADD, friend_info);
-        break;
+    {
+        channel_server::basic_info info;
+        info.set_id(game_mgr->friend_text_field->getString());
+        this->send_packet_friend_req(channel_server::packet_friends_req_req_type_ADD, info);
+    }
+    break;
 
     case channel_server::packet_friends_ans_ans_type::packet_friends_ans_ans_type_ADD_SUCCESS:
         game_mgr->get_scheduler()->performFunctionInCocosThread(
             CC_CALLBACK_0(
                 game_manager::add_friend_in_list,
                 game_mgr,
-                friend_basic_info.id()
+                packet.mutable_friends_info()->mutable_basic_info_()->id()
             )
         );
         break;
@@ -229,7 +230,7 @@ void channel_session::process_packet_friend_ans(channel_server::packet_friends_a
             CC_CALLBACK_0(
                 game_manager::del_friend_in_list,
                 game_mgr,
-                friend_basic_info.id()
+                packet.mutable_friends_info()->mutable_basic_info_()->id()
             )
         );
         break;
@@ -249,9 +250,21 @@ void channel_session::process_packet_play_friend_game_rel(channel_server::packet
     switch(packet.type())
     {
     case channel_server::packet_play_friends_game_rel::APPLY:
+        game_mgr->accept_friend_match_ = true;
+        game_mgr->friend_match_id_ = packet.target_id();
+
+        game_mgr->get_scheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                lobby_scene::match_game,
+                game_mgr->lobby_scene_
+            )
+        );
+
+        //this->send_packet_play_friend_game_rel(channel_server::packet_play_friends_game_rel_req_type_DENY, packet.target_id());
         break;
 
     case channel_server::packet_play_friends_game_rel::DENY:
+
         break;
     }
 }
@@ -275,11 +288,8 @@ void channel_session::process_packet_matching_complete_ans(channel_server::packe
 
     game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
-            logic_session::send_packet_enter_req,
-            network_logic,
-            network_mgr->get_room_key(),
-            network_mgr->get_player_key()
-        )
+            game_manager::start_game, game_mgr,
+            )
     );
     
     send_packet_matching_confirm();

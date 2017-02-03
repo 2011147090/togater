@@ -37,7 +37,7 @@ bool loading_scene::init()
     background->setScale(1.28f);
     this->addChild(background, 0);
     
-    auto loading_title = ui::Text::create("Searching For Enemy", "fonts/D2Coding.ttf", 25);
+    auto loading_title = ui::Text::create("Searching For Opponent", "fonts/D2Coding.ttf", 25);
     loading_title->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 80));
     loading_title->setTextColor(Color4B::WHITE);
     this->addChild(loading_title, 1);
@@ -48,16 +48,6 @@ bool loading_scene::init()
     this->addChild(progress_bar, 1);
 
     timer = 0;
-
-    network_logic->create();
-
-    this->getScheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            logic_session::connect,
-            network_logic,
-            LOGIC_SERVER_IP, LOGIC_SERVER_PORT
-        )
-    );
 
     game_mgr->scheduler_[game_manager::LOADING] = this->getScheduler();
     game_mgr->set_scene_status(game_manager::SCENE_TYPE::LOADING);
@@ -82,7 +72,25 @@ void loading_scene::update(float delta)
     {
         timer = 3;
 
-        network_lobby->send_packet_rank_game_req(false);  
+        if (game_mgr->accept_friend_match_ == true)
+        {
+            network_lobby->send_packet_play_friend_game_rel(
+                channel_server::packet_play_friends_game_rel_req_type_ACCEPT,
+                game_mgr->friend_match_id_
+            );
+        }
+        else
+        {
+            if (!game_mgr->send_friend_match_)
+                network_lobby->send_packet_rank_game_req(false);
+            else
+            {
+                network_lobby->send_packet_play_friend_game_rel(
+                    channel_server::packet_play_friends_game_rel::APPLY,
+                    game_mgr->friend_text_field->getString()
+                );
+            }
+        }
     }
 
     progress_bar->setRotation(depth);

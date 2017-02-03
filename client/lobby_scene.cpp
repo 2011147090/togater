@@ -184,10 +184,8 @@ bool lobby_scene::init()
 
     friend_match->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
         if (type == ui::Widget::TouchEventType::ENDED) {
-            network_lobby->send_packet_play_friend_game_rel(
-                channel_server::packet_play_friends_game_rel::APPLY,
-                ((cocos2d::ui::Text*)friend_list->getCurrentFocusedWidget())->getString()
-            );
+            game_mgr->send_friend_match_ = true;
+            match_game();
         }
     });
 
@@ -232,6 +230,7 @@ bool lobby_scene::init()
 
 #pragma region Init Manager Members
 
+    game_mgr->lobby_scene_ = this;
     game_mgr->scheduler_[game_manager::LOBBY] = this->getScheduler();
     
     game_mgr->lobby_chat_list_ = chat_list;
