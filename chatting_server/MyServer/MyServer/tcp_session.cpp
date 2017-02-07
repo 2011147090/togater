@@ -1,6 +1,6 @@
 #include "tcp_session.h"
 #include "tcp_server.h"
-
+#include "redis_connector.h"
 
 // ---------- public ----------
 tcp_session::tcp_session(int session_id, boost::asio::io_service& io_service, tcp_server* server)
@@ -50,6 +50,27 @@ void tcp_session::post_logout_ans(bool is_successful)
     post_send(false, message_header_size + header.size, send_buffer->begin());
 }
 
+void tcp_session::post_whisper_error(std::string target_id)
+{
+    chat_server::packet_chat_whisper error_message;
+    error_message.set_user_id("Error");
+    error_message.set_target_id(user_id_);
+
+
+    MESSAGE_HEADER header;
+
+    header.size = error_message.ByteSize();
+    header.type = chat_server::WHISPER;
+
+
+    boost::array<BYTE, 1024>* send_buffer = new boost::array<BYTE, 1024>;
+
+    CopyMemory(send_buffer->begin(), (void*)&header, message_header_size);
+    error_message.SerializeToArray(send_buffer->begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer->begin());
+}
+
 void tcp_session::post_send(const bool immediate, const int size, BYTE* data)
 {
     if (immediate == false)
@@ -89,7 +110,7 @@ void tcp_session::handle_write(const boost::system::error_code& error, size_t by
             verify_message.ParseFromArray(send_data_queue_.front() + message_header_size, message_header->size);
 
             if (socket_.is_open() && !(verify_message.is_successful()))
-                server_->close_session(session_id_);
+                server_->get_io_service().post(server_->strand_close_.wrap(boost::bind(&tcp_server::close_session, server_, session_id_)));
         }
         break;
 
@@ -99,20 +120,19 @@ void tcp_session::handle_write(const boost::system::error_code& error, size_t by
             logout_message.ParseFromArray(send_data_queue_.front() + message_header_size, message_header->size);
 
             if (socket_.is_open() && logout_message.is_successful())
-                server_->close_session(session_id_);
+                server_->get_io_service().post(server_->strand_close_.wrap(boost::bind(&tcp_server::close_session, server_, session_id_)));
         }
         break;
 
+    case chat_server::NORMAL:
+        break;
 
     case chat_server::WHISPER:
         break;
 
     case chat_server::ROOM:
         break;
-
-    case chat_server::NORMAL:
-        break;
-
+    
     case chat_server::NOTICE:
         break;
     }
@@ -128,20 +148,20 @@ void tcp_session::handle_write(const boost::system::error_code& error, size_t by
 
 void tcp_session::handle_receive(const boost::system::error_code& error, size_t bytes_transferred)
 {
-    if (error)
+    if (!error)
+    {
+        server_->get_io_service().post(server_->strand_receive_.wrap(boost::bind(&tcp_server::process_packet, server_, session_id_, bytes_transferred, receive_buffer_.begin())));
+
+        post_receive();
+    }
+    else
     {
         if (error == boost::asio::error::eof)
             std::cout << "Disconnected with client" << std::endl;
         else
             std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
         
-        server_->close_session(session_id_);
-    }
-    else
-    {
-        server_->process_packet(session_id_, bytes_transferred, receive_buffer_.begin());
-
-        post_receive();
+        server_->get_io_service().post(server_->strand_close_.wrap(boost::bind(&tcp_server::close_session, server_, session_id_)));
     }
 }
 

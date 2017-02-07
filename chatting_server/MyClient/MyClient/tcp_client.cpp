@@ -243,7 +243,14 @@ void tcp_client::handle_write(const boost::system::error_code& error, size_t byt
 
 void tcp_client::handle_receive(const boost::system::error_code& error, size_t bytes_transferred)
 {
-    if (error)
+    if (!error)
+    {
+        if (process_packet(bytes_transferred))
+            post_receive();
+        else
+            return;
+    }
+    else
     {
         if (error == boost::asio::error::eof)
             std::cout << "Disconnected with server" << std::endl;
@@ -251,13 +258,6 @@ void tcp_client::handle_receive(const boost::system::error_code& error, size_t b
             std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
 
         close();
-    }
-    else
-    {
-        if (process_packet(bytes_transferred))
-            post_receive();
-        else
-            return;
     }
 }
 
@@ -309,8 +309,8 @@ bool tcp_client::process_packet(const int size)
         
             normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
 
-            std::cout << normal_message.user_id() << "> ";
-            std::cout << normal_message.chat_message() << std::endl;
+            //std::cout << normal_message.user_id() << "> ";
+            //std::cout << normal_message.chat_message() << std::endl;
 
             //TEMP_COUNT++;
             //if (TEMP_COUNT >= 100)

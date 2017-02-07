@@ -1,16 +1,16 @@
 #include "tcp_server.h"
 #include "redis_connector.h"
+#include "config.h"
 
 
 // ---------- public ----------
-tcp_server::tcp_server(boost::asio::io_service& io_service)
+tcp_server::tcp_server(boost::asio::io_service& io_service, int server_port, int master_buffer_len)
     :io_service_(io_service),
-        acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), PORT_NUMBER)),
-        strand_accept_(io_service), strand_close_(io_service)
-        //, strand_receive_(io_service),  strand_send_(io_service)
+        acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), server_port)),
+        strand_accept_(io_service), strand_close_(io_service), strand_receive_(io_service),  strand_send_(io_service)
 {
     is_accepting_ = false;
-    master_data_queue_.set_capacity(MAX_MASTER_BUFFER_LEN);
+    master_data_queue_.set_capacity(master_buffer_len);
 }
 
 tcp_server::~tcp_server()
@@ -38,6 +38,7 @@ void tcp_server::start()
 {
     std::cout << "Server Start..." << std::endl;
 
+    // There are 8 threads.
     io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
     io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
     io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
@@ -47,10 +48,12 @@ void tcp_server::start()
     io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
     io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
 }
-
+ 
 void tcp_server::close_session(const int session_id)
 {
+    std::string user_key = session_list_[session_id]->get_user_key();
     std::string user_id = session_list_[session_id]->get_user_id();
+    
     if (connected_session_map_.find(user_id) != connected_session_map_.end())
         connected_session_map_.erase(user_id);
 
@@ -80,6 +83,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
             if (redis_connector::get_instance()->get(redis_key) == redis_value)
             {
+                session_list_[session_id]->set_user_key(redis_key);
                 session_list_[session_id]->set_user_id(redis_value);
                 session_list_[session_id]->set_status(lobby);
 
@@ -161,10 +165,17 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             master_data_queue_.push_back(send_data);
 
             auto iter = connected_session_map_.find(whisper_message.target_id());
-            if (session_list_[session_id]->get_socket().is_open())
+            
+            if (session_list_[session_id]->get_socket().is_open() && iter != connected_session_map_.end())
             {
                 session_list_[session_id]->post_send(false, size, master_data_queue_.back().begin());
                 iter->second->post_send(false, size, master_data_queue_.back().begin());
+            }
+            else
+            {
+                master_data_queue_.pop_back();
+
+                session_list_[session_id]->post_whisper_error(whisper_message.target_id());
             }
         }
         break;
@@ -176,7 +187,10 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             CopyMemory(&send_data, packet, size);
             master_data_queue_.push_back(send_data);
             
-            if (master_data_queue_.size() >= MAX_MASTER_BUFFER_LEN)
+            int MASTER_BUFFER_LEN;
+            config::get_value("MASTER_BUFFER_LEN", MASTER_BUFFER_LEN);
+
+            if (master_data_queue_.size() >= MASTER_BUFFER_LEN)
                 std::cout << "FULL!" << std::endl;
 
             if (session_list_[session_id]->get_socket().is_open() && session_list_[session_id]->get_status() == room)
@@ -206,20 +220,20 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
     // 실행될 일 없음???
     default:
-        std::cout << message_header->type << std::endl;
+        std::cout << "process_packet error! - " << message_header->type << std::endl;
         break;
     }
 }
 
 
 // ---------- private ----------
-bool tcp_server::post_accept()
+void tcp_server::post_accept()
 {
    if (session_queue_.empty())
     {
         is_accepting_ = false;
         
-        return false;
+        return;
     }
 
     is_accepting_ = true;
@@ -232,15 +246,13 @@ bool tcp_server::post_accept()
             session_list_[session_id],
             boost::asio::placeholders::error)
     );
-    
-    return true;
 }
 
 void tcp_server::handle_accept(tcp_session* session, const boost::system::error_code& error)
 {
     if (!error)
     {
-        //std::cout << "Client connection successed. session_id: " << session->get_session_id() << std::endl;
+        std::cout << "Client connection successed. session_id: " << session->get_session_id() << std::endl;
         
         session->post_receive();
         io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));

@@ -1,8 +1,5 @@
 #include "redis_connector.h"
-
-const std::string redis_ip = "127.0.0.1";//"192.168.1.201";
-const std::string redis_port = "6379";
-const std::string redis_password = "password";
+#include "config.h"
 
 
 redis_connector::redis_connector()
@@ -15,7 +12,17 @@ redis_connector::~redis_connector()
 
 bool redis_connector::init_singleton()
 {
-    conn_ = new redispp::Connection(redis_ip, redis_port, redis_password, false);
+    std::string REDIS_IP;
+    config::get_value("REDIS_IP", REDIS_IP);
+
+    std::string REDIS_PORT;
+    config::get_value("REDIS_PORT", REDIS_PORT);
+
+    std::string REDIS_PW;
+    config::get_value("REDIS_PW", REDIS_PW);
+
+
+    conn_ = new redispp::Connection(REDIS_IP, REDIS_PORT, REDIS_PW, false);
 
 
     if (conn_ == nullptr)
@@ -36,15 +43,20 @@ bool redis_connector::release_singleton()
         
 }
 
-void redis_connector::set(std::string key, std::string value)
-{
-    conn_->set(key, value);
-}
-
 std::string redis_connector::get(std::string key)
 {
     if (conn_->get(key).result().is_initialized())
         return conn_->get(key);
 
     return "";
+}
+
+void redis_connector::set(std::string key, std::string value)
+{
+    conn_->set(key, value);
+}
+
+void redis_connector::del(std::string key)
+{
+    conn_->del(key);
 }

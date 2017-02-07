@@ -26,18 +26,18 @@ class tcp_server;
 class tcp_session
 {
 private:
+    boost::asio::ip::tcp::socket socket_;
+
     int session_id_;
+    std::string user_key_;
     std::string user_id_;
     user_status status_;
-
-    boost::asio::ip::tcp::socket socket_;
+    tcp_session* opponent_session_;
+    tcp_server* server_;
 
     boost::array<BYTE, 1024> receive_buffer_;
     boost::container::deque<BYTE*> send_data_queue_;
-
-    tcp_server* server_;
-    tcp_session* opponent_session_;
-
+    
     void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
 
@@ -45,22 +45,22 @@ public:
     tcp_session(int session_id, boost::asio::io_service& io_service, tcp_server* server);
     ~tcp_session();
 
-    int get_session_id() { return session_id_; }
-    
-    std::string get_user_id() { return user_id_; }
-    void set_user_id(std::string user_id) { user_id_ = user_id; }
-
-    tcp_session* get_opponent_session() { return opponent_session_; }
-    void set_opponent_session(tcp_session* opponent_session) { opponent_session_ = opponent_session; }
-    
-    user_status get_status() { return status_; }
-    void set_status(user_status status) { status_ = status; }
-    
     boost::asio::ip::tcp::socket& get_socket() { return socket_; }
 
+    int get_session_id() { return session_id_; }
+    std::string get_user_key() { return user_key_; }
+    std::string get_user_id() { return user_id_; }
+    tcp_session* get_opponent_session() { return opponent_session_; }
+    user_status get_status() { return status_; }
+    
+    void set_user_key(std::string user_key) { user_key_ = user_key; }
+    void set_user_id(std::string user_id) { user_id_ = user_id; }
+    void set_opponent_session(tcp_session* opponent_session) { opponent_session_ = opponent_session; }
+    void set_status(user_status status) { status_ = status; }
 
     void post_verify_ans(bool is_successful);
     void post_logout_ans(bool is_successful);
+    void post_whisper_error(std::string target_id);
     void post_send(const bool immediate, const int size, BYTE* data);
     void post_receive();
 };

@@ -26,25 +26,24 @@ private:
 
     boost::circular_buffer<boost::array<BYTE, 1024>> master_data_queue_;
 
-
-    bool post_accept();
+    void post_accept();
     void handle_accept(tcp_session* session, const boost::system::error_code& error);
 
 public:
-    tcp_server(boost::asio::io_service& io_service);
+    tcp_server(boost::asio::io_service& io_service, int server_port, int master_buffer_len);
     ~tcp_server();
 
     void init(const int max_session_count);
     void start();
 
+    boost::asio::io_service& get_io_service() { return io_service_; }
+
     void close_session(const int session_id);
 
     void process_packet(const int session_id, const int size, BYTE* packet);
 
-    
-
     boost::asio::strand strand_accept_;
     boost::asio::strand strand_close_;
-    //boost::asio::strand strand_receive_;
-    //boost::asio::strand strand_send_;
+    boost::asio::strand strand_receive_;
+    boost::asio::strand strand_send_;
 };

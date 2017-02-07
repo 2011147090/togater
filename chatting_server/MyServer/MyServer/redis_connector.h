@@ -18,6 +18,7 @@ public:
     virtual bool init_singleton();
     virtual bool release_singleton();
 
-    void set(std::string key, std::string value);
     std::string get(std::string key);
+    void set(std::string key, std::string value);
+    void del(std::string key);
 };

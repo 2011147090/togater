@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="chat_protobuf.pb.cc" />
+    <ClCompile Include="config.cpp" />
     <ClCompile Include="log_manager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="redispp.cpp" />
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="chat_protobuf.pb.h" />
     <ClInclude Include="chat_protocol.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="log_manager.h" />
     <ClInclude Include="redispp.h" />
     <ClInclude Include="redis_connector.h" />
