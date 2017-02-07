@@ -35,7 +35,7 @@ void tcp_server::init(const int n_max_session_count)
 
 void tcp_server::start()
 {
-    std::cout << "서버 시작 ...." << std::endl;
+    std::cout << "[CHANNEL SERVER] [START] [PORT : 8800] [SINGLE THREAD]" << std::endl;
     post_accept();
 }
 
@@ -157,9 +157,9 @@ bool tcp_server::post_accept()
     }
     
     accepting_flag_ = true;
-    int n_session_id = session_queue_.front(); // shared resource !
+    int n_session_id = session_queue_.front();
     
-    session_queue_.pop_front(); // shared resource !
+    session_queue_.pop_front();
     
     acceptor_.async_accept(session_list_[n_session_id]->get_socket(), boost::bind(&tcp_server::handle_accept, this, session_list_[n_session_id], boost::asio::placeholders::error));
 

@@ -56,7 +56,7 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
 
             add_id_in_user_map(request_session, request_session->get_user_id());
             history->set_total_games(battle_history);
-            history->set_rating_score(packet_handler_.check_rating(rating));
+            history->set_rating_score(rating);
             history->set_win(win);
             history->set_lose(lose);
 

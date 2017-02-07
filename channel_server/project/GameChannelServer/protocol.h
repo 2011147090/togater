@@ -20,6 +20,7 @@ using namespace channel_server;
 #define MYSQL_DB_NAME "game"
 
 /* server */
+#define MAX_THREAD 8
 #define MAX_RECEIVE_BUFFER_LEN 256
 #define TOKEN_SIZE 32
 const unsigned short PORT_NUMBER = 8800;
