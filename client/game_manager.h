@@ -5,6 +5,7 @@
 #include "player.h"
 #include "main_scene.h"
 #include "lobby_scene.h"
+#include "friend_match_dialog.h"
 #include "singleton.h"
 #include "holdem_card.h"
 #include "ui\UIButton.h"
@@ -19,6 +20,10 @@ public:
     virtual bool release_singleton();
 
     game_manager();
+
+    enum SCENE_TYPE { LOGIN = 0, LOBBY, LOADING, ROOM };
+    enum CHAT_TYPE { NORMAL, WHISPER, NOTICE };
+
 
     // friend ui
     cocos2d::ui::ListView* friend_list_;
@@ -56,13 +61,16 @@ public:
         
     main_scene* scene_;
     lobby_scene* lobby_scene_;
+    
+    friend_match_dialog* friend_match_dialog_;
+
+    cocos2d::ui::Text* history_;
 
     bool send_friend_match_;
     bool accept_friend_match_;
     std::string friend_match_id_;
     bool hide_card_;
 
-    enum SCENE_TYPE { LOGIN = 0, LOBBY, LOADING, ROOM };
     SCENE_TYPE scene_type_;
 
 
@@ -72,7 +80,7 @@ public:
     cocos2d::Scheduler* get_scheduler();
 
     void set_opponent_info(std::string id, int win, int defeat, int rating);
-    void update_chat(std::string id, std::string str);
+    void update_chat(std::string id, std::string str, CHAT_TYPE type);
 
     void new_turn(int public_card_1, int public_card_2, int opponent_card, int remain_money, int my_money, int opponent_money);
     void opponent_turn_end(int my_money, int opponent_money);
@@ -81,6 +89,8 @@ public:
     void check_public_card();
 
     void start_game();
+
+    void set_history(int win, int lose, int rating);
 };
 
 

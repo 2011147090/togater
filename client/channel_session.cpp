@@ -165,13 +165,6 @@ void channel_session::process_packet_join_ans(channel_server::packet_join_ans pa
     if (packet.success() == false)
         return;
 
-    if (packet.has_history())
-    {
-        const channel_server::game_history& histroy = packet.history();
-    
-        network_mgr->set_player_history(histroy);
-    }
-
     for (int i = 0; i < packet.friends_list_size(); ++i)
     {
         const channel_server::basic_info& info = packet.friends_list(i);
@@ -183,6 +176,23 @@ void channel_session::process_packet_join_ans(channel_server::packet_join_ans pa
                 info.id()
             )
         );
+    }
+
+    if (packet.has_history())
+    {
+        const channel_server::game_history& history = packet.history();
+
+        game_mgr->get_scheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                game_manager::set_history,
+                game_mgr,
+                history.win(),
+                history.lose(),
+                history.rating_score()
+            )
+        );
+
+        network_mgr->set_player_history(history);
     }
 }
 
@@ -255,16 +265,17 @@ void channel_session::process_packet_play_friend_game_rel(channel_server::packet
 
         game_mgr->get_scheduler()->performFunctionInCocosThread(
             CC_CALLBACK_0(
-                lobby_scene::match_game,
+                lobby_scene::show_friend_match_pop_up,
                 game_mgr->lobby_scene_
             )
         );
 
-        //this->send_packet_play_friend_game_rel(channel_server::packet_play_friends_game_rel_req_type_DENY, packet.target_id());
         break;
 
     case channel_server::packet_play_friends_game_rel::DENY:
-
+        game_mgr->accept_friend_match_ = false;
+                
+        cocos2d::CCDirector::getInstance()->popScene();
         break;
     }
 }
@@ -287,9 +298,7 @@ void channel_session::process_packet_matching_complete_ans(channel_server::packe
     network_mgr->set_room_key(packet.room_key());
 
     game_mgr->get_scheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            game_manager::start_game, game_mgr,
-            )
+        CC_CALLBACK_0(game_manager::start_game, game_mgr)
     );
     
     send_packet_matching_confirm();

@@ -11,6 +11,9 @@ public:
 
     virtual bool init();
 
+    void show_friend_match_pop_up();
+    void hide_friend_match_pop_up();
+
     void chat_event_listener(Ref* sender, cocos2d::ui::ListView::EventType type);
 
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) override;

@@ -92,11 +92,12 @@ bool main_scene::init()
     this->addChild(chat_background, 4);
 
     room_chat_field = ui::TextField::create("Input Chat Here", "fonts/D2Coding.ttf", 15);
-    room_chat_field->setMaxLength(10);
+    room_chat_field->setMaxLength(8);
     room_chat_field->setColor(cocos2d::Color3B::BLACK);
     room_chat_field->setMaxLength(true);
     room_chat_field->setAnchorPoint(Vec2(0, 0));
     room_chat_field->setPosition(Vec2(9, 5));
+    room_chat_field->setCursorEnabled(true);
 
     this->addChild(room_chat_field, 5);
 
@@ -104,13 +105,13 @@ bool main_scene::init()
     chat_list->setDirection(ui::ListView::Direction::VERTICAL);
     chat_list->setClippingEnabled(true);
     chat_list->setTouchEnabled(true);
-    chat_list->setContentSize(Size(210, 260));
-    chat_list->setAnchorPoint(Vec2(0.5, 1));
+    chat_list->setContentSize(Size(150, 260));
+    chat_list->setAnchorPoint(Vec2(0, 1));
     chat_list->setBounceEnabled(false);
     chat_list->setScrollBarEnabled(true);
     chat_list->setScrollBarPositionFromCorner(Vec2(0, 0));
     chat_list->setItemsMargin(2.0f);
-    chat_list->setPosition(Vec2(30, visibleSize.height - 50));
+    chat_list->setPosition(Vec2(10, visibleSize.height - 50));
     this->addChild(chat_list, 5);
 
     auto chat_button = ui::Button::create("button3_normal.png", "button3_pressed.png");
@@ -162,10 +163,42 @@ bool main_scene::init()
         switch (type)
         {
         case ui::Widget::TouchEventType::ENDED:
-            network_chat->send_packet_chat_room(
-                network_mgr->get_player_id(),
-                room_chat_field->getString()
-            );
+
+            std::string chat_str = room_chat_field->getString();
+            std::string target_id = "";
+            std::string real_str = "";
+
+            bool is_whisper = false;
+
+            if (chat_str.find("/w ") != std::string::npos)
+            {
+                for (int j = 3; j < chat_str.size(); j++)
+                {
+                    if (chat_str[j] != ' ')
+                        target_id += chat_str[j];
+                    else
+                    {
+                        is_whisper = true;
+                        break;
+                    }
+                }
+            }
+
+            if (is_whisper)
+            {
+                network_chat->send_packet_chat_whisper(
+                    network_mgr->get_player_id(),
+                    target_id,
+                    real_str
+                );
+            }
+            else
+            {
+                network_chat->send_packet_chat_room(
+                    network_mgr->get_player_id(),
+                    chat_str
+                );
+            }
 
             room_chat_field->setText("");
             break;

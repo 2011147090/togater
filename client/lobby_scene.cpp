@@ -9,6 +9,7 @@
 #include "network_manager.h"
 #include "chat_session.h"
 #include "channel_session.h"
+#include "friend_match_dialog.h"
 
 using namespace cocos2d;
 
@@ -107,6 +108,7 @@ bool lobby_scene::init()
     friend_search_field->setMaxLengthEnabled(true);
     friend_search_field->setColor(cocos2d::Color3B::BLACK);
     friend_search_field->setPosition(Vec2(visibleSize.width / 2 + 255, visibleSize.height / 2 - 132));
+    friend_search_field->setCursorEnabled(true);
     this->addChild(friend_search_field, 1);
 
     auto chat_list = ui::ListView::create();
@@ -143,8 +145,24 @@ bool lobby_scene::init()
     chat_field->setAnchorPoint(Vec2(0, 0.5));
     chat_field->setColor(cocos2d::Color3B::BLACK);
     chat_field->setPosition(Vec2(40, 33));
+    chat_field->setCursorEnabled(true);
     
     this->addChild(chat_field, 1);
+
+
+    auto rating_image = cocos2d::Sprite::create("bronze.png");
+    rating_image->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 10));
+    rating_image->setAnchorPoint(Vec2(0.5f, 0.5f));
+    rating_image->setScale(1.5f, 1.5f);
+    this->addChild(rating_image, 1);
+
+    auto history = ui::Text::create("", "fonts/D2Coding.ttf", 20);
+    history->setTextHorizontalAlignment(cocos2d::TextHAlignment::LEFT);
+    history->setPosition(Vec2(visibleSize.width / 2 - 25, visibleSize.height / 2 - 140));
+    history->setTextColor(Color4B::BLACK);
+    this->addChild(history, 1);
+
+    game_mgr->history_ = history;
 
 #pragma endregion
 
@@ -200,13 +218,47 @@ bool lobby_scene::init()
         switch (type)
         {
         case ui::Widget::TouchEventType::ENDED:
-            network_chat->send_packet_chat_normal(
-                network_mgr->get_player_id(),
-                chat_field->getString()
-            );
+        {
+            std::string chat_str = chat_field->getString();
+            std::string target_id = "";
+            std::string real_str = "";
+
+            bool is_whisper = false;
+
+            if (chat_str.find("/w ") != std::string::npos)
+            {
+                for (int j = 3; j < chat_str.size(); j++)
+                {
+                    if (chat_str[j] != ' ')
+                        target_id += chat_str[j];
+                    else
+                    {
+                        real_str = chat_str.substr(j + 1, chat_str.size() - j - 1);
+                        is_whisper = true;
+                        break;
+                    }
+                }
+            }
+        
+            if (is_whisper)
+            {
+                network_chat->send_packet_chat_whisper(
+                    network_mgr->get_player_id(),
+                    target_id,
+                    real_str
+                );
+            }
+            else
+            {
+                network_chat->send_packet_chat_normal(
+                    network_mgr->get_player_id(),
+                    chat_str
+                );
+            }
 
             chat_field->setText("");
-            break;
+        }
+        break;
         }
     });
 
@@ -290,15 +342,71 @@ void lobby_scene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
     {
         if (chat_field->isFocused())
         {
-            network_chat->send_packet_chat_normal(
-                network_mgr->get_player_id(),
-                chat_field->getString()
-            );
+            std::string chat_str = chat_field->getString();
+            std::string target_id = "";
+            std::string real_str = "";
+
+            bool is_whisper = false;
+
+            if (chat_str.find("/w ") != std::string::npos)
+            {
+                for (int j = 3; j < chat_str.size(); j++)
+                {
+                    if (chat_str[j] != ' ')
+                        target_id += chat_str[j];
+                    else
+                    {
+                        real_str = chat_str.substr(j + 1, chat_str.size() - j - 1);
+                        is_whisper = true;
+                        break;
+                    }
+                }
+            }
+
+            if (is_whisper)
+            {
+                network_chat->send_packet_chat_whisper(
+                    network_mgr->get_player_id(),
+                    target_id,
+                    real_str
+                );
+            }
+            else
+            {
+                network_chat->send_packet_chat_normal(
+                    network_mgr->get_player_id(),
+                    chat_str
+                );
+            }
 
             chat_field->setText("");
         }
     }
 }
+
+void lobby_scene::show_friend_match_pop_up()
+{
+    auto friend_match_dialog_ = friend_match_dialog::create();
+    
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->setSwallowTouches(true);
+    listener->onTouchBegan = [](Touch *touch, Event*event)->bool {
+        return true;
+    };
+
+    auto dispatcher = Director::getInstance()->getEventDispatcher();
+    dispatcher->addEventListenerWithSceneGraphPriority(listener, friend_match_dialog_);
+
+    this->addChild(friend_match_dialog_, 10);//TransitionFade::create(1, (cocos2d::Scene*)friend_match_dialog_));
+
+    game_mgr->friend_match_dialog_ = friend_match_dialog_;
+}
+
+void lobby_scene::hide_friend_match_pop_up()
+{
+    this->removeChild(game_mgr->friend_match_dialog_);
+}
+
 void lobby_scene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event)
 {
 }

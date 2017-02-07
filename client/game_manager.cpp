@@ -170,14 +170,23 @@ void game_manager::set_scene_status(SCENE_TYPE status)
     scene_type_ = status;
 }
 
-void game_manager::update_chat(std::string id, std::string str)
+void game_manager::update_chat(std::string id, std::string str, CHAT_TYPE type)
 {
     std::string message = id;
     message += " : ";
     message += str;
     
     auto label = cocos2d::ui::Text::create(message, "fonts/D2Coding.ttf", 15);
-    label->setTextColor(cocos2d::Color4B::BLACK);
+
+    if (id == network_mgr->get_player_id())
+        label->setTextColor(cocos2d::Color4B::BLUE);
+    else if (type == CHAT_TYPE::NORMAL)
+        label->setTextColor(cocos2d::Color4B::BLACK);
+    else if (type == CHAT_TYPE::WHISPER)
+        label->setTextColor(cocos2d::Color4B::MAGENTA);
+    else if (type == CHAT_TYPE::NOTICE)
+        label->setTextColor(cocos2d::Color4B::RED);
+
     label->setTouchEnabled(true);
 
     if (scene_type_ == LOBBY)
@@ -211,4 +220,27 @@ void game_manager::del_friend_in_list(std::string id)
 
     if (index != -1)
         friend_list_->removeItem(index);
+}
+
+void game_manager::set_history(int win, int lose, int rating)
+{
+    char temp[10] = "";
+
+    std::string str = "ID : ";
+    str += network_mgr->get_player_id();
+    str += "\nWin : ";
+    itoa(win, temp, 10);
+    str += temp;
+    str += "\nLose : ";
+    itoa(lose, temp, 10);
+    str += temp;
+    str += "\nTotal Game : ";
+    itoa(win + lose, temp, 10);
+    str += temp;
+    str += "\nRating : ";
+    itoa(rating, temp, 10);
+    str += temp;
+    str += "\0";
+
+    history_->setText(str);
 }

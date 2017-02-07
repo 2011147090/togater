@@ -124,7 +124,7 @@ void login_scene::http_request_complete(cocos2d::network::HttpClient *sender, co
         network_mgr->set_player_key(sub);
 
         auto scene = lobby_scene::createScene();
-        Director::getInstance()->pushScene(TransitionSlideInR::create(1, scene));
+        Director::getInstance()->pushScene(TransitionCrossFade::create(2, scene));
     }
     else
     {

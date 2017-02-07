@@ -81,7 +81,7 @@ void loading_scene::update(float delta)
         }
         else
         {
-            if (!game_mgr->send_friend_match_)
+            if (game_mgr->send_friend_match_ == false)
                 network_lobby->send_packet_rank_game_req(false);
             else
             {

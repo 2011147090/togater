@@ -149,7 +149,7 @@ void chat_session::process_packet_chat_normal(chat_server::packet_chat_normal pa
     game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::update_chat, game_mgr,
-            packet.user_id(), packet.chat_message()
+            packet.user_id(), packet.chat_message(), game_manager::CHAT_TYPE::NORMAL
         )
     );
 }
@@ -161,7 +161,7 @@ void chat_session::process_packet_chat_whisper(chat_server::packet_chat_whisper 
     game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::update_chat, game_mgr,
-            "[w]" + packet.user_id(), packet.chat_message()
+            "[w]" + packet.user_id(), packet.chat_message(), game_manager::CHAT_TYPE::WHISPER
         )
     );
 }
@@ -173,7 +173,7 @@ void chat_session::process_packet_chat_room(chat_server::packet_chat_room packet
     game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::update_chat, game_mgr,
-            packet.user_id(), packet.chat_message()
+            packet.user_id(), packet.chat_message(), game_manager::CHAT_TYPE::NORMAL
         )
     );
 }
@@ -185,7 +185,7 @@ void chat_session::process_packet_chat_notice(chat_server::packet_chat_notice pa
     game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::update_chat, game_mgr,
-            "[GM]" + packet.user_id(), packet.chat_message()
+            "[GM]" + packet.user_id(), packet.chat_message(), game_manager::CHAT_TYPE::NOTICE
         )
     );
 }
