@@ -1,6 +1,7 @@
 #include "logic_worker.h"
 #include "random_generator.h"
 #include "log_manager.h"
+#include "database_connector.h"
 
 _PLAYER_INFO::_PLAYER_INFO()
 {
@@ -12,7 +13,7 @@ _PLAYER_INFO::_PLAYER_INFO()
 
 _ROOM_INFO::_ROOM_INFO(PLAYER_INFO player_info)
 {
-    ready_player_num_ = 1;
+    ready_player_num_ = 0;
     time_ = 0;
     turn_count_ = 0;
     hide_card_ = true;
@@ -102,8 +103,6 @@ bool logic_worker::enter_room_player(connected_session* session, std::string roo
     
     if (iter != room_hashs_.end())
     {
-        iter->second.ready_player_num_++;
-
         PLAYER_INFO player_info;
         player_info.remain_money_ = 20;
         player_info.submit_money_ = 0;
@@ -154,8 +153,24 @@ bool comp(int const& a, int const& b) {
     return false;
 }
 
+bool logic_worker::ready_for_game(std::string room_key)
+{
+    thread_sync sync;
+
+    auto iter = room_hashs_.find(room_key);
+
+    if (iter != room_hashs_.end())
+        iter->second.ready_player_num_++;
+    else
+        return false;
+
+    return true;
+}
+
 logic_worker::HOLDEM_HANDS logic_worker::check_card_mix(int i, int j, int k)
 {
+    thread_sync sync;
+
     if (i == j)
         if (i == k)
             return HOLDEM_HANDS::TRIPLE;
@@ -608,11 +623,6 @@ void logic_worker::process_queue()
 
                 game_state_packet.set_state(2);
 
-                if (iter->second.player_[0].remain_money_ >= iter->second.player_[1].remain_money_)
-                    game_state_packet.set_win_player_key(iter->second.player_[0].session_->get_player_key());
-                else
-                    game_state_packet.set_win_player_key(iter->second.player_[1].session_->get_player_key());
-
                 int disconnect_session = 0;
 
                 for (int i = 0; i < 2; i++)
@@ -643,13 +653,64 @@ void logic_worker::process_queue()
                         );
                     }
 
+                    if (iter->second.player_[0].remain_money_ >= iter->second.player_[1].remain_money_)
+                    {
+                        db_query query;
+                        query.callback_func = nullptr;
+                        query.query_ = "UPDATE user_info SET ";
+                        query.query_ += "win = win + 1, ";
+                        query.query_ += "rating = rating + 20 ";
+                        query.query_ += "WHERE id = \'";
+                        query.query_ += redis_connector::get_instance()->get_id(iter->second.player_[0].session_->get_player_key()) + "\';";
+
+                        db_connector->push_query(query);
+
+                        db_query query2;
+                        query2.callback_func = nullptr;
+                        query2.query_ = "UPDATE user_info SET ";
+                        query2.query_ += "lose = lose + 1, ";
+                        query2.query_ += "rating = rating - 20 ";
+                        query2.query_ += "WHERE id = \'";
+                        query2.query_ += redis_connector::get_instance()->get_id(iter->second.player_[1].session_->get_player_key()) + "\';";
+
+                        db_connector->push_query(query2);
+
+                        game_state_packet.set_win_player_key(iter->second.player_[0].session_->get_player_key());
+
+                    }
+                    else
+                    {
+                        db_query query;
+                        query.callback_func = nullptr;
+                        query.query_ = "UPDATE user_info SET ";
+                        query.query_ += "win = win + 1, ";
+                        query.query_ += "rating = rating + 20 ";
+                        query.query_ += "WHERE id = \'";
+                        query.query_ += redis_connector::get_instance()->get_id(iter->second.player_[1].session_->get_player_key()) + "\';";
+
+                        db_connector->push_query(query);
+
+                        db_query query2;
+                        query2.callback_func = nullptr;
+                        query2.query_ = "UPDATE user_info SET ";
+                        query2.query_ += "lose = lose + 1, ";
+                        query2.query_ += "rating = rating - 20 ";
+                        query2.query_ += "WHERE id = \'";
+                        query2.query_ += redis_connector::get_instance()->get_id(iter->second.player_[0].session_->get_player_key()) + "\';";
+
+                        db_connector->push_query(query2);
+
+                        game_state_packet.set_win_player_key(iter->second.player_[1].session_->get_player_key());
+                    }
+
                     iter = room_hashs_.erase(iter);
                 }
             }
             break;
             }
 
-            iter++;
+            if (iter != room_hashs_.end())
+                iter++;
         }
     }
 }
@@ -663,11 +724,40 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
     if (iter == room_hashs_.end())
         return false;
 
+    system_log->info("remove room info - room_key:{}", room_key);
+
+    std::string win_player_key;
+
+    if (iter->second.player_[0].session_->get_player_key() == player_key)
+        win_player_key = iter->second.player_[1].session_->get_player_key();
+    else
+        win_player_key = iter->second.player_[0].session_->get_player_key();
+
     logic_server::packet_game_state_ntf game_state_packet;
 
     game_state_packet.set_state(2);
-    game_state_packet.set_win_player_key(player_key);
+    game_state_packet.set_win_player_key(win_player_key);
 
+    db_query query;
+    query.callback_func = nullptr;
+    query.query_ = "UPDATE user_info SET ";
+    query.query_ += "win = win + 1, ";
+    query.query_ += "rating = rating + 20 ";
+    query.query_ += "WHERE id = \'";
+    query.query_ += redis_connector::get_instance()->get_id(win_player_key) + "\';";
+
+    db_connector->push_query(query);
+
+    db_query query2;
+    query2.callback_func = nullptr;
+    query2.query_ = "UPDATE user_info SET ";
+    query2.query_ += "lose = lose + 1, ";
+    query2.query_ += "rating = rating - 20 ";
+    query2.query_ += "WHERE id = \'";
+    query2.query_ += redis_connector::get_instance()->get_id(player_key) + "\';";
+
+    db_connector->push_query(query2);
+        
     int disconnect_session = 0;
 
     for (int i = 0; i < 2; i++)
@@ -681,23 +771,22 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
 
     if (disconnect_session >= 2)
     {
-        if (iter->second.player_[0].remain_money_ != 0)
-        {
-            log(iter->first)->info("end_game, win_player_key:{}",
-                iter->second.player_[0].session_->get_player_key()
-            );
-        }
-        else
-        {
-            log(iter->first)->info("end_game, win_player_key:{}",
-                iter->second.player_[1].session_->get_player_key()
-            );
-        }
-
-        room_hashs_.erase(iter);
+        log(iter->first)->info("end_game, win_player_key:{}", win_player_key);
+      
+        iter = room_hashs_.erase(iter);
 
         return true;
     }
+
+    return false;
+}
+
+bool logic_worker::destroy_room(std::string room_key)
+{
+    thread_sync sync;
+
+    if (redis_connector::get_instance()->remove_room_info(room_key))
+        return true;
 
     return false;
 }

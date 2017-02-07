@@ -10,12 +10,14 @@ void connected_session::process_packet_enter_req(logic_server::packet_enter_req 
 
     if (logic_worker::get_instance()->enter_room_player(this, packet.room_key()))
     {
+        enter_room_ = true;
         recevie_packet.set_result(1);
     }
     else
+    {
         recevie_packet.set_result(0);
-    
-    recevie_packet.SerializeToArray(send_buf_.c_array(), recevie_packet.ByteSize());
+        this->shut_down();
+    }
 
     handle_send(logic_server::ENTER_ANS, recevie_packet);
 }
@@ -30,4 +32,14 @@ void connected_session::process_packet_disconnect_room_ntf(logic_server::packet_
 {
     if (logic_worker::get_instance()->disconnect_room(room_key_, this->get_player_key()))
         return;
+}
+
+void connected_session::process_packet_echo_ntf(logic_server::packet_echo_ntf packet)
+{
+    this->handle_send(logic_server::ECHO_NTF, packet);
+}
+
+void connected_session::porcess_packet_game_state_ntf(logic_server::packet_game_state_ntf packet)
+{
+    logic_worker::get_instance()->ready_for_game(room_key_);
 }

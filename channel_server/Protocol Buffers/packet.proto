@@ -1,0 +1,85 @@
+syntax = "proto2";
+
+package channel_serv;
+
+enum MESSAGE_ID {
+	FRIENDS_REQ      = 0;
+	FRIENDS_ANS      = 1;
+	PLAY_RANK_REQ    = 2;
+	PLAY_FRIENDS_REQ = 3;
+	MATCH_COMPLETE   = 4;
+	ERROR_MSG        = 5;
+	JOIN_REQ         = 6;
+	JOIN_ANS         = 7;
+	LOGOUT_NTF       = 8;
+}
+
+enum RATING {
+			BRONZE   = 0;
+			SILVER   = 1;
+			GOLD     = 2;
+			PLATINUM = 3;
+			DIAMOND  = 4;
+			MASTER   = 5;
+			CHAL     = 6;
+}
+
+message user_info {
+	required RATING rating        = 1;
+	required int32 battle_history = 2;
+	required int32 win            = 3;
+	required int32 lose           = 4;
+	required string user_id       = 5;
+}
+
+message join_ans {
+	required user_info my_info      = 1;
+	repeated string friends_id_list = 2;
+}
+
+message join_req {
+	required string token = 1;
+}
+
+message logout_ntf {
+	required string token = 1;
+}
+
+message friends_req {
+	enum F_REQ {
+		ADD      = 1;
+		DEL      = 2;
+		SEARCH   = 3;
+	}
+	required F_REQ req      = 1;	
+	required string user_id = 2;
+	optional bool on_off = 3;
+}
+
+message friends_ans {
+	required user_info user_information = 1;
+	required bool online                = 2;
+}
+
+message play_rank_game_req {
+	required user_info my_info = 1;
+}
+
+message play_friends_game_req {
+	enum FLAG {
+		APPLY  = 0;
+		ACCEPT = 1;
+		DENY   = 2;
+	}
+	required FLAG flag_id   = 1;
+	required string recv_id = 3;
+}
+
+message matching_complete_ans {
+	required int32 room_number         = 1;
+	required user_info opponent_player = 2;
+}
+
+message error_msg {
+	required string error_message = 1;
+}

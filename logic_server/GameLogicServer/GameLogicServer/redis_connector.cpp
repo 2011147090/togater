@@ -24,8 +24,6 @@ bool redis_connector::init_singleton()
         return false;
     }
 
-    conn->set("temp", "0");
-
     return true;
 }
 
@@ -55,18 +53,43 @@ bool redis_connector::check_room(std::string room_key)
     return true;
 }
 
-void redis_connector::remove_room_info(std::string room_key)
+bool redis_connector::remove_room_info(std::string room_key)
 {
     thread_sync sync;
 
     if (!conn->del(room_key).result())
+    {
         system_log->error("redis_connector:remove_room_info, room_key_is_null");
+        return false;
+    }
+
+    return true;
 }
 
-void redis_connector::remove_player_info(std::string player_key)
+bool redis_connector::remove_player_info(std::string player_key)
 {
     thread_sync sync;
 
     if (!conn->del(player_key).result())
+    {
         system_log->error("redis_connector:remove_player_info, player_key_is_null");
+        return false;
+    }
+
+    return true;
+}
+
+std::string redis_connector::get_id(std::string player_key)
+{
+    thread_sync sync;
+
+    auto value = conn->get(player_key);
+
+    if (!value.result().is_initialized())
+    {
+        system_log->error("redis_connector:check_room, room_key_is_null");
+        return false;
+    }
+
+    return value.result().get().c_str();
 }

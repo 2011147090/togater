@@ -42,7 +42,7 @@ void chat_session::handle_send(chat_server::message_type msg_type, const protobu
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
-    socket_->write_some(boost::asio::buffer(send_buf_));
+    socket_->write_some(boost::asio::buffer(send_buf_, message_header_size + header.size));
 }
 
 void chat_session::handle_read()
@@ -62,6 +62,28 @@ void chat_session::handle_read()
 
         switch (message_header.type)
         {
+        case chat_server::VERIFY_ANS:
+        {
+            chat_server::packet_verify_ans message;
+
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
+
+            process_packet_verify_ans(message);
+        }
+        break;
+
+        case chat_server::LOGOUT_ANS:
+        {
+            chat_server::packet_logout_ans message;
+
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
+
+            process_pacekt_logout_ans(message);
+        }
+        break;
+        
         case chat_server::NORMAL:
         {
             chat_server::packet_chat_normal message;
@@ -73,19 +95,99 @@ void chat_session::handle_read()
         }
         break;
 
-        case chat_server::VERIFY_RES:
+        case chat_server::WHISPER:
         {
-            chat_server::packet_verify_res message;
+            chat_server::packet_chat_whisper message;
 
             if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                 break;
 
-            process_packet_verify_res(message);
+            process_packet_chat_whisper(message);
+        }
+        break;
+
+        case chat_server::ROOM:
+        {
+            chat_server::packet_chat_room message;
+
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
+
+            process_packet_chat_room(message);
+        }
+        break;
+
+        case chat_server::NOTICE:
+        {
+            chat_server::packet_chat_notice message;
+
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
+
+            process_packet_chat_notice(message);
         }
         break;
 
         }
     }
+}
+
+void chat_session::process_packet_verify_ans(chat_server::packet_verify_ans packet)
+{
+    thread_sync sync;
+}
+
+void chat_session::process_pacekt_logout_ans(chat_server::packet_logout_ans packet)
+{
+    thread_sync sync;
+}
+
+void chat_session::process_packet_chat_normal(chat_server::packet_chat_normal packet)
+{
+    thread_sync sync;
+
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            game_manager::update_chat, game_mgr,
+            packet.user_id(), packet.chat_message(), game_manager::CHAT_TYPE::NORMAL
+        )
+    );
+}
+
+void chat_session::process_packet_chat_whisper(chat_server::packet_chat_whisper packet)
+{
+    thread_sync sync;
+
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            game_manager::update_chat, game_mgr,
+            "[w]" + packet.user_id(), packet.chat_message(), game_manager::CHAT_TYPE::WHISPER
+        )
+    );
+}
+
+void chat_session::process_packet_chat_room(chat_server::packet_chat_room packet)
+{
+    thread_sync sync;
+
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            game_manager::update_chat, game_mgr,
+            packet.user_id(), packet.chat_message(), game_manager::CHAT_TYPE::NORMAL
+        )
+    );
+}
+
+void chat_session::process_packet_chat_notice(chat_server::packet_chat_notice packet)
+{
+    thread_sync sync;
+    
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            game_manager::update_chat, game_mgr,
+            "[GM]" + packet.user_id(), packet.chat_message(), game_manager::CHAT_TYPE::NOTICE
+        )
+    );
 }
 
 void chat_session::send_packet_verify_req(std::string player_key, std::string id)
@@ -99,6 +201,36 @@ void chat_session::send_packet_verify_req(std::string player_key, std::string id
     this->handle_send(chat_server::VERIFY_REQ, packet);
 }
 
+void chat_session::send_packet_logout_req(std::string player_id)
+{
+    thread_sync sync;
+
+    chat_server::packet_logout_req packet;
+    packet.set_user_id(player_id);
+    
+    this->handle_send(chat_server::LOGOUT_REQ, packet);
+}
+
+void chat_session::send_packet_enter_match_ntf(std::string target_id)
+{
+    thread_sync sync;
+    
+    chat_server::packet_enter_match_ntf packet;
+
+    packet.set_opponent_id(target_id);
+
+    this->handle_send(chat_server::ENTER_MATCH_NTF, packet);
+}
+
+void chat_session::send_packet_leave_match_ntf()
+{
+    thread_sync sync;
+
+    chat_server::packet_leave_match_ntf packet;
+
+    this->handle_send(chat_server::LEAVE_MATCH_NTF, packet);
+}
+
 void chat_session::send_packet_chat_normal(std::string id, std::string message)
 {
     thread_sync sync;
@@ -110,19 +242,25 @@ void chat_session::send_packet_chat_normal(std::string id, std::string message)
     this->handle_send(chat_server::NORMAL, packet);
 }
 
-void chat_session::process_packet_verify_res(chat_server::packet_verify_res packet)
+void chat_session::send_packet_chat_whisper(std::string id, std::string target_id, std::string message)
 {
     thread_sync sync;
+
+    chat_server::packet_chat_whisper packet;
+    packet.set_chat_message(message);
+    packet.set_user_id(id);
+    packet.set_target_id(target_id);
+
+    this->handle_send(chat_server::WHISPER, packet);
 }
 
-void chat_session::process_packet_chat_normal(chat_server::packet_chat_normal packet)
+void chat_session::send_packet_chat_room(std::string id, std::string message)
 {
     thread_sync sync;
 
-    game_mgr->scheduler_->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            game_manager::add_lobby_chat, game_mgr,
-            packet.user_id(), packet.chat_message()
-        )
-    );
+    chat_server::packet_chat_room packet;
+    packet.set_chat_message(message);
+    packet.set_user_id(id);
+
+    this->handle_send(chat_server::ROOM, packet);
 }

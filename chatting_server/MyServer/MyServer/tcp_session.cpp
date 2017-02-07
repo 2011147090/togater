@@ -12,6 +12,44 @@ tcp_session::~tcp_session()
 {
 }
 
+void tcp_session::post_verify_ans(bool is_successful)
+{
+    chat_server::packet_verify_ans verify_message;
+    verify_message.set_is_successful(is_successful);
+    
+    MESSAGE_HEADER header;
+    
+    header.size = verify_message.ByteSize();
+    header.type = chat_server::VERIFY_ANS;
+
+
+    boost::array<BYTE, 1024>* send_buffer = new boost::array<BYTE, 1024>;
+
+    CopyMemory(send_buffer->begin(), (void*)&header, message_header_size);
+    verify_message.SerializeToArray(send_buffer->begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer->begin());
+}
+
+void tcp_session::post_logout_ans(bool is_successful)
+{
+    chat_server::packet_logout_ans logout_message;
+    logout_message.set_is_successful(is_successful);
+
+    MESSAGE_HEADER header;
+
+    header.size = logout_message.ByteSize();
+    header.type = chat_server::LOGOUT_ANS;
+
+
+    boost::array<BYTE, 1024>* send_buffer = new boost::array<BYTE, 1024>;
+
+    CopyMemory(send_buffer->begin(), (void*)&header, message_header_size);
+    logout_message.SerializeToArray(send_buffer->begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer->begin());
+}
+
 void tcp_session::post_send(const bool immediate, const int size, BYTE* data)
 {
     if (immediate == false)
@@ -40,8 +78,46 @@ void tcp_session::post_receive()
 // ---------- private ----------
 void tcp_session::handle_write(const boost::system::error_code& error, size_t bytes_transferred)
 {
-    send_data_queue_.pop_front();
+    MESSAGE_HEADER* message_header = (MESSAGE_HEADER*)send_data_queue_.front();
+    
 
+    switch (message_header->type)
+    {
+    case chat_server::VERIFY_ANS:
+        {
+            chat_server::packet_verify_ans verify_message;
+            verify_message.ParseFromArray(send_data_queue_.front() + message_header_size, message_header->size);
+
+            if (socket_.is_open() && !(verify_message.is_successful()))
+                server_->close_session(session_id_);
+        }
+        break;
+
+    case chat_server::LOGOUT_ANS:
+        {
+            chat_server::packet_logout_ans logout_message;
+            logout_message.ParseFromArray(send_data_queue_.front() + message_header_size, message_header->size);
+
+            if (socket_.is_open() && logout_message.is_successful())
+                server_->close_session(session_id_);
+        }
+        break;
+
+
+    case chat_server::WHISPER:
+        break;
+
+    case chat_server::ROOM:
+        break;
+
+    case chat_server::NORMAL:
+        break;
+
+    case chat_server::NOTICE:
+        break;
+    }
+
+    send_data_queue_.pop_front();
     if (send_data_queue_.empty() == false)
     {
         BYTE* data = send_data_queue_.front();

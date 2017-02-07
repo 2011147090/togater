@@ -12,6 +12,8 @@ typedef struct _LOGGER_INFO {
 class log_manager : public singleton<log_manager>, public multi_thread_sync<log_manager> {
 private:
     std::map<std::string, LOGGER_INFO> logger_list;
+    std::shared_ptr<spdlog::logger> console;
+    bool is_debug_mode_;
 
 public:
     std::shared_ptr<spd::logger> get_logger(std::string logger_name, std::string file_name);
@@ -21,6 +23,8 @@ public:
     
     virtual bool init_singleton();
     virtual bool release_singleton();
+
+    void set_debug_mode(bool is_debug_mode);
 
     virtual ~log_manager();
     log_manager();

@@ -10,8 +10,10 @@
 #include <json_spirit.h>
 /* protocol buffer */
 #include "protocol.h"
-/* redis util*/
+/* redis util */
 // channel_server.h 에서 사용
+/* mysql util */
+#include "db_connector.h"
 /* class */
 #include "log_manager.h"
 #include "channel_server.h"
@@ -19,20 +21,21 @@
 int main()
 {
     boost::asio::io_service io_service;
+    MYSQL initail;
     /* redis connector module */
     redispp::Connection redis_conn(REDIS_SERVER_IP, REDIS_PORT, REDIS_PWD, false); 
     
+    /* mysql connector module*/
+    db_connector db_connector_main(initail);
+   
     /* pakcet handle module */
     packet_handler packet_handler_main;
     
     /* user manager module */
-    friends_manager friends_manager_main(redis_conn, packet_handler_main);
+    friends_manager friends_manager_main(redis_conn, packet_handler_main, db_connector_main);
     match_manager match_manager_main(packet_handler_main,friends_manager_main,redis_conn);
     
     /* log manager module */
-
-    
-    /* db connector module */
 
     
     /* config module */

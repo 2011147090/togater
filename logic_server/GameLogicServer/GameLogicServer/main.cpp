@@ -4,6 +4,9 @@
 #include "redis_connector.h"
 #include "logic_worker.h"
 #include "configurator.h"
+#include "database_connector.h"
+
+tcp_server* server = nullptr;
 
 BOOL WINAPI ConsolHandler(DWORD handle)
 {
@@ -15,13 +18,23 @@ BOOL WINAPI ConsolHandler(DWORD handle)
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
     default:
+        if (database_connector::get_instance()->release_singleton())
+            system_log->info("release_database_manager");
+
         if (logic_worker::get_instance()->release_singleton())
             system_log->info("release_logic_manager");
 
         if (redis_connector::get_instance()->release_singleton())
             system_log->info("release_redis_manager");
 
+        system_log->info("server_close");
         log_manager::get_instance()->release_singleton();
+
+        if (server != nullptr)
+        {
+            server->end_server();
+            delete server;
+        }
 
         return false;
     }
@@ -32,21 +45,17 @@ BOOL WINAPI ConsolHandler(DWORD handle)
 int main(int argc, char* argv[])
 {
     SetConsoleCtrlHandler(ConsolHandler, true);
-
-
+    
     try
     {
-        system_log->info("server_start");
-
-        if (!log_manager::get_instance()->init_singleton())
+        if (log_manager::get_instance()->init_singleton())
         {
-            system_log->error("failed_init_log_manager");
+            log_manager::get_instance()->set_debug_mode(true);
 
-            throw;
-        }
-        else
+            system_log->info("server_start");
             system_log->info("init_log_manager");
-
+        }
+                
         if (!redis_connector::get_instance()->init_singleton())
         {
             system_log->error("failed_init_redis_manager");
@@ -65,7 +74,15 @@ int main(int argc, char* argv[])
         else
             system_log->info("init_logic_manager");
 
-        boost::asio::io_service io_Service;
+        if (!database_connector::get_instance()->init_singleton())
+        {
+            system_log->info("failed_init_database_manager");
+            throw;
+        }
+        else
+            system_log->info("init_database_manager");
+
+        boost::asio::io_service service;
         
         int port;
 
@@ -75,13 +92,14 @@ int main(int argc, char* argv[])
             throw;
         }
 
-        tcp_server tcp_server(io_Service, port);
+        server = new tcp_server(service, port);
                 
         boost::thread_group io_thread;
-        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
-        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
-        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
-        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &io_Service));
+        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
+        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
+        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
+        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
+        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
 
         io_thread.join_all();
 
@@ -89,18 +107,29 @@ int main(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
+        server->end_server();
+
+        if (database_connector::get_instance()->release_singleton())
+            system_log->info("release_database_manager");
+
         if (logic_worker::get_instance()->release_singleton())
             system_log->info("release_logic_manager");
 
         if (redis_connector::get_instance()->release_singleton())
             system_log->info("release_redis_manager");
+        
+        system_log->error("{}", e.what());
+
+        if (server != nullptr)
+        {
+            server->end_server();
+            delete server;
+        }
+
+        system_log->info("server_close");
 
         log_manager::get_instance()->release_singleton();
-
-        system_log->error("{}", e.what());
     }
-
-    system_log->info("server_close");
-
+        
     return 0;
 }

@@ -6,6 +6,7 @@
 #include "loading_scene.h"
 #include "network_manager.h"
 #include "game_manager.h"
+#include "channel_session.h"
 #include "logic_session.h"
 
 using namespace cocos2d;
@@ -36,7 +37,7 @@ bool loading_scene::init()
     background->setScale(1.28f);
     this->addChild(background, 0);
     
-    auto loading_title = ui::Text::create("Searching For Enemy", "fonts/D2Coding.ttf", 25);
+    auto loading_title = ui::Text::create("Searching For Opponent", "fonts/D2Coding.ttf", 25);
     loading_title->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 80));
     loading_title->setTextColor(Color4B::WHITE);
     this->addChild(loading_title, 1);
@@ -46,6 +47,11 @@ bool loading_scene::init()
     progress_bar->setScale(0.5f);
     this->addChild(progress_bar, 1);
 
+    timer = 0;
+
+    game_mgr->scheduler_[game_manager::LOADING] = this->getScheduler();
+    game_mgr->set_scene_status(game_manager::SCENE_TYPE::LOADING);
+    
     scheduleUpdate();
 
     return true;
@@ -59,21 +65,6 @@ void loading_scene::update(float delta)
     if (delta > 300)
         delta = 0;
 
-    progress_bar->setRotation(depth);
-
-    static float timer = 0;
-
-    if (timer == 0)
-    {
-        this->getScheduler()->performFunctionInCocosThread(
-            CC_CALLBACK_0(
-                logic_session::connect, 
-                network_logic,
-                LOGIC_SERVER_IP, "8600"
-            )
-        );
-    }
-
     if (timer < 3)
         timer += delta;
 
@@ -81,12 +72,27 @@ void loading_scene::update(float delta)
     {
         timer = 3;
 
-        if (network_logic->is_run())
+        if (game_mgr->accept_friend_match_ == true)
         {
-            network_logic->send_packet_enter_req(
-                "temp",
-                network_mgr->get_player_key()
+            network_lobby->send_packet_play_friend_game_rel(
+                channel_server::packet_play_friends_game_rel_req_type_ACCEPT,
+                game_mgr->friend_match_id_
             );
         }
+        else
+        {
+            if (game_mgr->send_friend_match_ == false)
+                network_lobby->send_packet_rank_game_req(false);
+            else
+            {
+                network_lobby->send_packet_play_friend_game_rel(
+                    channel_server::packet_play_friends_game_rel::APPLY,
+                    game_mgr->friend_text_field->getString()
+                );
+            }
+        }
     }
+
+    progress_bar->setRotation(depth);
+
 }

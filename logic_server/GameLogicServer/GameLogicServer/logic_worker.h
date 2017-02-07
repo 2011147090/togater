@@ -6,8 +6,6 @@
 #include "critical_section.h"
 
 typedef struct _PLAYER_INFO {
-    std::string id_;
-
     bool submit_card_;
     int opponent_card_num_;
 
@@ -26,7 +24,6 @@ typedef struct _ROOM_INFO {
 
     PLAYER_INFO* turn_player_;
     
-    //std::string room_key_;
     int time_;
     int turn_count_;
 
@@ -55,6 +52,8 @@ public:
     bool enter_room_player(connected_session* session, std::string room_key);
     bool process_turn(std::string room_key, std::string player_key, int money);
     bool disconnect_room(std::string room_key, std::string player_key);
+    bool destroy_room(std::string room_key);
+    bool ready_for_game(std::string room_key);
 
     void process_queue();
 
@@ -63,7 +62,6 @@ public:
     
 private:
     boost::unordered_map<std::string, ROOM_INFO> room_hashs_;
-    //std::vector<ROOM_INFO> room_list_;
     boost::thread* logic_thread_;
 
     bool end_server_;

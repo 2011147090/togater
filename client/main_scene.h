@@ -10,8 +10,6 @@ public:
     static cocos2d::Scene* createScene();
 
     virtual bool init();
-
-    void setup_scene();
     void end();
 
     void menu_close_callback(cocos2d::Ref* sender);

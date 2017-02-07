@@ -2,11 +2,13 @@
 #include "connected_session.h"
 #include "log_manager.h"
 
-connected_session::connected_session(boost::asio::io_service& io_service) : socket_(io_service)
+connected_session::connected_session(boost::asio::io_service& io_service) : socket_(io_service), safe_disconnect_(true), enter_room_(false), is_accept_(false)
 {}
 
 bool connected_session::handle_check_keep_alive()
 {
+    thread_sync sync;
+
     boost::system::error_code error;
 
     if (error)
@@ -17,19 +19,18 @@ bool connected_session::handle_check_keep_alive()
 
 void connected_session::handle_send(logic_server::message_type msg_type, const protobuf::Message& message)
 {
+    thread_sync sync;
+
     MESSAGE_HEADER header;
     header.size = message.ByteSize();
     header.type = msg_type;
-
-    int buf_size = 0;
-    buf_size = message_header_size + message.ByteSize();
 
     CopyMemory(send_buf_.begin(), (void*)&header, message_header_size);
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
     boost::system::error_code error;
-    socket_.write_some(boost::asio::buffer(send_buf_), error);
+    socket_.write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
 
     if (error)
         system_log->error(error.message());
@@ -37,17 +38,33 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
 
 void connected_session::shut_down()
 {
-    socket_.shutdown(boost::asio::socket_base::shutdown_receive);
-    socket_.close();
+    thread_sync sync;
+
+    if (socket_.is_open())
+    {
+        socket_.shutdown(boost::asio::socket_base::shutdown_receive);
+        socket_.close();
+    }
 }
 
 std::string connected_session::get_player_key()
 {
+    thread_sync sync;
+
     return player_key_;
+}
+
+std::string connected_session::get_room_key()
+{
+    thread_sync sync;
+
+    return room_key_;
 }
 
 void connected_session::handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/)
 {
+    thread_sync sync;
+
     if (!error)
     {
         socket_.async_read_some(boost::asio::buffer(recv_buf_),
@@ -72,6 +89,17 @@ void connected_session::handle_read(const boost::system::error_code& error, size
         }
         break;
 
+        case logic_server::GAME_STATE_NTF:
+        {
+            logic_server::packet_game_state_ntf message;
+        
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
+
+            porcess_packet_game_state_ntf(message);
+        }
+        break;          
+
         case logic_server::PROCESS_TURN_ANS:
         {
             logic_server::packet_process_turn_ans message;
@@ -93,14 +121,35 @@ void connected_session::handle_read(const boost::system::error_code& error, size
             process_packet_disconnect_room_ntf(message);
         }
         break;
+
+        case logic_server::ECHO_NTF:
+        {
+            logic_server::packet_echo_ntf message;
+
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
+                break;
+
+            process_packet_echo_ntf(message);
+        }
+        break;
         }
     }
     else
+    {
         system_log->error("handle_read_error:{}", error.message());
+        
+        if (is_connected())
+        {
+            safe_disconnect_ = false;
+            this->shut_down();
+        }
+    }
 }
 
 bool connected_session::is_connected()
 {
+    thread_sync sync;
+
     if (socket_.is_open())
         return true;
 
@@ -109,18 +158,47 @@ bool connected_session::is_connected()
 
 connected_session::pointer connected_session::create(boost::asio::io_service& io_service)
 {
+    thread_sync sync;
+
     return connected_session::pointer(new connected_session(io_service));
 }
 
 tcp::socket& connected_session::get_socket()
 {
+    thread_sync sync;
+
     return socket_;
 }
 
 void connected_session::start()
 {
+    thread_sync sync;
+
     socket_.async_read_some(boost::asio::buffer(recv_buf_),
         boost::bind(&connected_session::handle_read, shared_from_this(),
             boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred));
+
+    is_accept_ = true;
+}
+
+bool connected_session::is_safe_disconnect()
+{
+    thread_sync sync;
+
+    return safe_disconnect_;
+}
+
+bool connected_session::is_start_game()
+{
+    thread_sync sync;
+
+    return enter_room_;
+}
+
+bool connected_session::accept_client()
+{
+    thread_sync sync;
+
+    return is_accept_;
 }

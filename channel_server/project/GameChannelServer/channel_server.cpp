@@ -1,6 +1,6 @@
 #include "channel_server.h"
 
-namespace ch = channel_serv;
+
 
 tcp_server::tcp_server(boost::asio::io_service & io_service, friends_manager& friends, match_manager& match, packet_handler& packet_handler)
     : acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),PORT_NUMBER))
@@ -43,9 +43,7 @@ void tcp_server::close_session(const int n_session_id)
 {
     
     session *request_session = session_list_[n_session_id];
-    //std::cout << "종료 클라이언트 토큰 : " << session_list_[n_session_id]->get_token();
-    //std::cout << " 클라이언트 ID : " << session_list_[n_session_id]->get_user_id() << std::endl << std::endl;
-    
+        
     if (request_session->get_status() == status::LOGIN)
     {
         //비정상 종료
@@ -61,7 +59,7 @@ void tcp_server::close_session(const int n_session_id)
     else if (request_session->get_status() == status::MATCH_COMPLETE)
     {
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        std::cout << "세션 ID : " << n_session_id << "매칭 완료" << std::endl;
+        //std::cout << "세션 ID : " << n_session_id << "매칭 완료" << std::endl;
         //정상 종료
     }
     else if (request_session->get_status() == status::MATCH_RECVER)
@@ -98,33 +96,52 @@ void tcp_server::process_packet(const int n_session_id, const char * p_data)
 {
     packet_header *p_header = (packet_header *)p_data;
     session *request_session = get_session(n_session_id);
-    switch (p_header->ID)
+    switch (p_header->type)
     {
-    case ch::MESSAGE_ID::FRIENDS_REQ:
-        {
+    case message_type::FRIENDS_REQ:
+    {
         friends_manager_.process_friends_function(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
-        }
-        break;
-    case ch::MESSAGE_ID::PLAY_FRIENDS_REQ:
-        {
+        return;
+    }
+    case message_type::PLAY_FRIENDS_REL:
+    {
         match_manager_.process_matching_with_friends(request_session, &p_data[packet_header_size], p_header->size);
-        }
-        break;
-    case ch::MESSAGE_ID::PLAY_RANK_REQ:
-        {
+        return;
+    }
+    case message_type::PLAY_RANK_REQ:
+    {
         match_manager_.process_matching(request_session, &p_data[packet_header_size], p_header->size);
-        }
-        break;
-    case ch::MESSAGE_ID::JOIN_REQ:
-        {
+        return;
+    }
+    case message_type::JOIN_REQ:
+    {
         friends_manager_.lobby_login_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
-        }
-        break;
-    case ch::MESSAGE_ID::LOGOUT_NTF:
-        {
+        return;
+    }
+    case message_type::LOGOUT_REQ:
+    {
         friends_manager_.lobby_logout_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
+        close_session(n_session_id);
+        return;
+    }
+    case message_type::MATCH_CONFIRM:
+    {
+        session *request_session = get_session(n_session_id);
+        if (request_session->get_status() == status::MATCH_COMPLETE)
+        {
+            close_session(n_session_id);
         }
-        break;
+        else
+        {
+            error_report error_message;
+            error_message.set_error_string("Your did not request match!");
+            int send_data_size = error_message.ByteSize() + packet_header_size;
+            char *send_data = packet_handler_.incode_message(error_message);
+            
+            request_session->post_send(false, send_data_size, send_data);
+        }
+        return;
+    }
     default:
         // 정의하지 않은 메세지는 로그로 남김
         break;
@@ -153,7 +170,6 @@ void tcp_server::handle_accept(session * p_session, const boost::system::error_c
 {
     if (!error)
     {
-        std::cout << "클라이언트 접속 성공, SessionID: " << p_session->get_session_id() << std::endl;
         p_session->init();
         p_session->post_receive();
         post_accept();

@@ -6,6 +6,8 @@ tcp_client::tcp_client(boost::asio::io_service& io_service)
     :io_service_(io_service), socket_(io_service)
 {
     InitializeCriticalSectionAndSpinCount(&lock_, 4000);
+    is_login_ = false;
+    TEMP_COUNT = 0;
 }
 
 tcp_client::~tcp_client()
@@ -70,7 +72,7 @@ void tcp_client::post_send(const bool immediate, const int size, BYTE* data)
     // CRITICAL SECTION END
 }
 
-void tcp_client::post_verify()
+void tcp_client::post_verify_req()
 {
     chat_server::packet_verify_req verify_message;
     verify_message.set_key_string(key_);
@@ -84,22 +86,40 @@ void tcp_client::post_verify()
     CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
     verify_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
 
-    post_send(false, message_header_size + header.size, send_buffer_.begin());
+    boost::system::error_code error;
+    socket_.write_some(boost::asio::buffer(send_buffer_.begin(), message_header_size + header.size), error);
+    size_t size = socket_.read_some(boost::asio::buffer(receive_buffer_), error);
+
+    process_packet(size);
 }
 
-void tcp_client::post_match(std::string opponent_id)
+void tcp_client::post_enter_match(std::string opponent_id)
 {
-    chat_server::packet_match_req match_message;
-    match_message.set_user_id(user_id_);
-    match_message.set_opponent_id(opponent_id);
+    chat_server::packet_enter_match_ntf enter_match_message;
+    enter_match_message.set_opponent_id(opponent_id);
 
     MESSAGE_HEADER header;
 
-    header.size = match_message.ByteSize();
-    header.type = chat_server::MATCH_REQ;
+    header.size = enter_match_message.ByteSize();
+    header.type = chat_server::ENTER_MATCH_NTF;
 
     CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
-    match_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
+    enter_match_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
+
+    post_send(false, message_header_size + header.size, send_buffer_.begin());
+}
+
+void tcp_client::post_leave_match()
+{
+    chat_server::packet_leave_match_ntf leave_match_message;
+
+    MESSAGE_HEADER header;
+
+    header.size = leave_match_message.ByteSize();
+    header.type = chat_server::LEAVE_MATCH_NTF;
+
+    CopyMemory(send_buffer_.begin(), (void*)&header, message_header_size);
+    leave_match_message.SerializeToArray(send_buffer_.begin() + message_header_size, header.size);
 
     post_send(false, message_header_size + header.size, send_buffer_.begin());
 }
@@ -183,7 +203,6 @@ void tcp_client::post_receive()
         boost::bind(&tcp_client::handle_receive, this,
             boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred)
-
     );
 }
 
@@ -191,12 +210,12 @@ void tcp_client::handle_connect(const boost::system::error_code& error)
 {
     if (!error)
     {
-        std::cout << "서버 접속 성공" << std::endl;
+        std::cout << "Server connection successed" << std::endl;
 
         post_receive();
     }
     else
-        std::cout << "서버 접속 실패. error No: " << error.value() << " error Message: " << error.message() << std::endl;
+        std::cout << "Server connection failed. error No: " << error.value() << " error Message: " << error.message() << std::endl;
 }
 
 void tcp_client::handle_write(const boost::system::error_code& error, size_t bytes_transferred)
@@ -214,7 +233,7 @@ void tcp_client::handle_write(const boost::system::error_code& error, size_t byt
     LeaveCriticalSection(&lock_);
     // CRITICAL SECTION END
 
-
+    
     if (data != nullptr)
     {
         MESSAGE_HEADER* header = (MESSAGE_HEADER*)data;
@@ -227,7 +246,7 @@ void tcp_client::handle_receive(const boost::system::error_code& error, size_t b
     if (error)
     {
         if (error == boost::asio::error::eof)
-            std::cout << "클라이언트와 연결이 끊어졌습니다" << std::endl;
+            std::cout << "Disconnected with server" << std::endl;
         else
             std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
 
@@ -235,12 +254,14 @@ void tcp_client::handle_receive(const boost::system::error_code& error, size_t b
     }
     else
     {
-        process_packet(bytes_transferred);
-        post_receive();
+        if (process_packet(bytes_transferred))
+            post_receive();
+        else
+            return;
     }
 }
 
-void tcp_client::process_packet(const int size)
+bool tcp_client::process_packet(const int size)
 {
     CopyMemory(&packet_buffer_, receive_buffer_.data(), size);
 
@@ -248,26 +269,67 @@ void tcp_client::process_packet(const int size)
 
     switch (message_header->type)
     {
-    case chat_server::VERIFY_RES:
+    case chat_server::VERIFY_ANS:
+        {
+            chat_server::packet_verify_ans verify_message;
+        
+            verify_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+
+            if (!verify_message.is_successful())
+            {
+                std::cout << "Cookie or ID is incorrect." << std::endl;
+                return false;
+            }
+            else
+                is_login_ = true;
+        }
+    break;
+
+    case chat_server::LOGOUT_ANS:
+        {
+            chat_server::packet_logout_ans logout_message;
+
+            logout_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+
+            if (!logout_message.is_successful())
+            {
+                std::cout << "Logout Failed" << std::endl;
+                return true;
+            }
+            else
+                return false;
+        }
         break;
-    case chat_server::MATCH_RES:
-        break;
+
+
 
     case chat_server::NORMAL:
-    {
-        chat_server::packet_chat_normal normal_message;
+        {
+            chat_server::packet_chat_normal normal_message;
         
-        normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+            normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
 
-        std::cout << normal_message.user_id() << "> ";
-        std::cout << normal_message.chat_message() << std::endl;
-    }
+            std::cout << normal_message.user_id() << "> ";
+            std::cout << normal_message.chat_message() << std::endl;
+
+            //TEMP_COUNT++;
+            //if (TEMP_COUNT >= 100)
+            //{
+            //    std::cout << user_id_ << " / 100" << std::endl;
+            //    TEMP_COUNT = 0;
+            //}
+        }
     break;
+
     case chat_server::WHISPER:
         break;
+
     case chat_server::ROOM:
         break;
+
     case chat_server::NOTICE:
         break;
     }
+
+    return true;
 }

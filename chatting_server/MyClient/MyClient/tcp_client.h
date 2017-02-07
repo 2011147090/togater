@@ -37,6 +37,8 @@ private:
 
     bool is_login_;
 
+    int TEMP_COUNT;
+
     
     void post_receive();
 
@@ -44,13 +46,14 @@ private:
     void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
     
-    void process_packet(const int size);
+    bool process_packet(const int size);
     
 public:
     tcp_client(boost::asio::io_service& io_service);
     ~tcp_client();
     
     bool is_connection() { return socket_.is_open(); }
+    bool is_login() { return is_login_; }
     
     void connect(boost::asio::ip::tcp::endpoint endpoint);
     void close();
@@ -61,8 +64,9 @@ public:
 
     void post_send(const bool immediate, const int size, BYTE* data);
 
-    void post_verify();
-    void post_match(std::string opponent_id);
+    void post_verify_req();
+    void post_enter_match(std::string opponent_id);
+    void post_leave_match();
 
     void post_normal(std::string message);
     void post_whisper(std::string target_id, std::string message);
