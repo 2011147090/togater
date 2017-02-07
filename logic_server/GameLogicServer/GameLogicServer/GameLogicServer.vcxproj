@@ -158,7 +158,7 @@
   <ItemGroup>
     <ClCompile Include="configurator.cpp" />
     <ClCompile Include="connected_session.cpp" />
-    <ClCompile Include="db_connector.cpp" />
+    <ClCompile Include="database_connector.cpp" />
     <ClCompile Include="logic_server.pb.cc" />
     <ClCompile Include="logic_worker.cpp" />
     <ClCompile Include="log_manager.cpp" />
@@ -173,7 +173,7 @@
     <ClInclude Include="configurator.h" />
     <ClInclude Include="connected_session.h" />
     <ClInclude Include="critical_section.h" />
-    <ClInclude Include="db_connector.h" />
+    <ClInclude Include="database_connector.h" />
     <ClInclude Include="logic_server.pb.h" />
     <ClInclude Include="random_generator.h" />
     <ClInclude Include="redispp.h" />

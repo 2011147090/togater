@@ -17,4 +17,5 @@ public:
     bool check_room(std::string room_key);
     bool remove_room_info(std::string room_key);
     bool remove_player_info(std::string player_key);
+    std::string get_id(std::string player_key);
 };

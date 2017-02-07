@@ -1,6 +1,6 @@
 #pragma once
 
-// Standard
+// standard
 #include <ctime>
 #include <string>
 #include <iostream>
@@ -9,7 +9,7 @@
 #include <fstream>
 #include <random>
 
-// Boost
+// boost
 #include <boost/asio.hpp>
 #include <boost/pool/pool.hpp>
 #include <boost/function.hpp>
@@ -22,13 +22,10 @@
 #include <boost/config.hpp>
 #include <boost/unordered_map.hpp>
 
-//#include <boost/random/random_device.hpp>
-//#include <boost/random/uniform_int_distribution.hpp>
-
-// Json Spirit
+// json Spirit
 #include <json_spirit.h>
 
-// Speed Log
+// speed Log
 #include <spdlog\spdlog.h>
 
 // redispp
@@ -41,7 +38,7 @@
 
 #include "logic_server.pb.h"
 
-enum { BUFSIZE = 128 };
+enum { BUFSIZE = 512 };
 
 using boost::asio::ip::tcp;
 

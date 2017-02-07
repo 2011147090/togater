@@ -2,7 +2,7 @@
 #include "connected_session.h"
 #include "log_manager.h"
 
-connected_session::connected_session(boost::asio::io_service& io_service) : socket_(io_service)
+connected_session::connected_session(boost::asio::io_service& io_service) : socket_(io_service), safe_disconnect_(true), enter_room_(false), is_accept_(false)
 {}
 
 bool connected_session::handle_check_keep_alive()
@@ -40,8 +40,11 @@ void connected_session::shut_down()
 {
     thread_sync sync;
 
-    socket_.shutdown(boost::asio::socket_base::shutdown_receive);
-    socket_.close();
+    if (socket_.is_open())
+    {
+        socket_.shutdown(boost::asio::socket_base::shutdown_receive);
+        socket_.close();
+    }
 }
 
 std::string connected_session::get_player_key()
@@ -132,7 +135,15 @@ void connected_session::handle_read(const boost::system::error_code& error, size
         }
     }
     else
+    {
         system_log->error("handle_read_error:{}", error.message());
+        
+        if (is_connected())
+        {
+            safe_disconnect_ = false;
+            this->shut_down();
+        }
+    }
 }
 
 bool connected_session::is_connected()
@@ -167,4 +178,27 @@ void connected_session::start()
         boost::bind(&connected_session::handle_read, shared_from_this(),
             boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred));
+
+    is_accept_ = true;
+}
+
+bool connected_session::is_safe_disconnect()
+{
+    thread_sync sync;
+
+    return safe_disconnect_;
+}
+
+bool connected_session::is_start_game()
+{
+    thread_sync sync;
+
+    return enter_room_;
+}
+
+bool connected_session::accept_client()
+{
+    thread_sync sync;
+
+    return is_accept_;
 }

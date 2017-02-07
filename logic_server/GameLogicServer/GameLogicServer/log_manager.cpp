@@ -6,6 +6,9 @@ log_manager::~log_manager() {}
 
 bool log_manager::init_singleton()
 {
+    is_debug_mode_ = false;
+    console = spd::stdout_color_mt("console");
+
     return true;
 }
 
@@ -31,6 +34,11 @@ std::shared_ptr<spd::logger> log_manager::get_logger(std::string logger_name, st
 {
     thread_sync sync;
 
+    if (is_debug_mode_)
+    {
+        return console;
+    }
+
     auto iter = logger_list.find(file_name);
 
     if (iter == logger_list.end())
@@ -43,6 +51,7 @@ std::shared_ptr<spd::logger> log_manager::get_logger(std::string logger_name, st
         spd::drop_all();
         
         logger_list.insert(std::pair<std::string, LOGGER_INFO>(file_name, new_logger));
+        
         return (*logger_list.find(file_name)).second.logger;
     }
         
@@ -89,4 +98,9 @@ bool log_manager::erase_logger(std::string name)
     logger_list.erase(iter);
 
     return true;
+}
+
+void log_manager::set_debug_mode(bool is_debug_mode)
+{
+    is_debug_mode_ = is_debug_mode;
 }

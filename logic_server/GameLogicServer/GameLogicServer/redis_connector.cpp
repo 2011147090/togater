@@ -78,3 +78,18 @@ bool redis_connector::remove_player_info(std::string player_key)
 
     return true;
 }
+
+std::string redis_connector::get_id(std::string player_key)
+{
+    thread_sync sync;
+
+    auto value = conn->get(player_key);
+
+    if (!value.result().is_initialized())
+    {
+        system_log->error("redis_connector:check_room, room_key_is_null");
+        return false;
+    }
+
+    return value.result().get().c_str();
+}

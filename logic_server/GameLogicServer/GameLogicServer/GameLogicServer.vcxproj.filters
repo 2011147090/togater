@@ -77,7 +77,7 @@
     <ClCompile Include="configurator.cpp">
       <Filter>소스 파일\system\configurator</Filter>
     </ClCompile>
-    <ClCompile Include="db_connector.cpp">
+    <ClCompile Include="database_connector.cpp">
       <Filter>소스 파일\system\database_connector</Filter>
     </ClCompile>
   </ItemGroup>
@@ -118,7 +118,7 @@
     <ClInclude Include="configurator.h">
       <Filter>소스 파일\system\configurator</Filter>
     </ClInclude>
-    <ClInclude Include="db_connector.h">
+    <ClInclude Include="database_connector.h">
       <Filter>소스 파일\system\database_connector</Filter>
     </ClInclude>
   </ItemGroup>

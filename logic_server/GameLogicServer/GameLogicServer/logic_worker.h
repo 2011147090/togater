@@ -6,8 +6,6 @@
 #include "critical_section.h"
 
 typedef struct _PLAYER_INFO {
-    std::string id_;
-
     bool submit_card_;
     int opponent_card_num_;
 

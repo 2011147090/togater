@@ -40,7 +40,7 @@ public:
     db_query();
 };
 
-class db_connector : public singleton<db_connector>, public multi_thread_sync<db_connector> {
+class database_connector : public singleton<database_connector>, public multi_thread_sync<database_connector> {
 private:
     DB_CONNECTION session_;
     std::queue<db_query> queue_list_;
@@ -55,3 +55,5 @@ public:
     bool push_query(db_query query);
     void process_queue();
 };
+
+#define db_connector database_connector::get_instance()

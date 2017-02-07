@@ -10,11 +10,15 @@ void connected_session::process_packet_enter_req(logic_server::packet_enter_req 
 
     if (logic_worker::get_instance()->enter_room_player(this, packet.room_key()))
     {
+        enter_room_ = true;
         recevie_packet.set_result(1);
     }
     else
+    {
         recevie_packet.set_result(0);
-    
+        this->shut_down();
+    }
+
     handle_send(logic_server::ENTER_ANS, recevie_packet);
 }
 

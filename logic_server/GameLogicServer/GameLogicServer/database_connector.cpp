@@ -1,4 +1,4 @@
-#include "db_connector.h"
+#include "database_connector.h"
 
 _DB_CONNECTION::_DB_CONNECTION()
 {
@@ -8,7 +8,7 @@ _DB_CONNECTION::_DB_CONNECTION()
     query_state_ = 0;
 }
 
-bool db_connector::init_singleton()
+bool database_connector::init_singleton()
 {
     thread_sync sync;
 
@@ -27,7 +27,7 @@ bool db_connector::init_singleton()
     if (session_.connection_ == nullptr)
         return false;
     
-    work_thread = new std::thread(&db_connector::process_queue, this);
+    work_thread = new std::thread(&database_connector::process_queue, this);
 
     if (work_thread == nullptr)
         return false;
@@ -35,7 +35,7 @@ bool db_connector::init_singleton()
     return true;
 }
 
-bool db_connector::release_singleton()
+bool database_connector::release_singleton()
 {
     thread_sync sync;
 
@@ -48,7 +48,7 @@ bool db_connector::release_singleton()
     return true;
 }
 
-bool db_connector::push_query(db_query query)
+bool database_connector::push_query(db_query query)
 {
     thread_sync sync;
 
@@ -57,8 +57,10 @@ bool db_connector::push_query(db_query query)
     return true;
 }
 
-void db_connector::process_queue()
+void database_connector::process_queue()
 {
+    is_work = true;
+
     while (is_work)
     {
         thread_sync sync;
@@ -73,9 +75,17 @@ void db_connector::process_queue()
             query.query_.c_str()
         );
 
-        //if (iter->query_state_ != 0) error;
+        if (session_.query_state_ != 0)
+        {
+            int k;
+        }
 
         session_.sql_result_ = mysql_store_result(session_.connection_);
+
+        if (session_.sql_result_ == nullptr)
+        {
+            int aSD;
+        }
 
         if (query.callback_func != nullptr)
             query.callback_event(session_.sql_result_);
