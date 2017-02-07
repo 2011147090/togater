@@ -7,6 +7,7 @@ session::session(int session_id, boost::asio::io_service &io_service, tcp_server
     : session_id_(session_id)
     , socket_(io_service)
     , channel_serv_(p_channel_serv)
+    , timer_(io_service)
 {
     stat_ = status::WAIT;
 }
@@ -63,6 +64,17 @@ void session::post_send(const bool immediately, const int send_data_size, char *
     );
 }
 
+void session::on_timer(const boost::system::error_code & error)
+{
+    channel_serv_->rematching_request(this);
+}
+
+void session::set_timer(int sec)
+{
+    timer_.expires_from_now(std::chrono::seconds(sec));
+    timer_.async_wait(boost::bind(&session::on_timer, this, boost::asio::placeholders::error));
+}
+
 void session::handle_write(const boost::system::error_code & error, size_t bytes_transferred)
 {
     delete[] send_data_queue_.front();
@@ -70,8 +82,13 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
 
     if (stat_ == status::MATCH_COMPLETE || stat_ == status::LOGOUT) 
     {
-        send_data_queue_.clear();
-        socket_.close();
+        channel_serv_->close_session(session_id_);
+        while (send_data_queue_.empty() == false)
+        {
+            delete[] send_data_queue_.front();
+            send_data_queue_.pop_front();
+        }
+        return;
     }
 
     if (send_data_queue_.empty() == false)
@@ -89,16 +106,17 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
         
         if (error == boost::asio::error::eof)
         {
-            std::cout << "클라이언트와 연결이 끊어졌습니다" << std::endl; //log
+            log_manager::get_instance()->get_logger()->info("[Recv Error No : {0:d}] [Error Message : { }] [User ID : { }]", error.value(), error.message(), get_user_id());
             channel_serv_->close_session(session_id_);
         }
         else if(error == boost::asio::error::connection_reset)
         {
+            log_manager::get_instance()->get_logger()->warn("[Recv Error No : {0:d}] [Error Message : { }] [User ID : { }]", error.value(), error.message(), get_user_id());
             channel_serv_->close_session(session_id_);
         }
         else
         {
-            //std::cout << "Recv error No: " << error.value() << "error Message: " << error.message() << std::endl;
+            log_manager::get_instance()->get_logger()->warn("[Recv Error No : {0:d}] [Error Message : { }] [User ID : { }]", error.value(), error.message(),get_user_id());
             channel_serv_->close_session(session_id_);
         }
     }
@@ -111,7 +129,6 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
 
         while (n_packet_data > 0) 
         {
-            //std::cout << "session_id[" << session_id_ << "]" << " : " << n_packet_data << std::endl;
             if (n_packet_data < packet_header_size)
             {
                 break;

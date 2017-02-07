@@ -2,11 +2,11 @@
 
 
 
-match_manager::match_manager(packet_handler & packet_handler, friends_manager & friends_manager, redispp::Connection & redis_connection)
+match_manager::match_manager(packet_handler & packet_handler, friends_manager & friends_manager, redis_connector & redis_connection)
     : packet_handler_(packet_handler)
     , friends_manager_(friends_manager)
     , redis_connection_(redis_connection)
-{ room_number = 3000;}
+{ }
 
 match_manager::~match_manager()
 { }
@@ -24,7 +24,7 @@ void match_manager::process_matching(session *request_session, const char *packe
 {
     match_request message;
     packet_handler_.decode_message(message, packet, data_size);
-    rating_name rating_name_ = packet_handler_.check_rating(request_session->get_rating());
+    rating rating_name_ = packet_handler_.check_rating(request_session->get_rating());
 
     set_matching_que(request_session, rating_name_);
 }
@@ -51,20 +51,21 @@ void match_manager::process_matching_with_friends(session *request_session, cons
     {
     case match_with_friends_relay::ACCEPT:
     {
-        if (recv_session == nullptr && request_session->get_status() != status::MATCH_RECVER && recv_session->get_status() != status::MATCH_REQUEST)
+        if (recv_session == nullptr && request_session->get_status() != status::MATCH_RECVER && recv_session->get_status() != status::MATCH_APPLY)
         {
             relay_message.set_type(match_with_friends_relay::DENY);
             request_session->post_send(false, relay_message.ByteSize() + packet_header_size, packet_handler_.incode_message(relay_message));
+            log_manager::get_instance()->get_logger()->warn("[Match Accept] [ERROR : Not found user or invalid status]");
             return;
         }
-        std::cout << request_session->get_user_id() << " 가 " << recv_session->get_user_id() << " 의 신청을 수락 " << std::endl;
+        
         match_complete match_message[2];
         user_info *match_user[2];
         session *player[2];
         
         std::string redis_room_key = generate_room_key();
         
-        redis_connection_.set(redis_room_key, "0");
+        redis_connection_.set_reids_kv(redis_room_key, "0");
 
         for (int i = 0; i < 2; i++)
         {
@@ -93,24 +94,26 @@ void match_manager::process_matching_with_friends(session *request_session, cons
             player[i]->set_status(status::MATCH_COMPLETE);
             player[i]->post_send(false, match_message[i].ByteSize() + packet_header_size, packet_handler_.incode_message(match_message[i]));
         }
-        std::cout << request_session->get_user_id() << " 와 " << recv_session->get_user_id() << " 가 대결 시작 " << std::endl;
+        log_manager::get_instance()->get_logger()->info("[Match Accept] [Req ID : { }] [Target Id : { }]", request_session->get_user_id(), recv_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Match Complete] [Req ID : { }] [Target Id : { }]", request_session->get_user_id(), recv_session->get_user_id());
     }
         break;
     case match_with_friends_relay::APPLY:
     {
         if (recv_session != nullptr && request_session->get_status() == status::LOGIN && recv_session->get_status() == status::LOGIN)
         {
-            std::cout << request_session->get_user_id() << " 가 " << recv_session->get_user_id() << " 에게 대결 신청 " << std::endl;
             relay_message.set_target_id(request_session->get_user_id());
-            request_session->set_status(status::MATCH_REQUEST);
+            request_session->set_status(status::MATCH_APPLY);
             recv_session->set_status(status::MATCH_RECVER);
             recv_session->post_send(false, relay_message.ByteSize() + packet_header_size, packet_handler_.incode_message(relay_message));
+            log_manager::get_instance()->get_logger()->info("[Match Apply] [Req ID : { }] [Target Id : { }]", request_session->get_user_id(), recv_session->get_user_id());
             return;
         }
         else
         {
             relay_message.set_type(match_with_friends_relay::DENY);
             request_session->post_send(false, error_message.ByteSize() + packet_header_size, packet_handler_.incode_message(error_message));
+            log_manager::get_instance()->get_logger()->warn("[Match Apply] [ERROR : Not found user or invalid status]");
         }
     }
         break;
@@ -118,17 +121,18 @@ void match_manager::process_matching_with_friends(session *request_session, cons
     {
         if (recv_session != nullptr && request_session->get_status() == status::MATCH_RECVER && recv_session->get_status() == status::MATCH_REQUEST)
         {
-            std::cout << request_session->get_user_id() << " 가 " << recv_session->get_user_id() << " 에게 대결 거절 " << std::endl;
             relay_message.set_target_id(request_session->get_user_id());
             request_session->set_status(status::LOGIN);
             recv_session->set_status(status::LOGIN);
             recv_session->post_send(false, relay_message.ByteSize() + packet_header_size, packet_handler_.incode_message(relay_message));
+            log_manager::get_instance()->get_logger()->info("[Match Deny] [Req ID : { }] [Target Id : { }]", request_session->get_user_id(), recv_session->get_user_id());
             return;
         }
         else
         {
             error_message.set_error_string("Not Found or You do not have permission");
             request_session->post_send(false, error_message.ByteSize() + packet_header_size, packet_handler_.incode_message(error_message));
+            log_manager::get_instance()->get_logger()->warn("[Match Deny] [ERROR : Not found user or invalid status]");
         }
     }
         break;
@@ -137,45 +141,43 @@ void match_manager::process_matching_with_friends(session *request_session, cons
     }
 }
 
+void match_manager::rematching_que(session * request_session)
+{
+    rating rating_name = packet_handler_.check_rating(request_session->get_rating());
+    if (request_session->get_status() == status::MATCH_REQUEST)
+    {
+        for (int i = bronze; i < MAX_RATING; ++i)
+        {
+            if (i != rating_name)
+            {
+                set_matching_que(request_session, (rating)i);
+            }
+        }
+        log_manager::get_instance()->get_logger()->info("[Rematching] [Rematch Complete]");
+    }
+    else if (request_session->get_status() == status::MATCH_COMPLETE)
+    {
+        log_manager::get_instance()->get_logger()->info("[Don't Need Rematching] [In Game]");
+        return;
+    }
+    else
+    {
+        log_manager::get_instance()->get_logger()->warn("[Rematching] [ERROR : invalid status]");
+        return;
+    }
+}
 
 
-void match_manager::set_matching_que(session * request_session, rating_name request_rating)
+
+void match_manager::set_matching_que(session * request_session, rating request_rating)
 {
     request_session->set_status(status::MATCH_REQUEST);
     std::cout << "[MATCH_REQ] [USER ID : " << request_session->get_user_id() << " ] " << std::endl;
-    switch (request_rating)
-    {
-    case bronze:
-        bronze_que.push_back(request_session);
-        get_matching_que(bronze_que);
-        break;
-    case silver:
-        silver_que.push_back(request_session);
-        get_matching_que(silver_que);
-        break;
-    case gold:
-        gold_que.push_back(request_session);
-        get_matching_que(gold_que);
-        break;
-    case platinum:
-        platinum_que.push_back(request_session);
-        get_matching_que(platinum_que);
-        break;
-    case diamond:
-        diamond_que.push_back(request_session);
-        get_matching_que(diamond_que);
-        break;
-    case master:
-        master_que.push_back(request_session);
-        get_matching_que(master_que);
-        break;
-    case challenger:
-        challenger_que.push_back(request_session);
-        get_matching_que(challenger_que);
-        break;
-    default:
-        break;
-    }
+    rank_que_mtx[request_rating].lock();
+    matching_que[request_rating].push_back(request_session);
+    get_matching_que(matching_que[request_rating]);
+    rank_que_mtx[request_rating].unlock();
+    log_manager::get_instance()->get_logger()->info("[Match Request] [Req ID : { }]",request_session->get_user_id());
 }
 
 void match_manager::get_matching_que(std::deque<session *> &target_que) //shared_resouce
@@ -186,13 +188,18 @@ void match_manager::get_matching_que(std::deque<session *> &target_que) //shared
 
         player[0] = target_que.front();
         target_que.pop_front();
+        
+        
         if (!(player[0]->get_socket().is_open()) || (player[0]->get_status() != status::MATCH_REQUEST))
         {
             return;
         }
 
+        
         player[1] = target_que.front();
         target_que.pop_front();
+        
+
         if (!(player[1]->get_socket().is_open()) || (player[1]->get_status() != status::MATCH_REQUEST))
         {
             target_que.push_front(player[0]);
@@ -203,8 +210,8 @@ void match_manager::get_matching_que(std::deque<session *> &target_que) //shared
         user_info *match_info[2];
         std::string redis_room_key = generate_room_key();
 
-        std::cout << redis_room_key << std::endl;
-        redis_connection_.set(redis_room_key, "0");
+        
+        redis_connection_.set_reids_kv(redis_room_key, "0");
 
         
         match_info[0] = message[1].mutable_opponent_player();
@@ -227,11 +234,12 @@ void match_manager::get_matching_que(std::deque<session *> &target_que) //shared
             player[i]->set_status(status::MATCH_COMPLETE);
             player[i]->post_send(false, message[i].ByteSize() + packet_header_size, packet_handler_.incode_message(message[i]));
         }
-        //큐배분
+        log_manager::get_instance()->get_logger()->info("[Match Complete] [Player 1 : { }] [Player 2: { }]", player[0]->get_user_id(), player[1]->get_user_id());
     }
     else
     {
-        //비동기 타이머 셋팅 큐가 안잡히는 하위 티어 애들과 매칭 잡아줌
+        log_manager::get_instance()->get_logger()->info("[Match Waiting] [Req ID : { }]",target_que.front()->get_user_id());
+        target_que.front()->set_timer(30);
     }
 }
 

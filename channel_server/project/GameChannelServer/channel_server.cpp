@@ -3,12 +3,13 @@
 
 
 tcp_server::tcp_server(boost::asio::io_service & io_service, friends_manager& friends, match_manager& match, packet_handler& packet_handler)
-    : acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),PORT_NUMBER))
+    : acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),port))
     , friends_manager_(friends)
     , match_manager_(match)
     , packet_handler_(packet_handler)
 {
     accepting_flag_ = false;
+    load_server_config();
 }
 
 tcp_server::~tcp_server()
@@ -23,9 +24,9 @@ tcp_server::~tcp_server()
     }
 }
 
-void tcp_server::init(const int n_max_session_count)
+void tcp_server::init()
 {
-    for (int i = 0; i < n_max_session_count; ++i)
+    for (int i = 0; i < max_session_count; ++i)
     {
         session *p_session = new session(i, acceptor_.get_io_service(), this);
         session_list_.push_back(p_session);
@@ -35,8 +36,12 @@ void tcp_server::init(const int n_max_session_count)
 
 void tcp_server::start()
 {
-    std::cout << "[CHANNEL SERVER] [START] [PORT : 8800] [SINGLE THREAD]" << std::endl;
-    post_accept();
+    for (int i = 0; i < max_thread; ++i)
+    {
+        post_accept();
+        boost::thread t(boost::bind(&boost::asio::io_service::run, &acceptor_.get_io_service()));
+    }
+    log_manager::get_instance()->get_logger()->info("[Channel Server] [Thread : {0:d} | Port : {1:d}]", max_thread, port);
 }
 
 void tcp_server::close_session(const int n_session_id)
@@ -49,31 +54,31 @@ void tcp_server::close_session(const int n_session_id)
         //비정상 종료
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        std::cout << "세션 ID : " << n_session_id << "비정상 종료" << std::endl;
+        log_manager::get_instance()->get_logger()->info("[Unusual Terminate] [User ID : { }]", request_session->get_user_id());
     }
     else if (request_session->get_status() == status::LOGOUT)
     {
         //정상 종료
-        std::cout << "세션 ID : " << n_session_id << "로그 아웃" << std::endl;
+        log_manager::get_instance()->get_logger()->info("[Log Out] [User ID : { }]", request_session->get_user_id());
     }
     else if (request_session->get_status() == status::MATCH_COMPLETE)
     {
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        //std::cout << "세션 ID : " << n_session_id << "매칭 완료" << std::endl;
+        log_manager::get_instance()->get_logger()->info("[Log Out] [Matching complete] [User ID : { }]", request_session->get_user_id());
         //정상 종료
     }
     else if (request_session->get_status() == status::MATCH_RECVER)
     {
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        std::cout << "세션 ID : " << n_session_id << "비정상 종료" << std::endl;
+        log_manager::get_instance()->get_logger()->info("[Unusual Terminate] [Match_recver] [User ID : { }]", request_session->get_user_id());
         //비정상 종료
     }
     else if (request_session->get_status() == status::MATCH_REQUEST)
     {
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        std::cout << "세션 ID : " << n_session_id << "비정상 종료" << std::endl;
+        log_manager::get_instance()->get_logger()->info("[Unusual Terminate] [Match_request] [User ID : { }]", request_session->get_user_id());
         //비정상 종료
     }
     else
@@ -148,18 +153,25 @@ void tcp_server::process_packet(const int n_session_id, const char * p_data)
     }
 }
 
+void tcp_server::rematching_request(session * request_session)
+{
+    match_manager_.rematching_que(request_session);
+}
+
 bool tcp_server::post_accept()
 {
+    session_queue_mtx.lock();
+   
     if (session_queue_.empty())
     {
         accepting_flag_ = false;
         return false;
     }
-    
     accepting_flag_ = true;
     int n_session_id = session_queue_.front();
-    
     session_queue_.pop_front();
+    
+    session_queue_mtx.unlock();
     
     acceptor_.async_accept(session_list_[n_session_id]->get_socket(), boost::bind(&tcp_server::handle_accept, this, session_list_[n_session_id], boost::asio::placeholders::error));
 
@@ -172,10 +184,20 @@ void tcp_server::handle_accept(session * p_session, const boost::system::error_c
     {
         p_session->init();
         p_session->post_receive();
+        log_manager::get_instance()->get_logger()->info("[Session Connect] [Session ID : {0:d}]",p_session->get_session_id());
         post_accept();
     }
     else
     {
-        std::cout << "Accept error No: " << error.value() << "error Message : " << error.message() << std::endl;
+        log_manager::get_instance()->get_logger()->warn("[Accept Error No : {0:d}] [Error Message : { }] ",error.value(), error.message());
     }
+}
+
+void tcp_server::load_server_config()
+{
+    config::get_instance()->get_value("SERVER_CONFIG", "MAX_THREAD", max_thread);
+    config::get_instance()->get_value("SERVER_CONFIG", "PORT", port);
+    config::get_instance()->get_value("SERVER_CONFIG", "MAX_BUFFER_LEN", max_buffer_len);
+    config::get_instance()->get_value("SERVER_CONFIG", "MAX_TOKEN_SIZE", max_token_size);
+    config::get_instance()->get_value("SERVER_CONFIG", "MAX_SESSION_COUNT", max_session_count);
 }

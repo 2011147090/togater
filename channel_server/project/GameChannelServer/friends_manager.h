@@ -3,15 +3,17 @@
 #include <iostream>
 #include <string>
 #include "server_session.h"
+#include "log_manager.h"
 #include "protocol.h"
-#include "redispp.h"
+#include "redis_connector.h"
 #include "db_connector.h"
-
+#include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>
 
 class friends_manager
 {
 public:
-    friends_manager(redispp::Connection& redis_connector, packet_handler& handler, db_connector &mysql);
+    friends_manager(redis_connector& redis_connector, packet_handler& handler, db_connector &mysql);
     ~friends_manager();
     bool lobby_login_process(session *login_session, const char *packet, const int packet_size);
     void del_redis_token(std::string token);
@@ -24,9 +26,11 @@ public:
     void del_id_in_user_map(std::string target_id);
     void add_id_in_user_map(session *request_session, std::string request_id);
 private:
-    redispp::Connection& redis_connector_;
+    redis_connector& redis_connector_;
     packet_handler& packet_handler_;
     std::map<std::string, session *> user_id_map_;
+
+    boost::mutex user_id_map_mtx;
     /* data base connection */
     db_connector &db_connector_;
 };

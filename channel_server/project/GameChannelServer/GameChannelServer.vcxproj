@@ -86,7 +86,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MYSQL_DIR)\include;$(BOOST_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(PROTOBUF_DIR);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(MYSQL_DIR)\include;$(BOOST_DIR);$(JSON_SPIRIT_DIR)\include;$(SPD_LOG_DIR)\include;$(PROTOBUF_DIR);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <LibraryPath>$(MYSQL_DIR)\lib;$(JSON_SPIRIT_DIR)\lib\release;$(BOOST_DIR)\lib64-msvc-14.0;$(PROTOBUF_DIR);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -165,10 +165,10 @@
     <ClCompile Include="log_manager.cpp" />
     <ClCompile Include="match_manager.cpp" />
     <ClCompile Include="redispp.cpp" />
+    <ClCompile Include="redis_connector.cpp" />
     <ClCompile Include="server_main.cpp" />
     <ClCompile Include="server_session.cpp" />
     <ClCompile Include="friends_manager.cpp" />
-    <ClCompile Include="singletone.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="channel_protobuf.pb.h" />
@@ -179,8 +179,10 @@
     <ClInclude Include="match_manager.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="redispp.h" />
+    <ClInclude Include="redis_connector.h" />
     <ClInclude Include="server_session.h" />
     <ClInclude Include="friends_manager.h" />
+    <ClInclude Include="singleton.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

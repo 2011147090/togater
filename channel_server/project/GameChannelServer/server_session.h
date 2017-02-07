@@ -2,6 +2,10 @@
 #include <deque>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/atomic.hpp>
+#include <boost/thread.hpp>
 #include "protocol.h"
 
 class tcp_server;
@@ -35,31 +39,36 @@ public:
     session(int session_id, boost::asio::io_service &io_service, tcp_server* p_channel_serv);
     ~session();
     
-    int get_session_id() { return session_id_; }
-        boost::asio::ip::tcp::socket& get_socket() { return socket_; }
-
+    inline int get_session_id() { return session_id_; }
+    inline boost::asio::ip::tcp::socket& get_socket() { return socket_; }
+    
+    
     void init();
-
     void post_receive();
-
     void post_send(const bool immediately, const int send_data_size, char *send_data);
 
     inline void set_token(const char* p_token) { memcpy(token_.data(), p_token, TOKEN_SIZE); }
     inline const char* get_token()            { return token_.data(); }
 
     inline void set_status(status state) { stat_ = state; }
-    inline status get_status() { return stat_; }
+    inline status get_status() { return stat_; } 
+    inline void lock_status() { status_mtx.lock(); }
+    inline void unlock_status() { status_mtx.unlock(); }
 
+    void on_timer(const boost::system::error_code & error);
+    void set_timer(int sec);
 private:
     void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
 
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
 
     std::array<char, TOKEN_SIZE> token_;
-    status stat_;
+    boost::atomic<status> stat_;
+    boost::mutex status_mtx;
     int session_id_;
     boost::asio::ip::tcp::socket socket_;
-    
+    boost::asio::steady_timer timer_;
+
     std::array<char, MAX_RECEIVE_BUFFER_LEN> receive_buffer_;
     int packet_buffer_mark_;
     char packet_buffer_[MAX_RECEIVE_BUFFER_LEN * 2];

@@ -1,30 +1,26 @@
-/* c++ stl */
 #include <iostream>
 /* boost lib */
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 /* spd_logger */
-#include <spdlog/spdlog.h>
-/* json_spirit */
-#include <json_spirit.h>
+#include "log_manager.h"
 /* protocol buffer */
 #include "protocol.h"
 /* redis util */
-// channel_server.h 에서 사용
+#include "redis_connector.h"
 /* mysql util */
 #include "db_connector.h"
-/* class */
-#include "log_manager.h"
+/* channel server */
 #include "channel_server.h"
 
 int main()
 {
     boost::asio::io_service io_service;
     MYSQL initail;
+    boost::asio::steady_timer timer(io_service);
     /* redis connector module */
-    redispp::Connection redis_conn(REDIS_SERVER_IP, REDIS_PORT, REDIS_PWD, false); 
-    
+    redis_connector redis_connector_main;
     /* mysql connector module*/
     db_connector db_connector_main(initail);
    
@@ -32,21 +28,17 @@ int main()
     packet_handler packet_handler_main;
     
     /* user manager module */
-    friends_manager friends_manager_main(redis_conn, packet_handler_main, db_connector_main);
-    match_manager match_manager_main(packet_handler_main,friends_manager_main,redis_conn);
-    
-    /* log manager module */
-
-    
-    /* config module */
-
+    friends_manager friends_manager_main(redis_connector_main, packet_handler_main, db_connector_main);
+    match_manager match_manager_main(packet_handler_main, friends_manager_main, redis_connector_main);
     
     /* main server */
-    tcp_server server(io_service, friends_manager_main, match_manager_main, packet_handler_main); // config module , log module , db connector
-    server.init(MAX_SESSION_COUNT);
-    server.start();
+    tcp_server server(io_service, friends_manager_main, match_manager_main, packet_handler_main);
+    int max_session_count;
     
+    server.init();
+    server.start();
     io_service.run();
+
     std::cout << "서버 종료" << std::endl;
     getchar();
     return 0;

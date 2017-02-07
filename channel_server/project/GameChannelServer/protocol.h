@@ -1,4 +1,6 @@
 #pragma once
+#include "config.h"
+
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 #include <google/protobuf/text_format.h>
 #include "channel_protobuf.pb.h"
@@ -6,25 +8,33 @@
 using namespace std;
 using namespace google;
 using namespace channel_server;
-/* redis */
-#define REDIS_SERVER_IP "192.168.1.201"
-//#define REDIS_SERVER_IP "127.0.0.1"
-#define REDIS_PORT "6379"
-#define REDIS_PWD "password"
 
-/* my sql */
-#define MYSQL_SERVER_IP "192.168.1.203"
-#define MYSQL_PORT 3306
-#define MYSQL_ID "root"
-#define MYSQL_PASSWORD "123123"
-#define MYSQL_DB_NAME "game"
+/* config */
 
-/* server */
-#define MAX_THREAD 8
+
+/* log mode */
+//#define LOG_CONSOL
+//
+///* redis */
+//#define REDIS_SERVER_IP "192.168.1.201"
+//#define REDIS_PORT "6379"
+//#define REDIS_PWD "password"
+//#define REDIS_POOL_SIZE 8
+//
+///* my sql */
+//#define CONNECTION_POOL_SIZE 8
+//#define MYSQL_SERVER_IP "192.168.1.203"
+//#define MYSQL_PORT 3306
+//#define MYSQL_ID "root"
+//#define MYSQL_PASSWORD "123123"
+//#define MYSQL_DB_NAME "game"
+//
+///* server */
+//#define MAX_THREAD 8
 #define MAX_RECEIVE_BUFFER_LEN 256
 #define TOKEN_SIZE 32
-const unsigned short PORT_NUMBER = 8800;
-const unsigned short MAX_SESSION_COUNT = 5000;
+//const unsigned short PORT_NUMBER = 8800;
+//const unsigned short MAX_SESSION_COUNT = 5000;
 
 /* session status */
 typedef enum session_status  
@@ -33,12 +43,14 @@ typedef enum session_status
     , LOGIN
     , LOGOUT
     , MATCH_REQUEST
+    , MATCH_APPLY
     , MATCH_RECVER
     , MATCH_COMPLETE
 } status;
 
 /* protobuf struct */
-typedef rating rating_name;
+#define MAX_RATING 7
+
 /* packet about join */
 typedef packet_join_req join_request;
 typedef packet_join_ans join_response;
@@ -47,18 +59,8 @@ typedef packet_join_ans join_response;
 typedef packet_friends_req friends_request;
 typedef packet_friends_ans friends_response;
 
-typedef packet_friends_req_req_type friends_request_type;
-const unsigned char friends_add = packet_friends_req::ADD;
-const unsigned char friends_del = packet_friends_req::DEL;
-const unsigned char friends_search = packet_friends_req::SEARCH;
-
-typedef packet_friends_ans_ans_type friends_reponse_type;
-const unsigned char add_success = packet_friends_ans::ADD_SUCCESS;
-const unsigned char add_fail = packet_friends_ans::ADD_FAIL;
-const unsigned char del_success = packet_friends_ans::DEL_SUCCESS;
-const unsigned char del_fail = packet_friends_ans::DEL_FAIL;
-const unsigned char search_success = packet_friends_ans::SEARCH_SUCCESS;
-const unsigned char search_fail = packet_friends_ans::SEARCH_FAIL;
+//typedef packet_friends_req_req_type friends_request_type;
+//typedef packet_friends_ans_ans_type friends_reponse_type;
 
 /* packet about game */
 typedef packet_play_rank_game_req match_request;
@@ -66,9 +68,6 @@ typedef packet_play_rank_game_ans match_response;
 typedef packet_matching_complete_ans match_complete;
 typedef packet_matching_confirm match_confirm;
 typedef packet_play_friends_game_rel match_with_friends_relay;
-const unsigned char normal_game_apply = packet_play_friends_game_rel::APPLY;
-const unsigned char normal_game_accept = packet_play_friends_game_rel::ACCEPT;
-const unsigned char normal_game_deny = packet_play_friends_game_rel::DENY;
 
 /* packet about logout*/
 typedef packet_logout_req logout_request;
