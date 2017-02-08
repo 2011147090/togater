@@ -27,7 +27,10 @@ bool redis_connector::init_singleton()
     return true;
 }
 
-bool redis_connector::release_singleton() { return true; }
+bool redis_connector::release_singleton() 
+{ 
+    return true; 
+}
 
 bool redis_connector::check_room(std::string room_key)
 {
