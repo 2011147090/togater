@@ -1,3 +1,4 @@
+#include "pre_headers.h"
 #include "log_manager.h"
 
 log_manager::log_manager() {}
@@ -28,6 +29,11 @@ bool log_manager::release_singleton()
     }
 
     return true;
+}
+
+void log_manager::set_create_time(int hour, int min)
+{
+
 }
 
 std::shared_ptr<spd::logger> log_manager::get_logger(std::string logger_name, std::string file_name)

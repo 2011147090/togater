@@ -1,5 +1,5 @@
 #pragma once
-#include "preHeaders.h"
+#include "pre_headers.h"
 #include "singleton.h"
 #include "critical_section.h"
 
@@ -18,6 +18,8 @@ private:
 public:
     std::shared_ptr<spd::logger> get_logger(std::string logger_name, std::string file_name);
     
+    void set_create_time(int hour, int min);
+
     bool set_logger(std::string name, int write_loop_num);
     bool erase_logger(std::string name);
     

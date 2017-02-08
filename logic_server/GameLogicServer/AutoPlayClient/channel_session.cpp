@@ -2,7 +2,7 @@
 #include "logic_session.h"
 #include "network_manager.h"
 
-void channel_session::handle_send(channel_server::message_type msg_type, const protobuf::Message& message)
+void channel_session::handle_send(channel_server::message_type msg_type, const protobuf::Message& message, bool must_recv)
 {
     thread_sync sync;
 
@@ -242,23 +242,8 @@ void channel_session::process_packet_matching_complete_ans(channel_server::packe
 {
     thread_sync sync;
     
-    /*game_mgr->get_scheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            game_manager::set_opponent_info,
-            game_mgr,
-            packet.mutable_opponent_player()->mutable_basic_info_()->id(),
-            packet.mutable_opponent_player()->mutable_game_history_()->win(),
-            packet.mutable_opponent_player()->mutable_game_history_()->lose(),
-            packet.mutable_opponent_player()->mutable_game_history_()->rating_score()
-        )
-    );*/
-
     network_mgr->set_room_key(packet.room_key());
-
-    /*game_mgr->get_scheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(game_manager::start_game, game_mgr)
-    );*/
-    
+   
     send_packet_matching_confirm();
 }
 

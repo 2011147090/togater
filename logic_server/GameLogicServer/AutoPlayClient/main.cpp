@@ -85,7 +85,7 @@ lobby:
         case 2: network_lobby->send_packet_rank_game_req(true);
             break;
 
-        case 3: 
+        /*case 3: 
             {
                 char temp[10] = "";
                 itoa(random_generator::get_random_int(0, 1000), temp, 10);
@@ -112,8 +112,7 @@ lobby:
 
                 network_lobby->send_packet_friend_req(channel_server::packet_friends_req_req_type_DEL, info);
             }
-            break;
-
+            break;*/
         }
 
         Sleep(behaviour_timer);
@@ -131,7 +130,8 @@ friend_match:
 
 #pragma region 분기 3 : 로직 화면
 
-    logic:
+            logic:
+
     
 
 #pragma endregion

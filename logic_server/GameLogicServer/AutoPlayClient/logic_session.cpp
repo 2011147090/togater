@@ -1,7 +1,7 @@
 #include "logic_session.h"
 #include "network_manager.h"
 
-void logic_session::handle_send(logic_server::message_type msg_type, const protobuf::Message& message)
+void logic_session::handle_send(logic_server::message_type msg_type, const protobuf::Message& message, bool must_recv)
 {
     thread_sync sync;
 
@@ -18,6 +18,10 @@ void logic_session::handle_send(logic_server::message_type msg_type, const proto
     message.SerializeToArray(send_buf.begin() + message_header_size, send_header.size);
 
     send(socket_, (char*)send_buf.begin(), message_header_size + send_header.size, 0);
+
+    if (!must_recv)
+        return;
+
     int size = recv(socket_, (char*)recv_buf_ori.begin(), 128, 0);
     
     int remain_size = size;

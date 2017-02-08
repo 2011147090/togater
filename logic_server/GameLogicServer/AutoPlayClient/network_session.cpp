@@ -5,7 +5,6 @@
 network_session::network_session()
 {
     is_connected_ = false;
-
 }
 
 network_session::~network_session() {}
@@ -31,6 +30,8 @@ bool network_session::connect(std::string ip, int port)
         return false;
     }
 
+    is_connected_ = true;
+
     return true;
 }
 
@@ -38,6 +39,7 @@ bool network_session::disconnect()
 {
     thread_sync sync;
 
+    is_connected_ = false;
     closesocket(socket_);
 
     return true;

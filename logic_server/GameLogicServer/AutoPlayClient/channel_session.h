@@ -15,7 +15,7 @@ private:
 
     const int message_header_size = sizeof(MESSAGE_HEADER);
 
-    void handle_send(channel_server::message_type msg_type, const protobuf::Message& message);
+    void handle_send(channel_server::message_type msg_type, const protobuf::Message& message, bool must_recv);
 
     void process_packet_join_ans(channel_server::packet_join_ans packet);
     void process_packet_logout_ans(channel_server::packet_logout_ans packet);

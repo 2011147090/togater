@@ -104,11 +104,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>preHeaders.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pre_headers.h</PrecompiledHeaderFile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -181,7 +181,7 @@
     <ClInclude Include="singleton.h" />
     <ClInclude Include="logic_worker.h" />
     <ClInclude Include="log_manager.h" />
-    <ClInclude Include="preHeaders.h" />
+    <ClInclude Include="pre_headers.h" />
     <ClInclude Include="tcp_server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

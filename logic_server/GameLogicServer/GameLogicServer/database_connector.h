@@ -1,10 +1,5 @@
 #pragma once
-#include <my_global.h>
-#include <WinSock2.h>
-#include <mysql.h>
-#include <vector>
-#include <thread>
-
+#include "pre_headers.h"
 #include "singleton.h"
 #include "critical_section.h"
 

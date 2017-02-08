@@ -1,3 +1,4 @@
+#include "pre_headers.h"
 #include "redis_connector.h"
 #include "log_manager.h"
 #include "configurator.h"

@@ -2,7 +2,7 @@
 #include "network_manager.h"
 #include "logger.h"
 
-void chat_session::handle_send(chat_server::message_type msg_type, const protobuf::Message& message)
+void chat_session::handle_send(chat_server::message_type msg_type, const protobuf::Message& message, bool must_recv)
 {
     thread_sync sync;
 

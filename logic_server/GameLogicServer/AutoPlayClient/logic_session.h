@@ -15,7 +15,7 @@ private:
 
     const int message_header_size = sizeof(MESSAGE_HEADER);
 
-    void handle_send(logic_server::message_type msg_type, const protobuf::Message& message);
+    void handle_send(logic_server::message_type msg_type, const protobuf::Message& message, bool must_recv);
 
     void process_packet_enter_ans(logic_server::packet_enter_ans packet);
     void process_packet_process_turn_req(logic_server::packet_process_turn_req packet);

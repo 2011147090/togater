@@ -15,7 +15,7 @@ private:
 
     const int message_header_size = sizeof(MESSAGE_HEADER);
 
-    void handle_send(chat_server::message_type msg_type, const protobuf::Message& message);
+    void handle_send(chat_server::message_type msg_type, const protobuf::Message& message, bool must_recv);
 
     void process_packet_verify_ans(chat_server::packet_verify_ans packet);
     void process_pacekt_logout_ans(chat_server::packet_logout_ans packet);
