@@ -1,5 +1,6 @@
-#include "redis_connector.h"
 #include "config.h"
+#include "log_manager.h"
+#include "redis_connector.h"
 
 
 redis_connector::redis_connector()
@@ -26,8 +27,12 @@ bool redis_connector::init_singleton()
 
 
     if (conn_ == nullptr)
+    {
+        LOG_ERROR << "init_singleton() : Redis connecting is failed.";
         return false;
+    }
     
+    LOG_INFO << "Redis connected.";
     return true;
 }
 
@@ -37,10 +42,13 @@ bool redis_connector::release_singleton()
 
 
     if (conn_ != nullptr)
+    {
+        LOG_ERROR << "release_singleton() : Redis disconnecting is failed.";
         return false;
-
+    }
+       
+    LOG_INFO << "Redis disconnected.";
     return true;
-        
 }
 
 std::string redis_connector::get(std::string key)
@@ -49,14 +57,4 @@ std::string redis_connector::get(std::string key)
         return conn_->get(key);
 
     return "";
-}
-
-void redis_connector::set(std::string key, std::string value)
-{
-    conn_->set(key, value);
-}
-
-void redis_connector::del(std::string key)
-{
-    conn_->del(key);
 }

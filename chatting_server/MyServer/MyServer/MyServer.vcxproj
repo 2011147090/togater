@@ -164,6 +164,7 @@
     <ClInclude Include="chat_protocol.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="log_manager.h" />
+    <ClInclude Include="preheaders.h" />
     <ClInclude Include="redispp.h" />
     <ClInclude Include="redis_connector.h" />
     <ClInclude Include="singleton.h" />
