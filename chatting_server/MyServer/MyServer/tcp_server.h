@@ -1,14 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <string>
-
-// -- boost --
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/container/vector.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/circular_buffer.hpp>
 
 #include "tcp_session.h"
 

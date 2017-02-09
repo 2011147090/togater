@@ -1,12 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-// -- boost --
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/array.hpp>
-#include <boost/container/deque.hpp>
+#include "preheaders.h"
 
 #include "chat_protocol.h"
 
@@ -60,7 +54,7 @@ public:
 
     void post_verify_ans(bool is_successful);
     void post_logout_ans(bool is_successful);
-    void post_whisper_error(std::string target_id);
+    void post_whisper_error();
     void post_send(const bool immediate, const int size, BYTE* data);
     void post_receive();
 };

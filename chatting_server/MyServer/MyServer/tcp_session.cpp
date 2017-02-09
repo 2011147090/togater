@@ -1,6 +1,9 @@
-#include "tcp_session.h"
-#include "tcp_server.h"
+#include "log_manager.h"
 #include "redis_connector.h"
+
+#include "tcp_server.h"
+#include "tcp_session.h"
+
 
 // ---------- public ----------
 tcp_session::tcp_session(int session_id, boost::asio::io_service& io_service, tcp_server* server)
@@ -50,12 +53,12 @@ void tcp_session::post_logout_ans(bool is_successful)
     post_send(false, message_header_size + header.size, send_buffer->begin());
 }
 
-void tcp_session::post_whisper_error(std::string target_id)
+void tcp_session::post_whisper_error()
 {
     chat_server::packet_chat_whisper error_message;
     error_message.set_user_id("Error");
     error_message.set_target_id(user_id_);
-
+    error_message.set_chat_message("");
 
     MESSAGE_HEADER header;
 
@@ -157,9 +160,9 @@ void tcp_session::handle_receive(const boost::system::error_code& error, size_t 
     else
     {
         if (error == boost::asio::error::eof)
-            std::cout << "Disconnected with client" << std::endl;
+            LOG_INFO << "Disconnected with client" << std::endl;
         else
-            std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
+            LOG_WARN << "handle_receive() : Error No: " << error.value() << " Error Message: " << error.message();
         
         server_->get_io_service().post(server_->strand_close_.wrap(boost::bind(&tcp_server::close_session, server_, session_id_)));
     }

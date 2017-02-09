@@ -1,7 +1,7 @@
 #pragma once
 
-// -- redis --
-#include "redispp.h"
+
+#include "preheaders.h"
 
 #include "singleton.h"
 
@@ -19,6 +19,4 @@ public:
     virtual bool release_singleton();
 
     std::string get(std::string key);
-    void set(std::string key, std::string value);
-    void del(std::string key);
 };
