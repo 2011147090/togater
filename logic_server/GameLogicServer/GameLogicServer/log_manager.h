@@ -11,14 +11,17 @@ typedef struct _LOGGER_INFO {
 
 class log_manager : public singleton<log_manager>, public multi_thread_sync<log_manager> {
 private:
-    std::map<std::string, LOGGER_INFO> logger_list;
-    std::shared_ptr<spdlog::logger> console;
+    std::map<std::string, LOGGER_INFO> logger_list_;
+    std::shared_ptr<spdlog::logger> console_;
     bool is_debug_mode_;
+
+    std::string time_str_;
+    time_t cur_time_;
 
 public:
     std::shared_ptr<spd::logger> get_logger(std::string logger_name, std::string file_name);
     
-    void set_create_time(int hour, int min);
+    std::string check_daily_time();
 
     bool set_logger(std::string name, int write_loop_num);
     bool erase_logger(std::string name);

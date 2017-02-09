@@ -6,11 +6,11 @@
 tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
     : acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
 {
+    connected_session_list_.reserve(1000);
+
     wait_accept();
 
     count = 0;
-
-    connected_session_list_.reserve(1000);
     end = false;
 
     keep_arrive_thread = new std::thread(&tcp_server::check_keep_arrive, this);
