@@ -28,7 +28,7 @@ BOOL WINAPI ConsolHandler(DWORD handle)
             system_log->info("release_redis_manager");
 
         system_log->info("server_close");
-        log_manager::get_instance()->release_singleton();
+        log_mgr->release_singleton();
 
         if (server != nullptr)
         {
@@ -48,9 +48,9 @@ int main(int argc, char* argv[])
     
     try
     {
-        if (log_manager::get_instance()->init_singleton())
+        if (log_mgr->init_singleton())
         {
-            log_manager::get_instance()->set_debug_mode(false);
+            log_mgr->set_debug_mode(false);
 
             system_log->info("server_start");
             system_log->info("init_log_manager");
@@ -94,12 +94,10 @@ int main(int argc, char* argv[])
         server = new tcp_server(service, port);
 
         boost::thread_group io_thread;
-        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
-        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
-        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
-        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
-        io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
-                
+
+        for (int i = 0; i < 6; i++)
+            io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
+            
         getchar();
         service.stop();
 
@@ -130,7 +128,7 @@ int main(int argc, char* argv[])
 
     system_log->info("server_close");
 
-    log_manager::get_instance()->release_singleton();
+    log_mgr->release_singleton();
         
     return 0;
 }

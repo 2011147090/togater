@@ -3,6 +3,8 @@
 #include "singleton.h"
 #include "critical_section.h"
 
+#define log_mgr log_manager::get_instance()
+
 typedef struct _LOGGER_INFO {
     std::shared_ptr<spd::logger> logger;
     int write_loop_num;
@@ -35,5 +37,5 @@ public:
     log_manager();
 };
 
-#define system_log log_manager::get_instance()->get_logger("logic_server", "system_log")
-#define log(name) log_manager::get_instance()->get_logger("match_", name)
+#define system_log log_mgr->get_logger("logic_server", "system_log")
+#define log(name) log_mgr->get_logger("match_", name)
