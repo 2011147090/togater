@@ -59,7 +59,6 @@ else{
       'ACCESS-CONTROL-ALLOW-METHODS' : 'GET, POST, OPTIONS',
       'ACCESS-CONTROL-ALLOW-HEADERS' : 'Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time'
   };
-
   /*io.on('connection', function(socket){
       console.log('connected client....');
 
@@ -68,11 +67,19 @@ else{
       });
   });*/
 
+//TODO : 로그아웃 기능이 필요하다. 로그인 시에 세션을 생성하는데 로그아웃을 따로 만들어서 로그인에서 만든 세션을 삭제 해주어야 한다.
+
   app.get('/', function(request, response){
       response.send('/public/index.html')
   });
+  app.get('/test', function(request, response){
+      console.log('test');
+      response.send('hello');
+  });
 
   app.post('/login', function (request, response) {
+      //console.log('id : ' + response.body.id);
+      //console.log('password' + response.body.password);
       redisClient.get(request.body.id, function(err, reply) {
           if(reply === null){
             console.log('this id is not login');
