@@ -1,5 +1,4 @@
 #include "config.h"
-#include <fstream>
 
 json_spirit::mValue config::json_;
 

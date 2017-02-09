@@ -93,9 +93,10 @@ void match_manager::process_matching_with_friends(session *request_session, cons
         {
             player[i]->set_status(status::MATCH_COMPLETE);
             player[i]->post_send(false, match_message[i].ByteSize() + packet_header_size, packet_handler_.incode_message(match_message[i]));
+            friends_manager_.del_id_in_user_map(player[i]->get_user_id());
         }
-        log_manager::get_instance()->get_logger()->info("[Match Accept] [Req ID : { }] [Target Id : { }]", request_session->get_user_id(), recv_session->get_user_id());
-        log_manager::get_instance()->get_logger()->info("[Match Complete] [Req ID : { }] [Target Id : { }]", request_session->get_user_id(), recv_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Match Accept] [Req ID : {0:s}] [Target Id : {1:s}]", request_session->get_user_id(), recv_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Match Complete] [Req ID : {0:s}] [Target Id : {1:s}]", request_session->get_user_id(), recv_session->get_user_id());
     }
         break;
     case match_with_friends_relay::APPLY:
@@ -106,7 +107,7 @@ void match_manager::process_matching_with_friends(session *request_session, cons
             request_session->set_status(status::MATCH_APPLY);
             recv_session->set_status(status::MATCH_RECVER);
             recv_session->post_send(false, relay_message.ByteSize() + packet_header_size, packet_handler_.incode_message(relay_message));
-            log_manager::get_instance()->get_logger()->info("[Match Apply] [Req ID : { }] [Target Id : { }]", request_session->get_user_id(), recv_session->get_user_id());
+            log_manager::get_instance()->get_logger()->info("[Match Apply] [Req ID : {0:s}] [Target Id : {1:s}]", request_session->get_user_id(), recv_session->get_user_id());
             return;
         }
         else
@@ -125,7 +126,7 @@ void match_manager::process_matching_with_friends(session *request_session, cons
             request_session->set_status(status::LOGIN);
             recv_session->set_status(status::LOGIN);
             recv_session->post_send(false, relay_message.ByteSize() + packet_header_size, packet_handler_.incode_message(relay_message));
-            log_manager::get_instance()->get_logger()->info("[Match Deny] [Req ID : { }] [Target Id : { }]", request_session->get_user_id(), recv_session->get_user_id());
+            log_manager::get_instance()->get_logger()->info("[Match Deny] [Req ID : {0:s}] [Target Id : {1:s}]", request_session->get_user_id(), recv_session->get_user_id());
             return;
         }
         else
@@ -177,7 +178,7 @@ void match_manager::set_matching_que(session * request_session, rating request_r
     matching_que[request_rating].push_back(request_session);
     get_matching_que(matching_que[request_rating]);
     rank_que_mtx[request_rating].unlock();
-    log_manager::get_instance()->get_logger()->info("[Match Request] [Req ID : { }]",request_session->get_user_id());
+    log_manager::get_instance()->get_logger()->info("[Match Request] [Req ID : {0:s}]",request_session->get_user_id());
 }
 
 void match_manager::get_matching_que(std::deque<session *> &target_que) //shared_resouce
@@ -233,13 +234,15 @@ void match_manager::get_matching_que(std::deque<session *> &target_que) //shared
         {
             player[i]->set_status(status::MATCH_COMPLETE);
             player[i]->post_send(false, message[i].ByteSize() + packet_header_size, packet_handler_.incode_message(message[i]));
+            friends_manager_.del_id_in_user_map(player[i]->get_user_id());
         }
-        log_manager::get_instance()->get_logger()->info("[Match Complete] [Player 1 : { }] [Player 2: { }]", player[0]->get_user_id(), player[1]->get_user_id());
+
+        log_manager::get_instance()->get_logger()->info("[Match Complete] [Player 1 : {0:s}] [Player 2: {1:s}]", player[0]->get_user_id(), player[1]->get_user_id());
     }
     else
     {
-        log_manager::get_instance()->get_logger()->info("[Match Waiting] [Req ID : { }]",target_que.front()->get_user_id());
-        target_que.front()->set_timer(30);
+        log_manager::get_instance()->get_logger()->info("[Match Waiting] [Req ID : {0:s}]",target_que.front()->get_user_id());
+        target_que.front()->set_timer_rematch(30);
     }
 }
 

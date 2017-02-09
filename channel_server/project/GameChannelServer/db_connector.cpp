@@ -1,11 +1,11 @@
 #include "db_connector.h"
 
 
-db_connector::db_connector(MYSQL &init)
-    : init_instance(init)
+db_connector::db_connector()
 {
-    mysql_init(&init_instance);
     load_mysql_config();
+    init_instance = new MYSQL[pool_size];
+    this->init();
 }
 
 db_connector::~db_connector()
@@ -20,13 +20,17 @@ void db_connector::init()
 {
     for (int i = 0; i < pool_size; i++)
     {
-        MYSQL *new_connection = mysql_real_connect(&init_instance, ip.c_str(), id.c_str(), pwd.c_str(), db_name.c_str(), port, (char *)nullptr, 0);
+        mysql_init(&init_instance[i]);
+        MYSQL *new_connection = mysql_real_connect(&init_instance[i], ip.c_str(), id.c_str(), pwd.c_str(), db_name.c_str(), port, (char *)nullptr, i);
         if (new_connection == nullptr)
         {
             std::cout << "connection error" << std::endl;
         }
-        connection_pool.push_back(new_connection);
-        connection_que.push_back(i);
+        else
+        {
+            connection_pool.push_back(new_connection);
+            connection_que.push_back(i);
+        }
     }
 }
 
@@ -98,14 +102,19 @@ bool db_connector::get_user_friends_list(const std::string request_id, std::vect
 
 bool db_connector::add_user_frineds_list(const std::string request_id, const std::string target_id)
 {
-    char query[100];
-    sprintf(query, "INSERT INTO friend_info (id_1,id_2) VALUES ('%s','%s')", request_id.c_str(), target_id.c_str());
-    
     int index = 0;
     MYSQL *mysql_connection;
     while ((mysql_connection = get_connection(index)) == nullptr);
-    set_connection(index);
+
+    if (!check_repetition(mysql_connection, request_id, target_id))
+    {
+        return false;
+    }
+    char query[100] = { 0, };
+    sprintf(query, "INSERT INTO friend_info (id_1,id_2) VALUES ('%s','%s')", request_id.c_str(), target_id.c_str());
+    
     int query_state = mysql_query(mysql_connection, query);
+    set_connection(index);
     if (query_state != 0)
     {
         return false;
@@ -115,20 +124,40 @@ bool db_connector::add_user_frineds_list(const std::string request_id, const std
 
 bool db_connector::del_user_frineds_list(const std::string request_id, const std::string target_id)
 {
-    char query[100];
-    sprintf(query, "DELETE FROM friend_info WHERE id_1='%s' AND id_2='%s'", request_id.c_str(),target_id.c_str());
-
     int index = 0;
     MYSQL *mysql_connection;
     while ((mysql_connection = get_connection(index)) == nullptr);
-    set_connection(index);
+    
+    char query[100] = { 0, };
+    sprintf(query, "DELETE FROM friend_info WHERE id_1='%s' AND id_2='%s'", request_id.c_str(),target_id.c_str());
+
     int query_state = mysql_query(mysql_connection, query);
     int row = mysql_affected_rows(mysql_connection);
+    set_connection(index);
     if (query_state != 0 || row == 0)
     {
         return false;
     }
     return true;
+}
+
+bool db_connector::check_repetition(MYSQL *con, const std::string request_id, const std::string target_id)
+{
+    char query[100] = { 0, };
+    sprintf(query, "SELECT * FROM friend_info WHERE id_1 = '%s' and id_2 = '%s'", request_id.c_str(), target_id.c_str());
+    int query_state = mysql_query(con, query);
+    if (query_state == 0)
+    {
+        MYSQL_RES *result = mysql_store_result(con);
+        MYSQL_ROW sql_row = mysql_fetch_row(result);
+        if (sql_row == nullptr)
+        {
+            mysql_free_result(result);
+            return true;
+        }
+        mysql_free_result(result);
+    }
+    return false;
 }
 
 MYSQL * db_connector::get_connection(int & index)
@@ -138,6 +167,7 @@ MYSQL * db_connector::get_connection(int & index)
     if (connection_que.empty())
     {
         index = -1;
+        connection_mtx.unlock();
         return nullptr;
     }
     index = connection_que.front();

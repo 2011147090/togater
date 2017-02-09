@@ -4,12 +4,27 @@
 
 log_manager::log_manager()
 {
-    logger = spd::stdout_color_mt("console");
+    is = false;
+    if (config::get_instance()->get_value("LOG_CONFIG", "MODE", log_mode))
+    {
+        if (!log_mode.compare("console"))
+        {
+            logger = spd::stdout_color_mt(log_mode.c_str());
+            is = true;
+        }
+        else if (!log_mode.compare("basic_logger"))
+        {
+            logger = spd::basic_logger_mt(log_mode.c_str(), "logs/channel_server_log.txt");
+            is = true;
+        }
+        //std::cout << log_mode << std::endl;
+    }
 }
 
 
 log_manager::~log_manager()
 {
+
 }
 
 std::string log_manager::get_log_mode()

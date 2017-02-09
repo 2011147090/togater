@@ -1,14 +1,9 @@
 #pragma once
-#include <map>
-#include <iostream>
-#include <string>
 #include "server_session.h"
 #include "log_manager.h"
-#include "protocol.h"
 #include "redis_connector.h"
 #include "db_connector.h"
-#include <boost/thread/mutex.hpp>
-#include <boost/thread.hpp>
+#include "config.h"
 
 class friends_manager
 {
@@ -28,9 +23,8 @@ public:
 private:
     redis_connector& redis_connector_;
     packet_handler& packet_handler_;
-    std::map<std::string, session *> user_id_map_;
+    std::unordered_map<std::string, session *> user_id_map_;
 
     boost::mutex user_id_map_mtx;
-    /* data base connection */
     db_connector &db_connector_;
 };

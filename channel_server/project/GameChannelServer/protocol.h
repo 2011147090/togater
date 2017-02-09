@@ -1,40 +1,41 @@
 #pragma once
-#include "config.h"
-
+/* STL */
+#include <iostream>
+#include <unordered_map>
+#include <string>
+#include <deque>
+#include <vector>
+#include <algorithm>
+#include <cstdlib>
+#include <fstream>
+/* Google Protocol Buffers */
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 #include <google/protobuf/text_format.h>
 #include "channel_protobuf.pb.h"
+/* boost lib */
+#include <boost/asio.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>
+#include <boost/atomic.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+/* singleton */
+#include "singleton.h"
+/* my sql */
+#include <mysql.h>
+/* redis */
+#include "redispp.h"
+/* json spirit -> config */
+#include <json_spirit.h>
+/* spd log */
+#include <spdlog\spdlog.h>
 
 using namespace std;
 using namespace google;
 using namespace channel_server;
-
-/* config */
-
-
-/* log mode */
-//#define LOG_CONSOL
-//
-///* redis */
-//#define REDIS_SERVER_IP "192.168.1.201"
-//#define REDIS_PORT "6379"
-//#define REDIS_PWD "password"
-//#define REDIS_POOL_SIZE 8
-//
-///* my sql */
-//#define CONNECTION_POOL_SIZE 8
-//#define MYSQL_SERVER_IP "192.168.1.203"
-//#define MYSQL_PORT 3306
-//#define MYSQL_ID "root"
-//#define MYSQL_PASSWORD "123123"
-//#define MYSQL_DB_NAME "game"
-//
-///* server */
-//#define MAX_THREAD 8
-#define MAX_RECEIVE_BUFFER_LEN 256
-#define TOKEN_SIZE 32
-//const unsigned short PORT_NUMBER = 8800;
-//const unsigned short MAX_SESSION_COUNT = 5000;
 
 /* session status */
 typedef enum session_status  
@@ -58,9 +59,6 @@ typedef packet_join_ans join_response;
 /* packet about friends */
 typedef packet_friends_req friends_request;
 typedef packet_friends_ans friends_response;
-
-//typedef packet_friends_req_req_type friends_request_type;
-//typedef packet_friends_ans_ans_type friends_reponse_type;
 
 /* packet about game */
 typedef packet_play_rank_game_req match_request;

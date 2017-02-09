@@ -1,18 +1,10 @@
 #pragma once
-#include <iostream>
-#include <vector>
-#include <deque>
-#include <algorithm>
-#include <string>
-
 #include "server_session.h"
 #include "friends_manager.h"
 #include "match_manager.h"
-#include "protocol.h"
 #include "redis_connector.h"
 #include "log_manager.h"
-#include <boost/thread/mutex.hpp>
-#include <boost/thread.hpp>
+#include "config.h"
 
 class tcp_server
 {
@@ -24,7 +16,7 @@ public:
 
     void start();
     
-    void close_session(const int n_session_id);
+    void close_session(const int n_session_id, bool force);
     void process_packet(const int n_session_id, const char *p_data);
     void rematching_request(session *request_session);
     session* get_session(const int n_session_id) { return session_list_[n_session_id]; }

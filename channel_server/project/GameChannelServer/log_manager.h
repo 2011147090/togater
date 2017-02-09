@@ -1,7 +1,5 @@
 #pragma once
-#include <spdlog\spdlog.h>
-#include "singleton.h"
-#include "protocol.h"
+#include "config.h"
 
 namespace spd = spdlog;
 
@@ -14,9 +12,14 @@ public:
     void set_log_mode();
     inline std::shared_ptr<spd::logger> get_logger()
     {
-        return logger;
+        if (is)
+            return logger;
+        else
+            return nullptr;
     }
 private:
     std::shared_ptr<spd::logger> logger;
+    std::string log_mode;
+    boost::atomic<bool> is;
 };
 

@@ -1,7 +1,5 @@
 #pragma once
 #include "protocol.h"
-#include "singleton.h"
-#include <json_spirit.h>
 
 
 class config:public singleton<config>

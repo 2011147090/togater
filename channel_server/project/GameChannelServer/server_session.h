@@ -1,12 +1,7 @@
 #pragma once
-#include <deque>
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/asio/steady_timer.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/atomic.hpp>
-#include <boost/thread.hpp>
-#include "protocol.h"
+#include "config.h"
+#include "log_manager.h"
+
 
 class tcp_server;
 
@@ -36,7 +31,7 @@ private:
 class session:public user
 {
 public:
-    session(int session_id, boost::asio::io_service &io_service, tcp_server* p_channel_serv);
+    session(int session_id, boost::asio::io_service &io_service, tcp_server* p_channel_serv, const int token_size, const int max_buffer_len);
     ~session();
     
     inline int get_session_id() { return session_id_; }
@@ -47,31 +42,37 @@ public:
     void post_receive();
     void post_send(const bool immediately, const int send_data_size, char *send_data);
 
-    inline void set_token(const char* p_token) { memcpy(token_.data(), p_token, TOKEN_SIZE); }
-    inline const char* get_token()            { return token_.data(); }
+    inline void set_token(const char* p_token) 
+    { if(token_size_ >0 )
+        memcpy(token_, p_token, token_size_); 
+    }
+    inline const char* get_token() { return token_; }
 
     inline void set_status(status state) { stat_ = state; }
     inline status get_status() { return stat_; } 
     inline void lock_status() { status_mtx.lock(); }
     inline void unlock_status() { status_mtx.unlock(); }
 
-    void on_timer(const boost::system::error_code & error);
-    void set_timer(int sec);
+    void rematch(const boost::system::error_code & error);
+    void check_status(const boost::system::error_code & error);
+    void set_timer_conn(int sec);
+    void set_timer_rematch(int sec);
 private:
     void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
 
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
 
-    std::array<char, TOKEN_SIZE> token_;
+    char *token_;
+    int token_size_, max_buffer_len_;
     boost::atomic<status> stat_;
     boost::mutex status_mtx;
     int session_id_;
     boost::asio::ip::tcp::socket socket_;
-    boost::asio::steady_timer timer_;
+    boost::asio::steady_timer match_timer_, con_timer_;
 
-    std::array<char, MAX_RECEIVE_BUFFER_LEN> receive_buffer_;
+    char *receive_buffer_,*temp_buffer_;
     int packet_buffer_mark_;
-    char packet_buffer_[MAX_RECEIVE_BUFFER_LEN * 2];
+    char *packet_buffer_;
 
     std::deque<char *> send_data_queue_;
 

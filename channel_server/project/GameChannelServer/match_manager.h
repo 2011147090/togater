@@ -1,17 +1,9 @@
 #pragma once
-#include <iostream>
-#include <deque>
 #include "server_session.h"
-#include "protocol.h"
 #include "friends_manager.h"
-#include "redispp.h"
+#include "redis_connector.h"
 #include "log_manager.h"
-
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread.hpp>
+#include "config.h"
 
 class match_manager
 {
@@ -45,11 +37,4 @@ private:
 
     boost::mutex rank_que_mtx[MAX_RATING];
     std::deque<session *> matching_que[MAX_RATING];
-   // std::deque<session *> bronze_que;
-   // std::deque<session *> silver_que;
-   // std::deque<session *> gold_que;
-   // std::deque<session *> platinum_que;
-   // std::deque<session *> diamond_que;
-   // std::deque<session *> master_que;
-   // std::deque<session *> challenger_que;
 };

@@ -17,12 +17,11 @@
 int main()
 {
     boost::asio::io_service io_service;
-    MYSQL initail;
     boost::asio::steady_timer timer(io_service);
     /* redis connector module */
     redis_connector redis_connector_main;
     /* mysql connector module*/
-    db_connector db_connector_main(initail);
+    db_connector db_connector_main;
    
     /* pakcet handle module */
     packet_handler packet_handler_main;
@@ -39,7 +38,7 @@ int main()
     server.start();
     io_service.run();
 
-    std::cout << "서버 종료" << std::endl;
+    log_manager::get_instance()->get_logger()->info("[Server Terminated!]");
     getchar();
     return 0;
 }

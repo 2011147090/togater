@@ -84,11 +84,11 @@
     <ClCompile Include="channel_protobuf.pb.cc">
       <Filter>소스 파일\packet</Filter>
     </ClCompile>
-    <ClCompile Include="server_session.cpp">
-      <Filter>소스 파일\server feature</Filter>
-    </ClCompile>
     <ClCompile Include="redis_connector.cpp">
       <Filter>소스 파일\DB\memcache</Filter>
+    </ClCompile>
+    <ClCompile Include="server_session.cpp">
+      <Filter>소스 파일\server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
