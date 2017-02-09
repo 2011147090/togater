@@ -15,7 +15,6 @@ _PLAYER_INFO::_PLAYER_INFO()
 _ROOM_INFO::_ROOM_INFO(PLAYER_INFO player_info)
 {
     ready_player_num_ = 0;
-    time_ = 0;
     turn_count_ = 0;
     hide_card_ = true;
     state_ = GAME_STATE::READY;

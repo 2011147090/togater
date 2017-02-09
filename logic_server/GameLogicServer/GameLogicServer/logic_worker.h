@@ -24,7 +24,6 @@ typedef struct _ROOM_INFO {
 
     PLAYER_INFO* turn_player_;
     
-    int time_;
     int turn_count_;
 
     int ready_player_num_;
