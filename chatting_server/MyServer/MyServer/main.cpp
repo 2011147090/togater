@@ -1,13 +1,16 @@
-
-#include <boost/thread.hpp>
+#include "preheaders.h"
 
 #include "config.h"
+#include "log_manager.h"
 #include "redis_connector.h"
+
 #include "tcp_server.h"
 
 
 int main()
 {
+    for (int i = 0; i < 90; i++)
+        LOG_INFO << "main() start";
     redis_connector::get_instance()->init_singleton();
     
     //for (int n = 0; n < 10000; n++)

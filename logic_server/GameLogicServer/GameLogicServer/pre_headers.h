@@ -7,6 +7,8 @@
 #include <map>
 #include <queue>
 #include <fstream>
+#include <vector>
+#include <thread>
 #include <random>
 
 // boost
@@ -35,6 +37,11 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
+
+// mysql
+#include <my_global.h>
+//#include <WinSock2.h>
+#include <mysql.h>
 
 #include "logic_server.pb.h"
 

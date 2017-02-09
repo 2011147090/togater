@@ -1,3 +1,4 @@
+#include "pre_headers.h"
 #include "redis_connector.h"
 #include "log_manager.h"
 #include "configurator.h"
@@ -27,7 +28,10 @@ bool redis_connector::init_singleton()
     return true;
 }
 
-bool redis_connector::release_singleton() { return true; }
+bool redis_connector::release_singleton() 
+{ 
+    return true; 
+}
 
 bool redis_connector::check_room(std::string room_key)
 {

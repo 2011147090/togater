@@ -1,3 +1,4 @@
+#include "pre_headers.h"
 #include "database_connector.h"
 
 _DB_CONNECTION::_DB_CONNECTION()

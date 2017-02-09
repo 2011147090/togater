@@ -27,6 +27,9 @@
     <Filter Include="소스 파일\config">
       <UniqueIdentifier>{552c42b4-5975-47bd-86c3-894eb1133238}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\preheaders">
+      <UniqueIdentifier>{0cc4e889-8398-48c6-ad31-0cdffd3d3f53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="chat_protobuf.pb.cc">
@@ -81,6 +84,9 @@
     </ClInclude>
     <ClInclude Include="config.h">
       <Filter>소스 파일\config</Filter>
+    </ClInclude>
+    <ClInclude Include="preheaders.h">
+      <Filter>소스 파일\preheaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

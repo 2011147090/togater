@@ -1,6 +1,9 @@
-#include "tcp_server.h"
-#include "redis_connector.h"
 #include "config.h"
+#include "log_manager.h"
+#include "redis_connector.h"
+
+#include "tcp_server.h"
+
 
 
 // ---------- public ----------
@@ -35,9 +38,10 @@ void tcp_server::init(const int max_session_count)
 }
 
 void tcp_server::start()
-{
+{ 
+    LOG_INFO << "Server Start";
     std::cout << "Server Start..." << std::endl;
-
+    
     // There are 8 threads.
     io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
     io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
@@ -57,8 +61,8 @@ void tcp_server::close_session(const int session_id)
     if (connected_session_map_.find(user_id) != connected_session_map_.end())
         connected_session_map_.erase(user_id);
 
-    std::cout << "Client connection closed. session_id: " << session_id << std::endl;
-
+    LOG_INFO << "Client connection closed. session_id: " << session_id;
+    
     session_list_[session_id]->get_socket().close();
     session_queue_.push_back(session_id);
 
@@ -175,7 +179,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             {
                 master_data_queue_.pop_back();
 
-                session_list_[session_id]->post_whisper_error(whisper_message.target_id());
+                session_list_[session_id]->post_whisper_error();
             }
         }
         break;
@@ -190,8 +194,6 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             int MASTER_BUFFER_LEN;
             config::get_value("MASTER_BUFFER_LEN", MASTER_BUFFER_LEN);
 
-            if (master_data_queue_.size() >= MASTER_BUFFER_LEN)
-                std::cout << "FULL!" << std::endl;
 
             if (session_list_[session_id]->get_socket().is_open() && session_list_[session_id]->get_status() == room)
             {
@@ -220,7 +222,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
     // 실행될 일 없음???
     default:
-        std::cout << "process_packet error! - " << message_header->type << std::endl;
+        LOG_WARN << "process_packet() : Message type is unknown. -> " << message_header->type;
         break;
     }
 }
@@ -252,14 +254,14 @@ void tcp_server::handle_accept(tcp_session* session, const boost::system::error_
 {
     if (!error)
     {
-        std::cout << "Client connection successed. session_id: " << session->get_session_id() << std::endl;
+        LOG_INFO << "Client connection successed. session_id: " << session->get_session_id();
         
         session->post_receive();
         io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
     }
     else
     {
-        std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
+        LOG_WARN << "handle_accept() : Error No: " << error.value() << " Error Message: " << error.message();
         io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
     }
 }

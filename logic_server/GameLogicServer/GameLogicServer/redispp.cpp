@@ -1,10 +1,11 @@
+#include "pre_headers.h"
 #include "redispp.h"
 #include <errno.h>
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-typedef int ssize_t;
+//typedef int ssize_t;
 typedef char* RecvBufferType;
 
 int close(SOCKET sock)
@@ -132,7 +133,7 @@ public:
         size_t sent = 0;
         while(sent < len)
         {
-            const ssize_t ret = ::send(sockFd, (const char*)data + sent, len - sent, 0);
+            const int ret = ::send(sockFd, (const char*)data + sent, len - sent, 0);
             if(ret <= 0)
             {
                 throw std::runtime_error(std::string("error writing to socket: ") + getLastErrorMessage());
@@ -143,7 +144,7 @@ public:
 
     size_t read(void* data, size_t len)
     {
-        const ssize_t ret = ::recv(sockFd, (RecvBufferType)data, len, 0);
+        const int ret = ::recv(sockFd, (RecvBufferType)data, len, 0);
         if(ret <= 0)
         {
             throw std::runtime_error(std::string("error reading from socket: ") + getLastErrorMessage());
