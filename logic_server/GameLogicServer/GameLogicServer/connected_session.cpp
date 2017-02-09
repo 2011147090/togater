@@ -61,7 +61,7 @@ std::string connected_session::get_room_key()
     return room_key_;
 }
 
-void connected_session::handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/)
+void connected_session::handle_read(const boost::system::error_code& error, size_t buf_size)
 {
     thread_sync sync;
 
@@ -72,67 +72,78 @@ void connected_session::handle_read(const boost::system::error_code& error, size
                 boost::asio::placeholders::error,
                 boost::asio::placeholders::bytes_transferred));
 
-        MESSAGE_HEADER message_header;
+        static boost::array<BYTE, BUFSIZE> packet_buf;
 
-        CopyMemory(&message_header, recv_buf_.begin(), message_header_size);
+        int remain_size = buf_size;
+        int process_size = 0;
 
-        switch (message_header.type)
+        do
         {
-        case logic_server::ENTER_REQ:
-        {
-            logic_server::packet_enter_req message;
+            MESSAGE_HEADER message_header;
+            CopyMemory(&message_header, recv_buf_.begin() + process_size, message_header_size);
+            CopyMemory(packet_buf.begin(), recv_buf_.begin() + process_size, message_header.size + message_header_size);
 
-            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
-                break;
+            process_size += message_header_size + message_header.size;
+            remain_size -= process_size;
 
-            process_packet_enter_req(message);
-        }
-        break;
+            switch (message_header.type)
+            {
+            case logic_server::ENTER_REQ:
+            {
+                logic_server::packet_enter_req message;
 
-        case logic_server::GAME_STATE_NTF:
-        {
-            logic_server::packet_game_state_ntf message;
-        
-            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
-                break;
+                if (false == message.ParseFromArray(packet_buf.begin() + message_header_size, message_header.size))
+                    break;
 
-            porcess_packet_game_state_ntf(message);
-        }
-        break;          
+                process_packet_enter_req(message);
+            }
+            break;
 
-        case logic_server::PROCESS_TURN_ANS:
-        {
-            logic_server::packet_process_turn_ans message;
+            case logic_server::GAME_STATE_NTF:
+            {
+                logic_server::packet_game_state_ntf message;
 
-            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
-                break;
+                if (false == message.ParseFromArray(packet_buf.begin() + message_header_size, message_header.size))
+                    break;
 
-            process_packet_process_turn_ans(message);
-        }
-        break;
+                porcess_packet_game_state_ntf(message);
+            }
+            break;
 
-        case logic_server::DISCONNECT_ROOM:
-        {
-            logic_server::packet_disconnect_room_ntf message;
+            case logic_server::PROCESS_TURN_ANS:
+            {
+                logic_server::packet_process_turn_ans message;
 
-            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
-                break;
+                if (false == message.ParseFromArray(packet_buf.begin() + message_header_size, message_header.size))
+                    break;
 
-            process_packet_disconnect_room_ntf(message);
-        }
-        break;
+                process_packet_process_turn_ans(message);
+            }
+            break;
 
-        case logic_server::ECHO_NTF:
-        {
-            logic_server::packet_echo_ntf message;
+            case logic_server::DISCONNECT_ROOM:
+            {
+                logic_server::packet_disconnect_room_ntf message;
 
-            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
-                break;
+                if (false == message.ParseFromArray(packet_buf.begin() + message_header_size, message_header.size))
+                    break;
 
-            process_packet_echo_ntf(message);
-        }
-        break;
-        }
+                process_packet_disconnect_room_ntf(message);
+            }
+            break;
+
+            case logic_server::ECHO_NTF:
+            {
+                logic_server::packet_echo_ntf message;
+
+                if (false == message.ParseFromArray(packet_buf.begin() + message_header_size, message_header.size))
+                    break;
+
+                process_packet_echo_ntf(message);
+            }
+            break;
+            }
+        } while (remain_size > 0);
     }
     else
     {
