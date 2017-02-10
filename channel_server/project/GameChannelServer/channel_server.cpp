@@ -38,51 +38,51 @@ void tcp_server::start()
 {
     for (int i = 0; i < max_thread; ++i)
     {
-        post_accept();
+        wait_accept();
         boost::thread t(boost::bind(&boost::asio::io_service::run, &acceptor_.get_io_service()));
     }
-    log_manager::get_instance()->get_logger()->info("[Channel Server Start!!] -Thread:{0:d} -Port:{1:d} -Max Session:{2:d} -Recv Buffer Size:{3:d}", max_thread, port, max_session_count, max_buffer_len);
+    log_manager::get_instance()->get_logger()->info("\n\n[TCP Server START] \n\n -Thread:{0:d} -Port:{1:d} -Max Session:{2:d} -Recv Buffer Size:{3:d}", max_thread, port, max_session_count, max_buffer_len);
 }
 
 void tcp_server::close_session(const int n_session_id, bool force)
 {
     
     session *request_session = session_list_[n_session_id];
-
-    if (request_session->get_status() == status::LOGIN)
+    status request_status = request_session->get_status();
+    if (request_status == status::LOGIN)
     {
         //비정상 종료
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        log_manager::get_instance()->get_logger()->info("[Unusual Terminate] [User ID : {0:s}]", request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->warn("[Close session]\n -Status:LOGIN -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
     }
-    else if(request_session->get_status() == status::LOGOUT)
+    else if(request_status == status::LOGOUT)
     {
         //정상 종료
-        log_manager::get_instance()->get_logger()->info("[Log Out] [User ID : {0:s}]", request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Close session]\n -Status:LOGOUT -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
     }
-    else if (request_session->get_status() == status::MATCH_COMPLETE)
+    else if (request_status == status::MATCH_COMPLETE)
     {
-        log_manager::get_instance()->get_logger()->info("[Log Out] [Matching complete] [User ID : {0:s}]", request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Close session]\n -Status:MATCH_COMPLETE -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
         //정상 종료
     }
-    else if (request_session->get_status() == status::MATCH_RECVER)
+    else if (request_status == status::MATCH_RECVER)
     {
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        log_manager::get_instance()->get_logger()->info("[Unusual Terminate] [Match_recver] [User ID : {0:s}]", request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->warn("[Close session]\n -Status:MATCH_RECVER -Session_id:{0:d} -User_id:{1:s}", n_session_id, request_session->get_user_id());
         //비정상 종료
     }
-    else if (request_session->get_status() == status::MATCH_REQUEST)
+    else if (request_status == status::MATCH_REQUEST)
     {
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        log_manager::get_instance()->get_logger()->info("[Unusual Terminate] [Match_request] [User ID : {0:s}]", request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->warn("[Close session]\n -Status:MATCH_REQUEST -Session_id:{0:d} -User_id:{1:s}", n_session_id, request_session->get_user_id());
         //비정상 종료
     }
-    else
+    else if(request_status == status::CONN)
     {
-        log_manager::get_instance()->get_logger()->info("[Unusual Terminate] [Over seconds in join req message wait]");
+        log_manager::get_instance()->get_logger()->warn("[Close session]\n -Status:CONN -Session_id:{0:d}", n_session_id);
     }
     
     request_session->set_status(status::WAIT);
@@ -96,7 +96,7 @@ void tcp_server::close_session(const int n_session_id, bool force)
 
     if (accepting_flag_ == false)
     {
-        post_accept();
+        wait_accept();
     }
 }
 
@@ -155,12 +155,12 @@ void tcp_server::process_packet(const int n_session_id, const char * p_data)
     }
 }
 
-void tcp_server::rematching_request(session * request_session)
+bool tcp_server::rematching_request(session * request_session)
 {
-    match_manager_.rematching_que(request_session);
+    return match_manager_.rematching_start(request_session);
 }
 
-bool tcp_server::post_accept()
+bool tcp_server::wait_accept()
 {
     session_queue_mtx.lock();
    
@@ -185,14 +185,17 @@ void tcp_server::handle_accept(session * p_session, const boost::system::error_c
     if (!error)
     {
         p_session->init();
-        p_session->post_receive();
-        p_session->set_timer_conn(300);
-        log_manager::get_instance()->get_logger()->info("[Session Connect] [Session ID : {0:d}]",p_session->get_session_id());
-        post_accept();
+        boost::asio::socket_base::keep_alive op(true);
+        p_session->get_socket().set_option(op);
+        p_session->wait_receive();
+        p_session->set_status(status::CONN);
+        //p_session->control_timer_conn(100,true);
+        log_manager::get_instance()->get_logger()->info("[Session Connect] -Session_id [{0:d}]",p_session->get_session_id());
+        wait_accept();
     }
     else
     {
-        log_manager::get_instance()->get_logger()->warn("[Accept Error No : {0:d}] [Error Message : {1:s}] ",error.value(), error.message());
+        log_manager::get_instance()->get_logger()->warn("[Accept Error] -No [{0:d}] -Error Message [{1:s}]",error.value(), error.message());
     }
 }
 

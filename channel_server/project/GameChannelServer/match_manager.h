@@ -12,7 +12,8 @@ public:
     ~match_manager();
     void process_matching(session *request_session, const char *packet, const int data_size);
     void process_matching_with_friends(session *request_session, const char *packet, const int data_size);
-    void rematching_que(session *request_session);
+    bool rematching_start(session *request_session);
+    void make_matching_and_send_complete(session * player_1, session * player_2);
 private:
     void set_matching_que(session *request_session, rating request_rating);
     void get_matching_que(std::deque<session *> &target_que);

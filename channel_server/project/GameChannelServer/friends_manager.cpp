@@ -45,7 +45,7 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
             {   
                 redis_connector_.del_redis_key(token);
                 response_message.set_success(false);
-                request_session->post_send(false, response_message.ByteSize() + packet_header_size, packet_handler_.incode_message(response_message));
+                request_session->wait_send(false, response_message.ByteSize() + packet_header_size, packet_handler_.incode_message(response_message));
                 return false;
             }
             
@@ -56,12 +56,12 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
             else
             {
                 response_message.set_success(false);
-                request_session->post_send(false, response_message.ByteSize() + packet_header_size, packet_handler_.incode_message(response_message));
+                request_session->wait_send(false, response_message.ByteSize() + packet_header_size, packet_handler_.incode_message(response_message));
                 return false;
             }
 
             request_session->set_user_info(rating, total_games, win, lose, id);
-            request_session->set_token(token.c_str());
+            request_session->set_token(token);
 
             for (int i = 0; i < friends_count; i++)
             {
@@ -75,14 +75,15 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
             history->set_win(win);
             history->set_lose(lose);
 
-            request_session->post_send(false, response_message.ByteSize() + packet_header_size, packet_handler_.incode_message(response_message));
+            request_session->wait_send(false, response_message.ByteSize() + packet_header_size, packet_handler_.incode_message(response_message));
             request_session->set_status(status::LOGIN);
-            log_manager::get_instance()->get_logger()->info("[Join Success] [User Id : {0:s}]", request_session->get_user_id());
+            //request_session->control_timer_conn(0, false);
+            log_manager::get_instance()->get_logger()->info("[Join Success] -User_id [{0:s}] -Session_id [{1:d}]", request_session->get_user_id(), request_session->get_session_id());
             return true;
         }
         else
         {
-            log_manager::get_instance()->get_logger()->warn("[Join Fail] [User Id : {0:s}]", request_session->get_user_id());
+            log_manager::get_instance()->get_logger()->warn("[Join Fail] -session_id [{0:d}]", request_session->get_session_id());
             request_session->get_socket().close(); //서버에서 먼저 끊음 
             return false;
         }
@@ -90,13 +91,16 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
     return false;
 }
 
-void friends_manager::del_redis_token(std::string token)
+bool friends_manager::del_redis_token(std::string token)
 {
     std::string id;
     if (redis_connector_.get_redis_kv(token,id))
     {
+        redis_connector_.del_redis_key(id);
         redis_connector_.del_redis_key(token);
+        return true;
     }
+    return false;
 }
 
 bool friends_manager::lobby_logout_process(session *request_session, const char *packet, const int packet_size)
@@ -112,13 +116,15 @@ bool friends_manager::lobby_logout_process(session *request_session, const char 
 
         int send_data_size = response_message.ByteSize() + packet_header_size;
 
-        request_session->post_send(false, send_data_size, packet_handler_.incode_message(response_message));
-        log_manager::get_instance()->get_logger()->info("[Logout Success] [User Id : {0:s}]", request_session->get_user_id());
+        request_session->wait_send(false, send_data_size, packet_handler_.incode_message(response_message));
+        //request_session->control_timer_conn(20, true);
+        
+        log_manager::get_instance()->get_logger()->info("[Logout Success] -User_id [{0:s}]", request_session->get_user_id());
         return true;
     }
     else
     {
-        log_manager::get_instance()->get_logger()->warn("[logout Fail] [User Id : {0:s}]", request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->warn("[logout Fail]\n -User_id [{0:s}]", request_session->get_user_id());
         return false;
     }
 }
@@ -146,7 +152,7 @@ void friends_manager::search_user(session * request_session, std::string target_
         else
         {
             message.set_type(friends_response::SEARCH_FAIL);
-            log_manager::get_instance()->get_logger()->warn("[Search Fail] [Req ID : {0:s}] [Target Id : {1:s}]",request_session->get_user_id(), target_id);
+            log_manager::get_instance()->get_logger()->warn("[Search Fail] -Req_id [{0:s}] -Target_id [{1:s}]",request_session->get_user_id(), target_id);
             return;
         }
     }
@@ -160,7 +166,7 @@ void friends_manager::search_user(session * request_session, std::string target_
         history->set_rating_score(packet_handler_.check_rating(target_session->get_rating()));
         id->set_id(target_session->get_user_id());
     }
-    log_manager::get_instance()->get_logger()->info("[Search Success] [Req ID : {0:s}] [Target Id : {1:s}]", request_session->get_user_id(), target_id);
+    log_manager::get_instance()->get_logger()->info("[Search Success] -Req_id [{0:s}] -Target_id [{1:s}]", request_session->get_user_id(), target_id);
     message.set_type(friends_response::SEARCH_SUCCESS);
 }
 
@@ -172,15 +178,15 @@ void friends_manager::add_friends(session * request_session, std::string target_
     if (!db_connector_.add_user_frineds_list(request_session->get_user_id(), target_id) || message.type() == friends_response::SEARCH_FAIL)
     {
         message.set_type(friends_response::ADD_FAIL);
-        log_manager::get_instance()->get_logger()->warn("[Add Fail] [Req ID : {0:s}] [Target Id : {1:s}]", request_session->get_user_id(), target_id);
+        log_manager::get_instance()->get_logger()->warn("[Add Fail] -Req_id [{0:s}] -Target_id [{1:s}]", request_session->get_user_id(), target_id);
     }
     else
     {
         message.set_type(friends_response::ADD_SUCCESS);
-        log_manager::get_instance()->get_logger()->info("[Add Success] [Req ID : {0:s}] [Target Id : {1:s}]", request_session->get_user_id(), target_id);
+        log_manager::get_instance()->get_logger()->info("[Add Success] -Req_id [{0:s}] -Target_id [{1:s}]", request_session->get_user_id(), target_id);
     }
     
-    request_session->post_send(false, message.ByteSize() + packet_header_size, packet_handler_.incode_message(message));
+    request_session->wait_send(false, message.ByteSize() + packet_header_size, packet_handler_.incode_message(message));
 }
 
 void friends_manager::del_friends(session * request_session, std::string target_id)
@@ -190,15 +196,15 @@ void friends_manager::del_friends(session * request_session, std::string target_
     if (!db_connector_.del_user_frineds_list(request_session->get_user_id(), target_id) || message.type() == friends_response::SEARCH_FAIL)
     {
         message.set_type(friends_response::DEL_FAIL);
-        log_manager::get_instance()->get_logger()->warn("[Del Fail] [Req ID : {0:s}] [Target Id : {1:s}]", request_session->get_user_id(), target_id);
+        log_manager::get_instance()->get_logger()->warn("[Del Fail] -Req_id [{0:s}] -Target_id [{1:s}]", request_session->get_user_id(), target_id);
     }
     else
     {
         message.set_type(friends_response::DEL_SUCCESS);
-        log_manager::get_instance()->get_logger()->info("[Del Success] [Req ID : {0:s}] [Target Id : {1:s}]", request_session->get_user_id(), target_id);
+        log_manager::get_instance()->get_logger()->info("[Del Success] -Req_id [{0:s}] -Target_id [{1:s}]", request_session->get_user_id(), target_id);
     }
 
-    request_session->post_send(false, message.ByteSize() + packet_header_size, packet_handler_.incode_message(message));
+    request_session->wait_send(false, message.ByteSize() + packet_header_size, packet_handler_.incode_message(message));
 }
 
 void friends_manager::process_friends_function(session * request_session, const char * packet, const int packet_size)
@@ -223,7 +229,7 @@ void friends_manager::process_friends_function(session * request_session, const 
     case friends_request::SEARCH:
     {
         search_user(request_session, target_id,res_message);
-        request_session->post_send(false, res_message.ByteSize() + packet_header_size, packet_handler_.incode_message(res_message));
+        request_session->wait_send(false, res_message.ByteSize() + packet_header_size, packet_handler_.incode_message(res_message));
         return;
     }
     default:

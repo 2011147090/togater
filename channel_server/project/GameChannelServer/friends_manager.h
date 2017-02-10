@@ -11,7 +11,7 @@ public:
     friends_manager(redis_connector& redis_connector, packet_handler& handler, db_connector &mysql);
     ~friends_manager();
     bool lobby_login_process(session *login_session, const char *packet, const int packet_size);
-    void del_redis_token(std::string token);
+    bool del_redis_token(std::string token);
     bool lobby_logout_process(session *logout_session, const char *packet, const int packet_size);
     void search_user(session * request_session, std::string target_id, friends_response & message);
     void add_friends(session *request_session, std::string target_id);

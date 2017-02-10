@@ -22,7 +22,7 @@ int main()
 
     boost::asio::ip::tcp::endpoint endpoint(
         boost::asio::ip::address::from_string(SERVER_IP),
-        PORT_NUMBER
+        9000
     );
     packet_handler handler;
     client clnt(io_service,handler);
@@ -53,7 +53,6 @@ int main()
             {
                 std::cout << "logout" << std::endl;
                 clnt.post_logout_message(token);
-                clnt.socket().shutdown(clnt.socket().shutdown_both);
                 clnt.socket().close();
             }
                 break;

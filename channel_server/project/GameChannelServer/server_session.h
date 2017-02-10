@@ -39,14 +39,15 @@ public:
     
     
     void init();
-    void post_receive();
-    void post_send(const bool immediately, const int send_data_size, char *send_data);
+    void flush();
+    void wait_receive();
+    void wait_send(const bool immediately, const int send_data_size, char *send_data);
 
-    inline void set_token(const char* p_token) 
-    { if(token_size_ >0 )
-        memcpy(token_, p_token, token_size_); 
+    inline void set_token(std::string token) 
+    { 
+        token_ = token;
     }
-    inline const char* get_token() { return token_; }
+    inline std::string get_token() { return token_; }
 
     inline void set_status(status state) { stat_ = state; }
     inline status get_status() { return stat_; } 
@@ -55,14 +56,14 @@ public:
 
     void rematch(const boost::system::error_code & error);
     void check_status(const boost::system::error_code & error);
-    void set_timer_conn(int sec);
-    void set_timer_rematch(int sec);
+    void control_timer_conn(int sec, bool is_set);
+    void control_timer_rematch(int sec, bool is_set);
 private:
     void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
 
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
 
-    char *token_;
+    std::string token_;
     int token_size_, max_buffer_len_;
     boost::atomic<status> stat_;
     boost::mutex status_mtx;
@@ -75,6 +76,6 @@ private:
     char *packet_buffer_;
 
     std::deque<char *> send_data_queue_;
-
+    boost::atomic<bool> cancel_flag;
     tcp_server *channel_serv_;
 };

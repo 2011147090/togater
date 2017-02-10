@@ -18,11 +18,11 @@ public:
     
     void close_session(const int n_session_id, bool force);
     void process_packet(const int n_session_id, const char *p_data);
-    void rematching_request(session *request_session);
+    bool rematching_request(session *request_session);
     session* get_session(const int n_session_id) { return session_list_[n_session_id]; }
 
 private:
-    bool post_accept();
+    bool wait_accept();
     void handle_accept(session *p_session, const boost::system::error_code& error);
 
     void load_server_config();

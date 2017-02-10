@@ -41,6 +41,7 @@ using namespace channel_server;
 typedef enum session_status  
 {
     WAIT
+    , CONN
     , LOGIN
     , LOGOUT
     , MATCH_REQUEST
@@ -85,134 +86,32 @@ const int packet_header_size = sizeof(packet_header);
 class packet_handler
 {
 public:
-    char* incode_message(const friends_request& message)
-    {
-        return incoding(message_type::FRIENDS_REQ, message);
-    }
+    char* incode_message(const friends_request& message)            { return incoding(message_type::FRIENDS_REQ, message); }
+    char* incode_message(const friends_response& message)           { return incoding(message_type::FRIENDS_ANS, message); }
+    char* incode_message(const match_with_friends_relay& message)   { return incoding(message_type::PLAY_FRIENDS_REL, message); }
+    char* incode_message(const match_request& message)              { return incoding(message_type::PLAY_RANK_REQ, message); }
+    char* incode_message(const match_response& message)             { return incoding(message_type::PLAY_RANK_ANS, message); }
+    char* incode_message(const join_request& message)               { return incoding(message_type::JOIN_REQ, message); }
+    char* incode_message(const join_response& message)              { return incoding(message_type::JOIN_ANS, message); }
+    char* incode_message(const match_complete& message)             { return incoding(message_type::MATCH_COMPLETE, message); }
+    char* incode_message(const match_confirm& message)              { return incoding(message_type::MATCH_CONFIRM, message); }
+    char* incode_message(const error_report& message)               { return incoding(message_type::ERROR_MSG, message); }
+    char* incode_message(const logout_request& message)             { return incoding(message_type::LOGOUT_REQ, message); }
+    char* incode_message(const logout_response& message)            { return incoding(message_type::LOGOUT_ANS, message); }
 
-    char* incode_message(const friends_response& message)
-    {
-        return incoding(message_type::FRIENDS_ANS, message);
-    }
-
-    char* incode_message(const match_with_friends_relay& message)
-    {
-        return incoding(message_type::PLAY_FRIENDS_REL, message);
-    }
-
-    char* incode_message(const match_request& message)
-    {
-        return incoding(message_type::PLAY_RANK_REQ, message);
-    }
-
-    char* incode_message(const match_response& message)
-    {
-        return incoding(message_type::PLAY_RANK_ANS, message);
-    }
-
-    char* incode_message(const join_request& message)
-    {
-        return incoding(message_type::JOIN_REQ, message);
-    }
-
-    char* incode_message(const join_response& message)
-    {
-        return incoding(message_type::JOIN_ANS, message);
-    }
-
-    char* incode_message(const match_complete& message)
-    {
-        return incoding(message_type::MATCH_COMPLETE, message);
-    }
-
-    char* incode_message(const match_confirm& message)
-    {
-        return incoding(message_type::MATCH_CONFIRM, message);
-    }
-
-    char* incode_message(const error_report& message)
-    {
-        return incoding(message_type::ERROR_MSG, message);
-    }
-
-    char* incode_message(const logout_request& message)
-    {
-        return incoding(message_type::LOGOUT_REQ, message);
-    }
-
-    char* incode_message(const logout_response& message)
-    {
-        return incoding(message_type::LOGOUT_ANS, message);
-    }
-
-    inline void decode_message(join_request &message, const char *decoding_data, const int data_size)
+    inline void decode_message(protobuf::Message &message, const char *decoding_data, const int data_size)
     {
         message.ParseFromArray(decoding_data, data_size);
     }
-
-    inline void decode_message(join_response &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(logout_request &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(logout_response &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(error_report &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(match_complete &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(match_confirm &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(match_with_friends_relay &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(match_request &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(match_response &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(friends_request &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
-    inline void decode_message(friends_response &message, const char *decoding_data, const int data_size)
-    {
-        message.ParseFromArray(decoding_data, data_size);
-    }
-
+    
     rating check_rating(const int rating)
     {
-        if (rating < 100) return rating::bronze;
-        else if (rating < 200) return rating::silver;
-        else if (rating < 300) return rating::gold;
-        else if (rating < 400) return rating::platinum;
-        else if (rating < 500) return rating::diamond;
-        else if (rating < 800) return rating::master;
+        if (rating < 300) return rating::bronze;
+        else if (rating < 400) return rating::silver;
+        else if (rating < 500) return rating::gold;
+        else if (rating < 600) return rating::platinum;
+        else if (rating < 700) return rating::diamond;
+        else if (rating < 900) return rating::master;
         else return rating::challenger;
     }
 private:

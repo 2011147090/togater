@@ -15,6 +15,7 @@ session::session(int session_id, boost::asio::io_service &io_service, tcp_server
     receive_buffer_ = new char[max_buffer_len_];
     temp_buffer_ = new char[max_buffer_len_];
     packet_buffer_ = new char[max_buffer_len_ * 2];
+    cancel_flag = false;
 }
 
 session::~session()
@@ -32,10 +33,15 @@ session::~session()
 void session::init()
 {
     packet_buffer_mark_ = 0;
-    memset(token_, 0, token_size_);
 }
 
-void session::post_receive()
+void session::flush()
+{
+    control_timer_conn(0, false);
+    control_timer_rematch(0, false);
+}
+
+void session::wait_receive()
 {
     socket_.async_read_some(
         boost::asio::buffer(receive_buffer_,max_buffer_len_),
@@ -48,7 +54,7 @@ void session::post_receive()
     );
 }
 
-void session::post_send(const bool immediately, const int send_data_size, char * send_data)
+void session::wait_send(const bool immediately, const int send_data_size, char * send_data)
 {
     if (immediately == false)
     {
@@ -74,27 +80,46 @@ void session::post_send(const bool immediately, const int send_data_size, char *
 
 void session::rematch(const boost::system::error_code & error)
 {
-    channel_serv_->rematching_request(this);
+    if (channel_serv_->rematching_request(this) == false)
+    {
+        control_timer_rematch(5, true);
+    }
 }
 
 void session::check_status(const boost::system::error_code & error)
 {
-    if (stat_ == status::WAIT || stat_ == status::MATCH_COMPLETE || stat_ == status::LOGOUT)
+    if (stat_ == status::CONN || stat_ == status::MATCH_COMPLETE || stat_ == status::LOGOUT)
     {
         channel_serv_->close_session(session_id_, true);
     }
 }
 
-void session::set_timer_conn(int sec)
+void session::control_timer_conn(int sec, bool is_set)                                            // true -> set , false -> cancle
 {
-    con_timer_.expires_from_now(std::chrono::seconds(sec));
-    con_timer_.async_wait(boost::bind(&session::check_status,this,boost::asio::placeholders::error));
+    if (is_set && (sec > 0))
+    {
+        con_timer_.expires_from_now(std::chrono::seconds(sec));
+        con_timer_.async_wait(boost::bind(&session::check_status, this, boost::asio::placeholders::error));
+    }
+    else
+    {
+        log_manager::get_instance()->get_logger()->critical("conn timer done session_id {0:d}", session_id_);
+        con_timer_.cancel();
+    }
 }
 
-void session::set_timer_rematch(int sec)
+void session::control_timer_rematch(int sec, bool is_set)
 {
-    match_timer_.expires_from_now(std::chrono::seconds(sec));
-    match_timer_.async_wait(boost::bind(&session::rematch, this, boost::asio::placeholders::error));
+    if (is_set && (sec > 0))
+    {
+        match_timer_.expires_from_now(std::chrono::seconds(sec));
+        match_timer_.async_wait(boost::bind(&session::rematch, this, boost::asio::placeholders::error));
+    }
+    else
+    {
+        log_manager::get_instance()->get_logger()->critical("[*rematch timer*] done usr_id {0:s}", this->get_user_id());
+        match_timer_.cancel();
+    }
 }
 
 void session::handle_write(const boost::system::error_code & error, size_t bytes_transferred)
@@ -109,6 +134,7 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
             delete[] send_data_queue_.front();
             send_data_queue_.pop_front();
         }
+        //control_timer_conn(60, true);
         return;
     }
 
@@ -116,7 +142,7 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
     {
         char *p_data = send_data_queue_.front();
         packet_header *p_header = (packet_header *)p_data;
-        post_send(true, p_header->size + packet_header_size, p_data);
+        wait_send(true, p_header->size + packet_header_size, p_data);
     }
 }
 
@@ -128,12 +154,16 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
         {
             log_manager::get_instance()->get_logger()->info("[Client Socket Close] [Socket Info : -session_id {0:d}]",session_id_);
             channel_serv_->close_session(session_id_, false);
-            //세션 초기화
+        }
+        else if (error == boost::asio::error::connection_reset)
+        {
+            log_manager::get_instance()->get_logger()->info("[Connection terminate] [Socket Info : -session_id {0:d}]", session_id_);
+            channel_serv_->close_session(session_id_, true);
+            control_timer_conn(0, false);
         }
         else
         {
             log_manager::get_instance()->get_logger()->warn("[Recv Error No : {0:d}] [Error Message : {1:s}] [User ID : {2:s}]", error.value(), error.message(), get_user_id());
-            channel_serv_->close_session(session_id_, false);
         }
     }
     else
@@ -174,6 +204,6 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
 
         packet_buffer_mark_ = n_packet_data;
 
-        post_receive();
+        wait_receive();
     }
 }

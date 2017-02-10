@@ -179,6 +179,7 @@ void client::process_packet(char * data, int nsize)
         break;
     case message_type::MATCH_COMPLETE:
         process_game(&data[packet_header_size], header->size);
+        std::cout << "¸ÅÄ¡µÊ" << std::endl;
         break;
     case message_type::PLAY_FRIENDS_REL:
         process_game_with_friends(&data[packet_header_size], header->size);
@@ -254,6 +255,7 @@ void client::process_join(char * data, int nsize)
 
 void client::process_game(char * data, int nsize)
 {
+    socket_.close();
 }
 
 void client::process_game_with_friends(char * data, int size)
