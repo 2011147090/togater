@@ -127,17 +127,6 @@ void tcp_session::handle_write(const boost::system::error_code& error, size_t by
         }
         break;
 
-    case chat_server::NORMAL:
-        break;
-
-    case chat_server::WHISPER:
-        break;
-
-    case chat_server::ROOM:
-        break;
-    
-    case chat_server::NOTICE:
-        break;
     }
 
     send_data_queue_.pop_front();
@@ -160,7 +149,7 @@ void tcp_session::handle_receive(const boost::system::error_code& error, size_t 
     else
     {
         if (error == boost::asio::error::eof)
-            LOG_INFO << "Disconnected with client" << std::endl;
+            LOG_INFO << "Disconnected with client";
         else
             LOG_WARN << "handle_receive() : Error No: " << error.value() << " Error Message: " << error.message();
         

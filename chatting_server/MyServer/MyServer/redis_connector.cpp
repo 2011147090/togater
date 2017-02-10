@@ -14,12 +14,11 @@ redis_connector::~redis_connector()
 bool redis_connector::init_singleton()
 {
     std::string REDIS_IP;
-    config::get_value("REDIS_IP", REDIS_IP);
-
     std::string REDIS_PORT;
-    config::get_value("REDIS_PORT", REDIS_PORT);
-
     std::string REDIS_PW;
+
+    config::get_value("REDIS_IP", REDIS_IP);
+    config::get_value("REDIS_PORT", REDIS_PORT);
     config::get_value("REDIS_PW", REDIS_PW);
 
 
@@ -39,8 +38,7 @@ bool redis_connector::init_singleton()
 bool redis_connector::release_singleton()
 {
     delete conn_;
-
-
+    
     if (conn_ != nullptr)
     {
         LOG_ERROR << "release_singleton() : Redis disconnecting is failed.";

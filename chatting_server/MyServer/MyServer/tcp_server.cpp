@@ -40,17 +40,10 @@ void tcp_server::init(const int max_session_count)
 void tcp_server::start()
 { 
     LOG_INFO << "Server Start";
-    std::cout << "Server Start..." << std::endl;
     
     // There are 8 threads.
-    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
-    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
-    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
-    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
-    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
-    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
-    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
-    io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
+    for (int i = 0; i < 8; i++)
+        io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
 }
  
 void tcp_server::close_session(const int session_id)
@@ -76,7 +69,6 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
     
     switch (message_header->type)
     {
-    //사용자 인증
     case chat_server::VERIFY_REQ:
         {
             chat_server::packet_verify_req verify_message;
@@ -85,6 +77,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             std::string redis_key = verify_message.key_string();
             std::string redis_value = verify_message.value_user_id();
 
+            // 레디스 인증 키 일치
             if (redis_connector::get_instance()->get(redis_key) == redis_value)
             {
                 session_list_[session_id]->set_user_key(redis_key);
@@ -93,15 +86,43 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
                 connected_session_map_.insert(std::pair<std::string, tcp_session*>(redis_value, session_list_[session_id]));
 
+                LOG_INFO << "Client cookie verified. user_id: " << session_list_[session_id]->get_user_id();
                 session_list_[session_id]->post_verify_ans(true);
+
+
+                // 입장 메세지
+                chat_server::packet_chat_normal normal_message;
+                normal_message.set_user_id("");
+                normal_message.set_chat_message(redis_value + "님이 입장하셨습니다.");
+
+                MESSAGE_HEADER header;
+
+                header.size = verify_message.ByteSize();
+                header.type = chat_server::NORMAL;
+
+                boost::array<BYTE, 1024>* send_data = new boost::array<BYTE, 1024>;
+                CopyMemory(send_data, (void*)&header, message_header_size);
+                master_data_queue_.push_back(*send_data);
+
+                LOG_CHAT << "[chat_system] " << normal_message.user_id() << ": " << normal_message.chat_message();
+
+                for (auto iter = connected_session_map_.begin(); iter != connected_session_map_.end(); ++iter)
+                {
+                    if (iter->second->get_socket().is_open() && iter->second->get_status() == lobby)
+                        iter->second->post_send(false, size, master_data_queue_.back().begin());
+                }
+                
             }
+            // 불일치
             else
+            {
+                LOG_WARN << "process_packet() - Client cookie does not verified. user_id: " << session_list_[session_id]->get_user_id();
                 session_list_[session_id]->post_verify_ans(false);
+            }
 
         }
         break;
 
-    // 로그아웃
     case chat_server::LOGOUT_REQ:
         {
             chat_server::packet_logout_req logout_message;
@@ -111,15 +132,20 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
             // 의미없는 if문
             if (user_id == session_list_[session_id]->get_user_id())
+            {
+                LOG_INFO << "Client logout successed. user_id: " << session_list_[session_id]->get_user_id();
                 session_list_[session_id]->post_logout_ans(true);
+            }
             else
+            {
+                LOG_WARN << "process_packet() - Client logout failed. user_id: " << session_list_[session_id]->get_user_id();
                 session_list_[session_id]->post_logout_ans(false);
+            }
 
         }
         break;
 
 
-    // 방 입장
     case chat_server::ENTER_MATCH_NTF:
         {
             chat_server::packet_enter_match_ntf enter_match_message;
@@ -133,7 +159,6 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         }
         break;
 
-    // 방 퇴장
     case chat_server::LEAVE_MATCH_NTF:
         {
             session_list_[session_id]->set_opponent_session(nullptr);
@@ -142,15 +167,18 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         break;
 
 
-    // 일반 채팅
     case chat_server::NORMAL:
         {
+            chat_server::packet_chat_normal normal_message;
+            normal_message.ParseFromArray(packet + message_header_size, message_header->size);
+
             boost::array<BYTE, 1024> send_data;
             CopyMemory(&send_data, packet, size);
             master_data_queue_.push_back(send_data);
 
-            auto iter = connected_session_map_.begin();
-            for (iter = connected_session_map_.begin(); iter != connected_session_map_.end(); ++iter)
+            LOG_CHAT << "[chat_normal] " << normal_message.user_id() << ": " << normal_message.chat_message();
+
+            for (auto iter = connected_session_map_.begin(); iter != connected_session_map_.end(); ++iter)
             {
                 if (iter->second->get_socket().is_open() && iter->second->get_status() == lobby)
                     iter->second->post_send(false, size, master_data_queue_.back().begin());
@@ -158,7 +186,6 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         }
         break;
 
-    // 귓속말
     case chat_server::WHISPER:
         {
             chat_server::packet_chat_whisper whisper_message;
@@ -169,12 +196,25 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             master_data_queue_.push_back(send_data);
 
             auto iter = connected_session_map_.find(whisper_message.target_id());
-            
             if (session_list_[session_id]->get_socket().is_open() && iter != connected_session_map_.end())
             {
-                session_list_[session_id]->post_send(false, size, master_data_queue_.back().begin());
-                iter->second->post_send(false, size, master_data_queue_.back().begin());
+                // 본인에게 귓속말을 한 경우
+                if (session_list_[session_id]->get_user_id() == iter->second->get_user_id())
+                {
+                    master_data_queue_.pop_back();
+
+                    session_list_[session_id]->post_whisper_error();
+                }
+                // 정상적인 경우
+                else
+                {
+                    LOG_CHAT << "[chat_whisper] " << whisper_message.user_id() << "->" << whisper_message.target_id() << ": " << whisper_message.chat_message();
+
+                    session_list_[session_id]->post_send(false, size, master_data_queue_.back().begin());
+                    iter->second->post_send(false, size, master_data_queue_.back().begin());
+                }
             }
+            // 귓속말 상대가 없는 경우
             else
             {
                 master_data_queue_.pop_back();
@@ -184,16 +224,16 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         }
         break;
 
-    // 방 채팅
     case chat_server::ROOM:
         {
+            chat_server::packet_chat_room room_message;
+            room_message.ParseFromArray(packet + message_header_size, message_header->size);
+
             boost::array<BYTE, 1024> send_data;
             CopyMemory(&send_data, packet, size);
             master_data_queue_.push_back(send_data);
-            
-            int MASTER_BUFFER_LEN;
-            config::get_value("MASTER_BUFFER_LEN", MASTER_BUFFER_LEN);
 
+            LOG_CHAT << "[chat_room] " << room_message.user_id() << "->" << session_list_[session_id]->get_opponent_session()->get_user_id() << ": " << room_message.chat_message();
 
             if (session_list_[session_id]->get_socket().is_open() && session_list_[session_id]->get_status() == room)
             {
@@ -203,15 +243,18 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         }
         break;
     
-    // 공지사항
     case chat_server::NOTICE:
         {
+            chat_server::packet_chat_notice notice_message;
+            notice_message.ParseFromArray(packet + message_header_size, message_header->size);
+
             boost::array<BYTE, 1024> send_data;
             CopyMemory(&send_data, packet, size);
             master_data_queue_.push_back(send_data);
 
-            auto iter = connected_session_map_.begin();
-            for (iter = connected_session_map_.begin(); iter != connected_session_map_.end(); ++iter)
+            LOG_CHAT << "[chat_notice] " << notice_message.user_id() << ": " << notice_message.chat_message();
+
+            for (auto iter = connected_session_map_.begin(); iter != connected_session_map_.end(); ++iter)
             {
                 if (iter->second->get_socket().is_open())
                     iter->second->post_send(false, size, master_data_queue_.back().begin());
@@ -220,9 +263,9 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         break;
 
 
-    // 실행될 일 없음???
+    // 패킷 타입 불명
     default:
-        LOG_WARN << "process_packet() : Message type is unknown. -> " << message_header->type;
+        LOG_WARN << "process_packet() - Message type is unknown. : " << message_header->type;
         break;
     }
 }
@@ -261,7 +304,7 @@ void tcp_server::handle_accept(tcp_session* session, const boost::system::error_
     }
     else
     {
-        LOG_WARN << "handle_accept() : Error No: " << error.value() << " Error Message: " << error.message();
+        LOG_WARN << "handle_accept() - Error No: " << error.value() << " Error Message: " << error.message();
         io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
     }
 }

@@ -17,8 +17,17 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(file_log, logger_t)
         boost::log::keywords::file_name = SYS_LOGFILE,
         boost::log::keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point(0, 0, 0),
         boost::log::keywords::format = (
-            expr::stream << expr::format_date_time<     boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
-            << " [" << expr::attr<     boost::log::trivial::severity_level >("Severity") << "]: "
+            expr::stream << expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
+            << " [" << expr::attr< boost::log::trivial::severity_level >("Severity") << "]: "
+            << expr::smessage
+            )
+    );
+
+    logging::add_console_log(
+        std::cout,
+        boost::log::keywords::format = (
+            expr::stream << expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
+            << " [" << expr::attr< boost::log::trivial::severity_level >("Severity") << "]: "
             << expr::smessage
             )
     );

@@ -1,6 +1,5 @@
 #pragma once
 
-
 // standard
 #include <iostream>
 #include <fstream>
@@ -17,6 +16,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
+#include <boost/locale.hpp>
 #include <boost/array.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/container/deque.hpp>
