@@ -108,7 +108,7 @@ bool lobby_scene::init()
     friend_search_field->setMaxLengthEnabled(true);
     friend_search_field->setColor(cocos2d::Color3B::BLACK);
     friend_search_field->setPosition(Vec2(visibleSize.width / 2 + 255, visibleSize.height / 2 - 132));
-    friend_search_field->setCursorEnabled(true);
+    //friend_search_field->setCursorEnabled(true);
     this->addChild(friend_search_field, 1);
 
     auto chat_list = ui::ListView::create();
@@ -145,17 +145,10 @@ bool lobby_scene::init()
     chat_field->setAnchorPoint(Vec2(0, 0.5));
     chat_field->setColor(cocos2d::Color3B::BLACK);
     chat_field->setPosition(Vec2(40, 33));
-    chat_field->setCursorEnabled(true);
+    //chat_field->setCursorEnabled(true);
     
     this->addChild(chat_field, 1);
-
-
-    auto rating_image = cocos2d::Sprite::create("bronze.png");
-    rating_image->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 10));
-    rating_image->setAnchorPoint(Vec2(0.5f, 0.5f));
-    rating_image->setScale(1.5f, 1.5f);
-    this->addChild(rating_image, 1);
-
+    
     auto history = ui::Text::create("", "fonts/D2Coding.ttf", 20);
     history->setTextHorizontalAlignment(cocos2d::TextHAlignment::LEFT);
     history->setPosition(Vec2(visibleSize.width / 2 - 25, visibleSize.height / 2 - 140));
@@ -169,7 +162,17 @@ bool lobby_scene::init()
 #pragma region Listener Event Settings
 
     back->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
-        if (type == ui::Widget::TouchEventType::ENDED) Director::getInstance()->popScene();
+        if (type == ui::Widget::TouchEventType::ENDED)
+        {
+            game_mgr->send_friend_match_ = false;
+            game_mgr->accept_friend_match_ = false;
+            game_mgr->friend_list_->removeAllItems();
+
+            network_chat->destroy();
+            network_lobby->destroy();
+
+            Director::getInstance()->popScene();
+        }
     });
 
     rank_match->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
@@ -291,40 +294,19 @@ bool lobby_scene::init()
 
     game_mgr->set_scene_status(game_manager::LOBBY);
 
-    this->getScheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            chat_session::connect,
-            network_chat,
-            CHAT_SERVER_IP, CHAT_SERVER_PORT
-        )
+    network_chat->create();
+    network_chat->connect(CHAT_SERVER_IP, CHAT_SERVER_PORT);
+    network_chat->send_packet_verify_req(
+        network_mgr->get_player_key(),
+        network_mgr->get_player_id()
     );
 
-    this->getScheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            chat_session::send_packet_verify_req,
-            network_chat,
-            network_mgr->get_player_key(),
-            network_mgr->get_player_id()
-        )
+    network_lobby->create();
+    network_lobby->connect(CHANNEL_SERVER_IP, CHANNEL_SEFVER_PORT);
+    network_lobby->send_packet_join_req(
+        network_mgr->get_player_key(), 
+        network_mgr->get_player_id()
     );
-    
-    this->getScheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            channel_session::connect,
-            network_lobby,
-            CHANNEL_SERVER_IP, CHANNEL_SEFVER_PORT
-        )
-    );
-
-    this->getScheduler()->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            channel_session::send_packet_join_req,
-            network_lobby,
-            network_mgr->get_player_key(),
-            network_mgr->get_player_id()
-        )
-    );
-
 #pragma endregion
 
     return true;

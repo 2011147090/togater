@@ -91,6 +91,8 @@ public:
     void start_game();
 
     void set_history(int win, int lose, int rating);
+
+    void set_tear(int rating);
 };
 
 

@@ -192,6 +192,14 @@ void channel_session::process_packet_join_ans(channel_server::packet_join_ans pa
             )
         );
 
+        game_mgr->get_scheduler()->performFunctionInCocosThread(
+            CC_CALLBACK_0(
+                game_manager::set_tear,
+                game_mgr,
+                history.rating_score()
+            )
+        );
+
         network_mgr->set_player_history(history);
     }
 }
@@ -260,6 +268,23 @@ void channel_session::process_packet_play_friend_game_rel(channel_server::packet
     switch(packet.type())
     {
     case channel_server::packet_play_friends_game_rel::APPLY:
+        if (game_mgr->send_friend_match_ == true)
+        {
+            game_mgr->accept_friend_match_ = false;
+            game_mgr->send_friend_match_ = false;
+
+            network_lobby->send_packet_play_friend_game_rel(
+                channel_server::packet_play_friends_game_rel_req_type_DENY,
+                packet.target_id()
+            );
+
+            game_mgr->lobby_scene_->hide_friend_match_pop_up();
+
+            cocos2d::CCDirector::getInstance()->popScene();
+
+            return;
+        }
+
         game_mgr->accept_friend_match_ = true;
         game_mgr->friend_match_id_ = packet.target_id();
 

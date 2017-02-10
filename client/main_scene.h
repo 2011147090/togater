@@ -19,8 +19,8 @@ public:
     void on_touch_cancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event);
     void on_touch_ended(cocos2d::Touch *touch, cocos2d::Event *unused_event);
 
-    void on_key_released(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-
+    void on_key_pressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+    
     CREATE_FUNC(main_scene);
 };
 

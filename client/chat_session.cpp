@@ -52,8 +52,15 @@ void chat_session::handle_read()
         if (!is_socket_open())
             break;
 
-        socket_->receive(boost::asio::buffer(recv_buf_));
+        boost::system::error_code error;
 
+        int i = 0;
+
+        socket_->receive(boost::asio::buffer(recv_buf_), i, error);
+
+        if (error)
+            return;
+        
         thread_sync sync;
 
         MESSAGE_HEADER message_header;
@@ -158,10 +165,19 @@ void chat_session::process_packet_chat_whisper(chat_server::packet_chat_whisper 
 {
     thread_sync sync;
 
+    std::string id = "[w]" + packet.user_id();
+    std::string str = packet.chat_message();
+
+    if (packet.user_id() == "Error")
+    {
+        id = "[w] - Invailed Command";
+        str = "";
+    }
+
     game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
             game_manager::update_chat, game_mgr,
-            "[w]" + packet.user_id(), packet.chat_message(), game_manager::CHAT_TYPE::WHISPER
+            id, str, game_manager::CHAT_TYPE::WHISPER
         )
     );
 }

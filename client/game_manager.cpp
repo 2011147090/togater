@@ -6,6 +6,7 @@
 #include "loading_scene.h"
 #include "channel_session.h"
 #include "chat_session.h"
+#include "CCShake.h"
 
 bool game_manager::init_singleton()
 {
@@ -44,16 +45,17 @@ game_manager::game_manager()
 
 void game_manager::set_opponent_info(std::string id, int win, int defeat, int rating)
 {
+    char temp[256] = "ID : %s\nWin : %d, Lose : %d\nRating : %d";
+    sprintf(temp, id.c_str(), win, defeat, rating);
+
     opponent_id_ = id;
-    opponent_info_ = "ID : ";
-    opponent_info_ += id;
-    opponent_info_ += "\nWin : " + win;
-    opponent_info_ += ", Defeat : " + defeat;
-    opponent_info_ += "\nRating : " + rating;
+    opponent_info_ = temp;
 }
 
 void game_manager::new_turn(int public_card_1, int public_card_2, int opponent_card, int remain_money, int my_money, int opponent_money)
 {
+    scene_->runAction(CCShake::actionWithDuration(1.0f, 10.0f));
+
     auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
     cocos2d::Vec2 origin = cocos2d::Director::getInstance()->getVisibleOrigin();
     cocos2d::Vec2 middle_pos(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y);
@@ -105,6 +107,36 @@ void game_manager::new_turn(int public_card_1, int public_card_2, int opponent_c
     
     opponent_info_text_->setString(opponent_info_ + opponent_bet_text);
     user_bet_text_->setString("Bet : 1");
+}
+
+void game_manager::set_tear(int rating)
+{
+    static cocos2d::Sprite* rating_image = nullptr;
+
+    if (rating_image != nullptr)
+        rating_image->removeFromParent();
+
+    if (rating < 300)
+        rating_image = cocos2d::Sprite::create("bronze.png");
+    else if (rating >= 300 && rating < 400)
+        rating_image = cocos2d::Sprite::create("silver.png");
+    else if (rating >= 400 && rating < 500)
+        rating_image = cocos2d::Sprite::create("Gold.png");
+    else if (rating >= 500 && rating < 600)
+        rating_image = cocos2d::Sprite::create("platinum.png");
+    else if (rating >= 600 && rating < 700)
+        rating_image = cocos2d::Sprite::create("diamond.png");
+    else if (rating >= 700 && rating < 800)
+        rating_image = cocos2d::Sprite::create("master.png");
+    else if (rating >= 800 && rating < 900)
+        rating_image = cocos2d::Sprite::create("GrandMaster.png");
+    else if (rating >= 900)
+        rating_image = cocos2d::Sprite::create("challenger.png");
+
+    rating_image->setPosition(Vec2(400, 240 + 10));
+    rating_image->setAnchorPoint(Vec2(0.5f, 0.5f));
+    rating_image->setScale(1.5f, 1.5f);
+    lobby_scene_->addChild(rating_image, 1);
 }
 
 void game_manager::betting()
@@ -173,9 +205,17 @@ void game_manager::set_scene_status(SCENE_TYPE status)
 void game_manager::update_chat(std::string id, std::string str, CHAT_TYPE type)
 {
     std::string message = id;
-    message += " : ";
-    message += str;
-    
+
+    if (scene_type_ == LOBBY)
+    {
+        message += " : ";
+        message += str;
+    }
+    else if (scene_type_ == ROOM)
+    {
+        message = str;
+    }
+
     auto label = cocos2d::ui::Text::create(message, "fonts/D2Coding.ttf", 15);
 
     if (id == network_mgr->get_player_id())
@@ -190,9 +230,15 @@ void game_manager::update_chat(std::string id, std::string str, CHAT_TYPE type)
     label->setTouchEnabled(true);
 
     if (scene_type_ == LOBBY)
+    {
         this->lobby_chat_list_->pushBackCustomItem(label);
+        this->lobby_chat_list_->scrollToBottom(1, true);
+    }
     else if (scene_type_ == ROOM)
+    {
         this->room_chat_list_->pushBackCustomItem(label);
+        this->room_chat_list_->scrollToBottom(1, true);
+    }
 }
 
 void game_manager::set_friend_text_field(std::string text)

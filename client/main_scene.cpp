@@ -97,7 +97,7 @@ bool main_scene::init()
     room_chat_field->setMaxLength(true);
     room_chat_field->setAnchorPoint(Vec2(0, 0));
     room_chat_field->setPosition(Vec2(9, 5));
-    room_chat_field->setCursorEnabled(true);
+    //room_chat_field->setCursorEnabled(true);
 
     this->addChild(room_chat_field, 5);
 
@@ -133,10 +133,6 @@ bool main_scene::init()
 #pragma endregion
 
 #pragma region Listener Event Settings
-    auto keylistener = EventListenerKeyboard::create();
-    keylistener->onKeyReleased = CC_CALLBACK_2(main_scene::on_key_released, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(keylistener, this);
-
     auto listener = EventListenerTouchOneByOne::create();
 
     listener->setSwallowTouches(true);
@@ -216,6 +212,10 @@ bool main_scene::init()
         }
     });
 
+    auto keyboard_listener = EventListenerKeyboard::create();
+    keyboard_listener->onKeyPressed = CC_CALLBACK_2(main_scene::on_key_pressed, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboard_listener, this);
+
     this->addChild(back, 1);
 #pragma endregion
 
@@ -293,13 +293,51 @@ void main_scene::end()
     game_mgr->set_scene_status(game_manager::SCENE_TYPE::LOBBY);
 }
 
-void main_scene::on_key_released(EventKeyboard::KeyCode keyCode, Event* event)
+void main_scene::on_key_pressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event)
 {
-    switch (keyCode)
+    if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_ENTER)
     {
-    case EventKeyboard::KeyCode::KEY_ENTER:
-        
-        break;
+        if (room_chat_field->isFocused())
+        {
+            std::string chat_str = room_chat_field->getString();
+            std::string target_id = "";
+            std::string real_str = "";
+
+            bool is_whisper = false;
+
+            if (chat_str.find("/w ") != std::string::npos)
+            {
+                for (int j = 3; j < chat_str.size(); j++)
+                {
+                    if (chat_str[j] != ' ')
+                        target_id += chat_str[j];
+                    else
+                    {
+                        real_str = chat_str.substr(j + 1, chat_str.size() - j - 1);
+                        is_whisper = true;
+                        break;
+                    }
+                }
+            }
+
+            if (is_whisper)
+            {
+                network_chat->send_packet_chat_whisper(
+                    network_mgr->get_player_id(),
+                    target_id,
+                    real_str
+                );
+            }
+            else
+            {
+                network_chat->send_packet_chat_room(
+                    network_mgr->get_player_id(),
+                    chat_str
+                );
+            }
+
+            room_chat_field->setText("");
+        }
     }
 }
 

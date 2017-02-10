@@ -5,6 +5,8 @@
 #include <network\HttpClient.h>
 #include <ui\UITextField.h>
 #include "network_manager.h"
+#include "channel_session.h"
+#include "chat_session.h"
 #include "game_manager.h"
 
 using namespace cocos2d;
