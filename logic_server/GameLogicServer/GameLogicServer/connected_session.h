@@ -50,7 +50,8 @@ public:
     std::string get_player_key();
     std::string get_room_key();
 
-    bool is_start_game();
+    bool is_in_room();
+    void set_room_state(bool is_enter);
     bool accept_client();
 
     typedef boost::shared_ptr<connected_session> pointer;

@@ -16,6 +16,7 @@ void connected_session::process_packet_enter_req(logic_server::packet_enter_req 
     }
     else
     {
+        enter_room_ = false;
         recevie_packet.set_result(0);
         this->shut_down();
     }

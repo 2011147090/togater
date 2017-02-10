@@ -3,7 +3,8 @@
 #include "log_manager.h"
 
 connected_session::connected_session(boost::asio::io_service& io_service) : socket_(io_service), safe_disconnect_(true), enter_room_(false), is_accept_(false)
-{}
+{
+}
 
 bool connected_session::handle_check_keep_alive()
 {
@@ -190,6 +191,9 @@ void connected_session::start()
             boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred));
 
+    boost::asio::socket_base::keep_alive option;
+    socket_.set_option(option);
+
     is_accept_ = true;
 }
 
@@ -200,11 +204,18 @@ bool connected_session::is_safe_disconnect()
     return safe_disconnect_;
 }
 
-bool connected_session::is_start_game()
+bool connected_session::is_in_room()
 {
     thread_sync sync;
 
     return enter_room_;
+}
+
+void connected_session::set_room_state(bool is_enter)
+{
+    thread_sync sync;
+
+    enter_room_ = is_enter;
 }
 
 bool connected_session::accept_client()

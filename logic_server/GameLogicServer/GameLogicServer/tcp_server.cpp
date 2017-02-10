@@ -6,14 +6,14 @@
 tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
     : acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
 {
-    connected_session_list_.reserve(1000);
-
     wait_accept();
+
+    connected_session_list_.reserve(1000);
 
     count = 0;
     end = false;
 
-    keep_arrive_thread = new std::thread(&tcp_server::check_keep_arrive, this);
+    keep_arrive_thread = new std::thread(&tcp_server::check_connected_session, this);
 }
 
 void tcp_server::wait_accept()
@@ -52,7 +52,7 @@ void tcp_server::end_server()
     keep_arrive_thread->join();
 }
 
-void tcp_server::check_keep_arrive()
+void tcp_server::check_connected_session()
 {
     while (!end)
     {
@@ -64,7 +64,7 @@ void tcp_server::check_keep_arrive()
         {
             if (!(*iter)->get_socket().is_open())
             {
-                if ((*iter)->is_start_game())
+                if ((*iter)->is_in_room())
                     logic_worker::get_instance()->disconnect_room((*iter)->get_room_key(), (*iter)->get_player_key());
             
                 if (!(*iter)->is_safe_disconnect())
@@ -81,7 +81,7 @@ void tcp_server::check_keep_arrive()
                 if ((*iter)->accept_client())
                 {
                     iter = connected_session_list_.erase(iter);
-                    system_log->info("keep arrive - erase session");
+                    system_log->info("keep alive - erase session");
                 }
             }
         }

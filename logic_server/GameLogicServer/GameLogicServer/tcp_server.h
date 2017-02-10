@@ -20,5 +20,5 @@ public:
 private:
     void wait_accept();
     void handle_accept(connected_session::pointer new_connection, const boost::system::error_code& error);
-    void check_keep_arrive();
+    void check_connected_session();
 };

@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     {
         if (log_mgr->init_singleton())
         {
-            log_mgr->set_debug_mode(false);
+            log_mgr->set_debug_mode(true);
 
             system_log->info("server_start");
             system_log->info("init_log_manager");
