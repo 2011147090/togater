@@ -1,47 +1,91 @@
+#include "pre_header.h"
 #include "channel_session.h"
 #include "logic_session.h"
+#include "game_manager.h"
 #include "network_manager.h"
+#include "logger.h"
 
-void channel_session::handle_send(channel_server::message_type msg_type, const protobuf::Message& message, bool must_recv)
+bool channel_session::create()
 {
     thread_sync sync;
 
-    boost::array<BYTE, BUFSIZE> send_buf;
-    boost::array<BYTE, BUFSIZE> recv_buf;
-    boost::array<BYTE, 128> recv_buf_ori;
+    is_connected_ = false;
 
-    MESSAGE_HEADER send_header;
-    send_header.size = message.ByteSize();
-    send_header.type = msg_type;
+    socket_ = new tcp::socket(io_service_);
 
-    CopyMemory(send_buf.begin(), (void*)&send_header, message_header_size);
+    return true;
+}
 
-    message.SerializeToArray(send_buf.begin() + message_header_size, send_header.size);
+bool channel_session::destroy()
+{
+    thread_sync sync;
 
-    send(socket_, (char*)send_buf.begin(), message_header_size + send_header.size, 0);
-    int size = recv(socket_, (char*)recv_buf_ori.begin(), 128, 0);
+    //socket_->shutdown(boost::asio::socket_base::send);
+    this->disconnect();
 
-    int remain_size = size;
-    int process_size = 0;
+    is_connected_ = false;
 
-    do
+    work_thread_->join();
+
+    if (socket_ != nullptr)
     {
-        MESSAGE_HEADER recv_header;
-        CopyMemory(&recv_header, recv_buf_ori.begin() + process_size, message_header_size);
-        CopyMemory(recv_buf.begin(), recv_buf_ori.begin() + process_size, recv_header.size + message_header_size);
+        delete socket_;
+        socket_ = nullptr;
+    }
 
-        process_size += message_header_size + recv_header.size;
-        remain_size -= process_size;
+    return true;
+}
 
-        switch (recv_header.type)
+void channel_session::handle_send(channel_server::message_type msg_type, const protobuf::Message& message)
+{
+    thread_sync sync;
+
+    MESSAGE_HEADER header;
+    header.size = message.ByteSize();
+    header.type = msg_type;
+
+    int buf_size = 0;
+    buf_size = message_header_size + message.ByteSize();
+
+    CopyMemory(send_buf_.begin(), (void*)&header, message_header_size);
+
+    message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
+
+    boost::system::error_code error;
+    socket_->write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
+}
+
+void channel_session::handle_read()
+{
+    while (true)
+    {
+        if (!is_socket_open())
+            break;
+
+        boost::system::error_code error;
+
+        int i = 0;
+
+        socket_->receive(boost::asio::buffer(recv_buf_), i, error);
+
+        if (error)
+            return;
+
+        thread_sync sync;
+
+        MESSAGE_HEADER message_header;
+
+        CopyMemory(&message_header, recv_buf_.begin(), message_header_size);
+
+        switch (message_header.type)
         {
         case channel_server::JOIN_ANS:
         {
             channel_server::packet_join_ans message;
 
-            if (false == message.ParseFromArray(recv_buf.begin() + message_header_size, recv_header.size))
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                 break;
-
+                
             process_packet_join_ans(message);
         }
         break;
@@ -50,7 +94,7 @@ void channel_session::handle_send(channel_server::message_type msg_type, const p
         {
             channel_server::packet_logout_ans message;
 
-            if (false == message.ParseFromArray(recv_buf.begin() + message_header_size, recv_header.size))
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                 break;
 
             process_packet_logout_ans(message);
@@ -61,7 +105,7 @@ void channel_session::handle_send(channel_server::message_type msg_type, const p
         {
             channel_server::packet_friends_ans message;
 
-            if (false == message.ParseFromArray(recv_buf.begin() + message_header_size, recv_header.size))
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                 break;
 
             process_packet_friend_ans(message);
@@ -72,7 +116,7 @@ void channel_session::handle_send(channel_server::message_type msg_type, const p
         {
             channel_server::packet_play_rank_game_ans message;
 
-            if (false == message.ParseFromArray(recv_buf.begin() + message_header_size, recv_header.size))
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                 break;
 
             process_packet_rank_game_ans(message);
@@ -83,7 +127,7 @@ void channel_session::handle_send(channel_server::message_type msg_type, const p
         {
             channel_server::packet_play_friends_game_rel message;
 
-            if (false == message.ParseFromArray(recv_buf.begin() + message_header_size, recv_header.size))
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                 break;
 
             process_packet_play_friend_game_rel(message);
@@ -94,7 +138,7 @@ void channel_session::handle_send(channel_server::message_type msg_type, const p
         {
             channel_server::packet_matching_complete_ans message;
 
-            if (false == message.ParseFromArray(recv_buf.begin() + message_header_size, recv_header.size))
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                 break;
 
             process_packet_matching_complete_ans(message);
@@ -105,7 +149,7 @@ void channel_session::handle_send(channel_server::message_type msg_type, const p
         {
             channel_server::packet_error_message message;
 
-            if (false == message.ParseFromArray(recv_buf.begin() + message_header_size, recv_header.size))
+            if (false == message.ParseFromArray(recv_buf_.begin() + message_header_size, message_header.size))
                 break;
 
             process_packet_error_message(message);
@@ -113,44 +157,36 @@ void channel_session::handle_send(channel_server::message_type msg_type, const p
         break;
 
         }
-    } while (remain_size > 0);
+    }
 }
 
 void channel_session::process_packet_join_ans(channel_server::packet_join_ans packet)
 {
     thread_sync sync;
 
+    logger::print("channel_session : process_packet_join_ans");
+
     if (packet.success() == false)
         return;
+
+    char temp[128] = "";
+    logger::print("[friend_list]");
 
     for (int i = 0; i < packet.friends_list_size(); ++i)
     {
         const channel_server::basic_info& info = packet.friends_list(i);
         
-        /*game_mgr->get_scheduler()->performFunctionInCocosThread(
-            CC_CALLBACK_0(
-                game_manager::add_friend_in_list,
-                game_mgr,
-                info.id()
-            )
-        );*/
+        sprintf(temp, "friend id(%s)", info.id().c_str());
+
+        logger::print(temp);
     }
 
     if (packet.has_history())
     {
         const channel_server::game_history& history = packet.history();
 
-        /*game_mgr->get_scheduler()->performFunctionInCocosThread(
-            CC_CALLBACK_0(
-                game_manager::set_history,
-                game_mgr,
-                history.win(),
-                history.lose(),
-                history.rating_score()
-            )
-        );*/
-
-        network_mgr->set_player_history(history);
+        sprintf(temp, "[player info] -> win(%d), lose(%d), rating(%d)", history.win(), history.lose(), history.rating_score());
+        logger::print(temp);
     }
 }
 
@@ -158,11 +194,14 @@ void channel_session::process_packet_logout_ans(channel_server::packet_logout_an
 {
     thread_sync sync;
 
+    logger::print("channel_session : process_packet_logout_ans");
 }
 
 void channel_session::process_packet_friend_ans(channel_server::packet_friends_ans packet)
 {
     thread_sync sync;
+
+    char temp[128] = "";
 
     const channel_server::user_info& friend_info = packet.friends_info();
     const channel_server::game_history& friend_history = friend_info.game_history_();
@@ -177,30 +216,21 @@ void channel_session::process_packet_friend_ans(channel_server::packet_friends_a
     {
     case channel_server::packet_friends_ans_ans_type::packet_friends_ans_ans_type_SEARCH_SUCCESS:
     {
-        channel_server::basic_info info;
-//        info.set_id(game_mgr->friend_text_field->getString());
-        this->send_packet_friend_req(channel_server::packet_friends_req_req_type_ADD, info);
+        sprintf(temp, "channel_session : search_friend_success, id(%s)", packet.mutable_friends_info()->mutable_basic_info_()->id().c_str());
+        logger::print(temp);
+
+        this->send_packet_friend_req(channel_server::packet_friends_req_req_type_ADD, friend_basic_info);
     }
     break;
 
     case channel_server::packet_friends_ans_ans_type::packet_friends_ans_ans_type_ADD_SUCCESS:
-        /*game_mgr->get_scheduler()->performFunctionInCocosThread(
-            CC_CALLBACK_0(
-                game_manager::add_friend_in_list,
-                game_mgr,
-                packet.mutable_friends_info()->mutable_basic_info_()->id()
-            )
-        );*/
+        sprintf(temp, "channel_session : add_friend_success : id(%s)", packet.mutable_friends_info()->mutable_basic_info_()->id().c_str());
+        logger::print(temp);
         break;
 
     case channel_server::packet_friends_ans_ans_type::packet_friends_ans_ans_type_DEL_SUCCESS:
-        /*game_mgr->get_scheduler()->performFunctionInCocosThread(
-            CC_CALLBACK_0(
-                game_manager::del_friend_in_list,
-                game_mgr,
-                packet.mutable_friends_info()->mutable_basic_info_()->id()
-            )
-        );*/
+        sprintf(temp, "channel_session : del_friend_success : id(%s)", packet.mutable_friends_info()->mutable_basic_info_()->id().c_str());
+        logger::print(temp);
         break;
     }
 }
@@ -209,31 +239,40 @@ void channel_session::process_packet_rank_game_ans(channel_server::packet_play_r
 {
     thread_sync sync;
 
+    logger::print("channel_session : process_packet_rank_game_ans");
 }
 
 void channel_session::process_packet_play_friend_game_rel(channel_server::packet_play_friends_game_rel packet)
 {
     thread_sync sync;
 
+    logger::print("channel_session : process_packet_play_friend_game_rel");
+
     switch(packet.type())
     {
     case channel_server::packet_play_friends_game_rel::APPLY:
-        /*game_mgr->accept_friend_match_ = true;
+        if (game_mgr->send_friend_match_ == true)
+        {
+            game_mgr->accept_friend_match_ = false;
+            game_mgr->send_friend_match_ = false;
+
+            network_lobby->send_packet_play_friend_game_rel(
+                channel_server::packet_play_friends_game_rel_req_type_DENY,
+                packet.target_id().c_str()
+            );
+
+            game_mgr->state_ = game_manager::DENY;
+            return;
+        }
+
+        game_mgr->accept_friend_match_ = true;
         game_mgr->friend_match_id_ = packet.target_id();
-
-        game_mgr->get_scheduler()->performFunctionInCocosThread(
-            CC_CALLBACK_0(
-                lobby_scene::show_friend_match_pop_up,
-                game_mgr->lobby_scene_
-            )
-        );*/
-
+                
         break;
 
     case channel_server::packet_play_friends_game_rel::DENY:
-        /*game_mgr->accept_friend_match_ = false;
-                
-        cocos2d::CCDirector::getInstance()->popScene();*/
+        game_mgr->accept_friend_match_ = false;
+        game_mgr->state_ = game_manager::DENY;
         break;
     }
 }
@@ -242,19 +281,37 @@ void channel_session::process_packet_matching_complete_ans(channel_server::packe
 {
     thread_sync sync;
     
+    logger::print("channel_session : process_packet_matching_complete_ans");
+
+    char temp[128] = "";
+
+    sprintf(temp, 
+        "matchiing_complete : id(%s), win(%d), lose(%d), rating(%d)",
+        packet.mutable_opponent_player()->mutable_basic_info_()->id().c_str(),
+        packet.mutable_opponent_player()->mutable_game_history_()->win(),
+        packet.mutable_opponent_player()->mutable_game_history_()->lose(),
+        packet.mutable_opponent_player()->mutable_game_history_()->rating_score()
+    );
+
     network_mgr->set_room_key(packet.room_key());
-   
+
+    game_mgr->state_ = game_manager::CONNECT;
+    
     send_packet_matching_confirm();
 }
 
 void channel_session::process_packet_error_message(channel_server::packet_error_message packet)
 {
     thread_sync sync;
+
+    logger::print("channel_session : process_packet_error_message");
 }
 
 void channel_session::send_packet_join_req(std::string key, std::string id)
 {
     thread_sync sync;
+
+    logger::print("channel_session : send_packet_join_req");
 
     channel_server::packet_join_req packet;
 
@@ -268,6 +325,8 @@ void channel_session::send_packet_logut_req(bool flag)
 {
     thread_sync sync;
 
+    logger::print("channel_session : send_packet_logut_req");
+
     channel_server::packet_logout_req packet;
     packet.set_none(flag);
 
@@ -277,7 +336,7 @@ void channel_session::send_packet_logut_req(bool flag)
 void channel_session::send_packet_friend_req(channel_server::packet_friends_req::req_type type, channel_server::basic_info info)
 {
     thread_sync sync;
-    
+
     channel_server::packet_friends_req packet;
     packet.set_type(type);
     packet.mutable_target_info()->set_id(info.id());
@@ -289,6 +348,8 @@ void channel_session::send_packet_rank_game_req(bool flag)
 {
     thread_sync sync;
 
+    logger::print("channel_session : send_packet_rank_game_req");
+
     channel_server::packet_play_rank_game_req packet;
     packet.set_none(flag);
 
@@ -298,6 +359,8 @@ void channel_session::send_packet_rank_game_req(bool flag)
 void channel_session::send_packet_play_friend_game_rel(channel_server::packet_play_friends_game_rel::req_type type, std::string target_id)
 {
     thread_sync sync;
+
+    logger::print("channel_session : send_packet_play_friend_game_rel");
 
     channel_server::packet_play_friends_game_rel packet;
     packet.set_type(type);
@@ -310,9 +373,11 @@ void channel_session::send_packet_matching_confirm()
 {
     thread_sync sync;
 
+    logger::print("channel_session : send_packet_matching_confirm");
+
     channel_server::packet_matching_confirm packet;
 
     this->handle_send(channel_server::MATCH_CONFIRM, packet);
 
-    this->disconnect();
+    this->destroy();
 }

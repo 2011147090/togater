@@ -26,8 +26,12 @@
 #include <cpprest\http_client.h>
 #include <cpprest\filestream.h>
 
-#pragma comment(lib, "libcpprest140d_2_9")
-#pragma comment(lib, "zlibstaticd")
+// json Spirit
+#include <json_spirit.h>
+
+#pragma comment(lib, "libcpprest140_2_9")
+//#pragma comment(lib, "libcpprest140d_2_9")
+#pragma comment(lib, "zlibstatic")
 
 using namespace utility;
 using namespace web;
@@ -37,4 +41,7 @@ using namespace concurrency::streams;
 
 using namespace boost::asio;
 using namespace boost::asio::ip;
+
+using namespace google;
+
 using namespace google;

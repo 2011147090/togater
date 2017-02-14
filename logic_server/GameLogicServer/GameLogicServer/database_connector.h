@@ -3,11 +3,6 @@
 #include "singleton.h"
 #include "critical_section.h"
 
-#define DB_HOST "192.168.1.203"
-#define DB_PORT "3301"
-#define DB_USER "root"
-#define DB_PASS "123123"
-#define DB_NAME "game"
 
 typedef struct _DB_CONNECTION {
     MYSQL* connection_;

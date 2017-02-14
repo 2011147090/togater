@@ -1,46 +1,72 @@
 #include "pre_header.h"
 #include "network_session.h"
-#include "logger.h"
 
 network_session::network_session()
 {
     is_connected_ = false;
+
+    socket_ = nullptr;
+    work_thread_ = nullptr;
 }
 
 network_session::~network_session() {}
 
-bool network_session::connect(std::string ip, int port)
+bool network_session::is_run()
 {
     thread_sync sync;
 
-    socket_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    return is_connected_;
+}
 
-    if (socket_ == SOCKET_ERROR) {
-        logger::print("Socket Error!");
-        return false;
+void network_session::connect(std::string ip, std::string port)
+{
+    thread_sync sync;
+
+    work_thread_ = new boost::thread(boost::bind(&boost::asio::io_service::run, &io_service_));
+
+    tcp::resolver resolver(socket_->get_io_service());
+    tcp::resolver::query query(tcp::v4(), ip, port);
+
+    auto endPointIter = resolver.resolve(query);
+    tcp::resolver::iterator end;
+
+    boost::system::error_code error = boost::asio::error::host_not_found;
+    while (error && endPointIter != end)
+    {
+        socket_->close();
+        socket_->connect(*endPointIter++, error);
     }
 
-    SOCKADDR_IN addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = inet_addr(ip.c_str());
-
-    if (::connect(socket_, (SOCKADDR*)&addr, sizeof(addr)) == -1) {
-        logger::print("Connent error!!");
-        return false;
-    }
+    if (error)
+        throw boost::system::system_error(error);
 
     is_connected_ = true;
 
-    return true;
+    recv_thread_ = new boost::thread(boost::bind(&network_session::handle_read, this));
+
+    io_service_.run();
 }
 
-bool network_session::disconnect()
+void network_session::disconnect()
 {
     thread_sync sync;
 
-    is_connected_ = false;
-    closesocket(socket_);
+    if (socket_->is_open())
+        socket_->close();
+}
+
+bool network_session::is_socket_open()
+{
+    thread_sync sync;
+
+    if (socket_ == nullptr)
+        return false;
+
+    if (!socket_->is_open() && is_connected_)
+    {
+        is_connected_ = false;
+        return false;
+    }
 
     return true;
 }

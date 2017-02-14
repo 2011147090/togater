@@ -1,15 +1,10 @@
-#pragma once
-
+#pragma once 
 #include "pre_header.h"
-
-#include "logic_server.pb.h"
-#include "chat_protobuf.pb.h"
-#include "channel_protobuf.pb.h"
-
-#include "my_thread_sync.h"
 #include "singleton.h"
-
-#include "network_session.h"
+#include "channel_protobuf.pb.h"
+#include "logic_session.h"
+#include "chat_session.h"
+#include "channel_session.h"
 
 #define network_mgr network_manager::get_instance()
 
@@ -42,10 +37,10 @@ public:
     void set_player_id(std::string id);
     void set_room_key(std::string key);
 
-    bool try_login(std::string id, std::string password);
-
     void set_player_history(channel_server::game_history history);
     channel_server::game_history get_player_history();
+
+    bool try_login(std::string id, std::string password);
 
     network_manager();
     ~network_manager();

@@ -192,11 +192,14 @@ void logic_worker::process_queue()
 {
     while (end_server_)
     {
+        if (room_hashs_.empty())
+        {
+            Sleep(100);
+            continue;
+        }
+
         thread_sync sync;
 
-        if (room_hashs_.empty())
-            continue;
-        
         auto iter = room_hashs_.begin();
 
         while (iter != room_hashs_.end())
@@ -217,10 +220,10 @@ void logic_worker::process_queue()
                     iter->second.player_[0].session_->handle_send(logic_server::GAME_STATE_NTF, start_ntf_packet);
                     iter->second.player_[1].session_->handle_send(logic_server::GAME_STATE_NTF, start_ntf_packet);
 
-                    log(iter->first)->info("game start, room_key:{}, player_1_key:{}, player_2_key:{}",
-                        iter->first,
-                        iter->second.player_[0].session_->get_player_key(),
-                        iter->second.player_[1].session_->get_player_key()
+                    Log::WriteLog(_T("game start, room_key:%s, player_1:%s, player_2:%s"),
+                        iter->first.c_str(),
+                        redis_connector::get_instance()->get_id(iter->second.player_[0].session_->get_player_key()).c_str(),
+                        redis_connector::get_instance()->get_id(iter->second.player_[1].session_->get_player_key()).c_str()
                     );
 
                     logic_server::packet_process_turn_ntf turn_ntf_packet;
@@ -296,9 +299,9 @@ void logic_worker::process_queue()
 
                         if (iter->second.turn_player_ == &iter->second.player_[0])
                         {
-                            log(iter->first)->info("turn_type:{}, submit_player:{}, sum_coin:{}, other_player_sum_coin:{}",
+                            Log::WriteLog(_T("turn_type:%d, submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
                                 turn_type,
-                                iter->second.turn_player_->session_->get_player_key(),
+                                redis_connector::get_instance()->get_id(iter->second.turn_player_->session_->get_player_key()).c_str(),
                                 iter->second.turn_player_->sum_money_,
                                 iter->second.player_[1].sum_money_
                             );
@@ -310,9 +313,9 @@ void logic_worker::process_queue()
                         }
                         else
                         {
-                            log(iter->first)->info("turn_type:{}, submit_player:{}, sum_coin:{}, other_player_sum_coin:{}",
+                            Log::WriteLog(_T("turn_type:%d, submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
                                 turn_type,
-                                iter->second.turn_player_->session_->get_player_key(),
+                                redis_connector::get_instance()->get_id(iter->second.turn_player_->session_->get_player_key()).c_str(),
                                 iter->second.turn_player_->sum_money_,
                                 iter->second.player_[0].sum_money_
                             );
@@ -333,9 +336,9 @@ void logic_worker::process_queue()
 
                         if (iter->second.turn_player_ == &iter->second.player_[0])
                         {
-                            log(iter->first)->info("turn_type:{}, submit_player:{}, sum_coin:{}, other_player_sum_coin:{}",
+                            Log::WriteLog(_T("turn_type:%d, submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
                                 turn_type,
-                                iter->second.turn_player_->session_->get_player_key(),
+                                redis_connector::get_instance()->get_id(iter->second.turn_player_->session_->get_player_key()).c_str(),
                                 iter->second.turn_player_->sum_money_,
                                 iter->second.player_[1].sum_money_
                             );
@@ -347,9 +350,9 @@ void logic_worker::process_queue()
                         }
                         else
                         {
-                            log(iter->first)->info("turn_type:{}, submit_player:{}, sum_coin:{}, other_player_sum_coin:{}",
+                            Log::WriteLog(_T("turn_type:%d, submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
                                 turn_type,
-                                iter->second.turn_player_->session_->get_player_key(),
+                                redis_connector::get_instance()->get_id(iter->second.turn_player_->session_->get_player_key()).c_str(),
                                 iter->second.turn_player_->sum_money_,
                                 iter->second.player_[0].sum_money_
                             );
@@ -375,9 +378,9 @@ void logic_worker::process_queue()
                             iter->second.player_[0].remain_money_ -= iter->second.player_[0].sum_money_;
                             iter->second.player_[1].remain_money_ += iter->second.player_[0].sum_money_;
 
-                            log(iter->first)->info("turn_type:{}, submit_player:{}, remain_coin:{}, other_player_remain_coin:{}",
+                            Log::WriteLog(_T("turn_type:%d, submit_player:%s), remain_coin:%d, other_player_remain_coin:%d"),
                                 turn_type,
-                                iter->second.turn_player_->session_->get_player_key(),
+                                redis_connector::get_instance()->get_id(iter->second.turn_player_->session_->get_player_key()).c_str(),
                                 iter->second.turn_player_->remain_money_,
                                 iter->second.player_[1].remain_money_
                             );
@@ -387,9 +390,9 @@ void logic_worker::process_queue()
                             iter->second.player_[0].remain_money_ += iter->second.player_[1].sum_money_;
                             iter->second.player_[1].remain_money_ -= iter->second.player_[1].sum_money_;
 
-                            log(iter->first)->info("turn_type:{}, submit_player:{}, remain_coin:{}, other_player_remain_coin:{}",
+                            Log::WriteLog(_T("turn_type:%d, submit_player:%s, remain_coin:%d, other_player_remain_coin:%d"),
                                 turn_type,
-                                iter->second.turn_player_->session_->get_player_key(),
+                                redis_connector::get_instance()->get_id(iter->second.turn_player_->session_->get_player_key()).c_str(),
                                 iter->second.turn_player_->remain_money_,
                                 iter->second.player_[0].remain_money_
                             );
@@ -452,18 +455,18 @@ void logic_worker::process_queue()
                             iter->second.public_card_[1]
                         );
 
-                        log(iter->first)->info("turn_type:{}",
+                        Log::WriteLog(_T("turn_type:%d"),
                             turn_type
                         );
 
-                        log(iter->first)->info("-> player:{}, card_deck:{}, card_num:{}",
-                            iter->second.player_[0].session_->get_player_key(),
+                        Log::WriteLog(_T("-> player:%s, card_deck:%d, card_num:%d"),
+                            redis_connector::get_instance()->get_id(iter->second.player_[0].session_->get_player_key()).c_str(),
                             player_1_result,
                             iter->second.player_[1].opponent_card_num_
                         );
 
-                        log(iter->first)->info("-> player:{}, card_deck:{}, card_num:{}",
-                            iter->second.player_[1].session_->get_player_key(),
+                        Log::WriteLog(_T("-> player:%s, card_deck:%d, card_num:%d"),
+                            redis_connector::get_instance()->get_id(iter->second.player_[1].session_->get_player_key()).c_str(),
                             player_2_result,
                             iter->second.player_[0].opponent_card_num_
                         );
@@ -539,7 +542,7 @@ void logic_worker::process_queue()
                                 iter->second.player_[i].session_->handle_send(logic_server::PROCESS_TURN_NTF, turn_ntf_packet);
                             }
 
-                            log(iter->first)->info("-> completely_same:true, player_1:{}, player_2:{}",
+                            Log::WriteLog(_T("-> completely_same:true, player_1:%d, player_2:%d"),
                                 iter->second.player_[0].remain_money_,
                                 iter->second.player_[1].remain_money_
                             );
@@ -574,9 +577,7 @@ void logic_worker::process_queue()
                             for (int i = 0; i < 2; i++)
                                 iter->second.player_[i].sum_money_ = 1;
 
-                            log(iter->first)->info("-> completely_same:false",
-                                turn_type
-                            );
+                            Log::WriteLog(_T("-> completely_same:false"));
                         }
 
                         iter->second.hide_card_ = true;
@@ -585,8 +586,8 @@ void logic_worker::process_queue()
 
                         if (iter->second.turn_player_ == &iter->second.player_[0])
                         {
-                            log(iter->first)->info("-> submit_player:{}, sum_coin:{}, other_player_sum_coin:{}",
-                                iter->second.turn_player_->session_->get_player_key(),
+                            Log::WriteLog(_T("-> submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
+                                redis_connector::get_instance()->get_id(iter->second.player_[0].session_->get_player_key()).c_str(),
                                 iter->second.turn_player_->sum_money_,
                                 iter->second.player_[1].sum_money_
                             );
@@ -598,8 +599,8 @@ void logic_worker::process_queue()
                         }
                         else
                         {
-                            log(iter->first)->info("-> submit_player:{}, sum_coin:{}, other_player_sum_coin:{}",
-                                iter->second.turn_player_->session_->get_player_key(),
+                            Log::WriteLog(_T("-> submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
+                                redis_connector::get_instance()->get_id(iter->second.player_[0].session_->get_player_key()).c_str(),
                                 iter->second.turn_player_->sum_money_,
                                 iter->second.player_[0].sum_money_
                             );
@@ -623,57 +624,48 @@ void logic_worker::process_queue()
 
                 game_state_packet.set_state(2);
 
-                log(iter->first)->info("end_game, database_update.");
+                Log::WriteLog(_T("end_game, database_update."));
+
+                int win_index = 0;
+                int lose_index = 0;
 
                 if (iter->second.player_[0].remain_money_ >= iter->second.player_[1].remain_money_)
                 {
-                    db_query query;
-                    query.callback_func = nullptr;
-                    query.query_ = "UPDATE user_info SET ";
-                    query.query_ += "win = win + 1, ";
-                    query.query_ += "rating = rating + 40 ";
-                    query.query_ += "WHERE id = \'";
-                    query.query_ += redis_connector::get_instance()->get_id(iter->second.player_[0].session_->get_player_key()) + "\';";
-
-                    db_connector->push_query(query);
-
-                    db_query query2;
-                    query2.callback_func = nullptr;
-                    query2.query_ = "UPDATE user_info SET ";
-                    query2.query_ += "lose = lose + 1, ";
-                    query2.query_ += "rating = rating - 40 ";
-                    query2.query_ += "WHERE id = \'";
-                    query2.query_ += redis_connector::get_instance()->get_id(iter->second.player_[1].session_->get_player_key()) + "\';";
-
-                    db_connector->push_query(query2);
-
-                    game_state_packet.set_win_player_key(iter->second.player_[0].session_->get_player_key());
-
+                    win_index = 0;
+                    lose_index = 1;
                 }
                 else
                 {
-                    db_query query;
-                    query.callback_func = nullptr;
-                    query.query_ = "UPDATE user_info SET ";
-                    query.query_ += "win = win + 1, ";
-                    query.query_ += "rating = rating + 40 ";
-                    query.query_ += "WHERE id = \'";
-                    query.query_ += redis_connector::get_instance()->get_id(iter->second.player_[1].session_->get_player_key()) + "\';";
-
-                    db_connector->push_query(query);
-
-                    db_query query2;
-                    query2.callback_func = nullptr;
-                    query2.query_ = "UPDATE user_info SET ";
-                    query2.query_ += "lose = lose + 1, ";
-                    query2.query_ += "rating = rating - 40 ";
-                    query2.query_ += "WHERE id = \'";
-                    query2.query_ += redis_connector::get_instance()->get_id(iter->second.player_[0].session_->get_player_key()) + "\';";
-
-                    db_connector->push_query(query2);
-
-                    game_state_packet.set_win_player_key(iter->second.player_[1].session_->get_player_key());
+                    win_index = 1;
+                    lose_index = 0;
                 }
+
+                char temp[255] = "";
+
+                db_query query;
+                sprintf(
+                    temp,
+                    "UPDATE user_info SET win = win + 1, rating = rating + %d WHERE id = \'%s\';",
+                    random_generator::get_random_int(30, 50),
+                    redis_connector::get_instance()->get_id(iter->second.player_[win_index].session_->get_player_key())
+                );
+                query.query_ = temp;
+
+                db_connector->push_query(query);
+
+                db_query query2;
+                query2.callback_func = nullptr;
+                sprintf(
+                    temp,
+                    "UPDATE user_info SET lose = lose + 1, rating = rating - %d WHERE id = \'%s\';",
+                    random_generator::get_random_int(30, 50),
+                    redis_connector::get_instance()->get_id(iter->second.player_[lose_index].session_->get_player_key())
+                );
+                query2.query_ = temp;
+
+                db_connector->push_query(query2);
+
+                game_state_packet.set_win_player_key(iter->second.player_[win_index].session_->get_player_key());
 
                 for (int i = 0; i < 2; i++)
                 {
@@ -685,26 +677,28 @@ void logic_worker::process_queue()
 
                 if (iter->second.player_[0].remain_money_ != 0)
                 {
-                    log(iter->first)->info("end_game, win_player_key:{}",
-                        iter->second.player_[0].session_->get_player_key()
+                    Log::WriteLog(_T("end_game, win_player:%s"),
+                        redis_connector::get_instance()->get_id(iter->second.player_[0].session_->get_player_key()).c_str()
                     );
                 }
                 else
                 {
-                    log(iter->first)->info("end_game, win_player_key:{}",
-                        iter->second.player_[1].session_->get_player_key()
+                    Log::WriteLog(_T("end_game, win_player:%s"),
+                        redis_connector::get_instance()->get_id(iter->second.player_[1].session_->get_player_key()).c_str()
                     );
                 }
 
                 iter = room_hashs_.erase(iter);
+                continue;
             }
             break;
             }
 
-            if (iter != room_hashs_.end())
-                iter++;
+            iter++;
         }
     }
+
+    int  k = 0;
 }
 
 bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
@@ -716,7 +710,7 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
     if (iter == room_hashs_.end())
         return false;
 
-    system_log->info("remove room info - room_key:{}", room_key);
+    Log::WriteLog(_T("remove room info - room_key:%s"), room_key.c_str());
 
     std::string win_player_key;
 
@@ -727,27 +721,33 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
 
     logic_server::packet_game_state_ntf game_state_packet;
 
-    game_state_packet.set_state(3);
+    game_state_packet.set_state(2);
     game_state_packet.set_win_player_key(win_player_key);
 
     db_query query;
     query.callback_func = nullptr;
-    query.query_ = "UPDATE user_info SET ";
-    query.query_ += "win = win + 1, ";
-    query.query_ += "rating = rating + 40 ";
-    query.query_ += "WHERE id = \'";
-    query.query_ += redis_connector::get_instance()->get_id(win_player_key) + "\';";
+
+    char temp[255] = "";
+    sprintf(
+        temp,
+        "UPDATE user_info SET win = win + 1, rating = rating + %d WHERE id = \'%s\';",
+        random_generator::get_random_int(30, 50),
+        redis_connector::get_instance()->get_id(win_player_key).c_str()
+    );
+    query.query_ = temp;
 
     db_connector->push_query(query);
 
     db_query query2;
     query2.callback_func = nullptr;
-    query2.query_ = "UPDATE user_info SET ";
-    query2.query_ += "lose = lose + 1, ";
-    query2.query_ += "rating = rating - 40 ";
-    query2.query_ += "WHERE id = \'";
-    query2.query_ += redis_connector::get_instance()->get_id(player_key) + "\';";
-
+    sprintf(
+        temp,
+        "UPDATE user_info SET lose = lose + 1, rating = rating - %d WHERE id = \'%s\';",
+        random_generator::get_random_int(30, 50),
+        redis_connector::get_instance()->get_id(player_key).c_str()
+    );
+    query2.query_ = temp;
+    
     db_connector->push_query(query2);
         
     int disconnect_session = 0;
@@ -757,29 +757,13 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
         iter->second.player_[i].session_->set_room_state(false);
         iter->second.player_[i].session_->handle_send(logic_server::GAME_STATE_NTF, game_state_packet);
         iter->second.player_[i].session_->shut_down();
-    
-        if (!iter->second.player_[i].session_->is_connected())
-            disconnect_session++;
     }
 
-    if (disconnect_session >= 2)
-    {
-        log(iter->first)->info("end_game, win_player_key:{}", win_player_key);
+    Log::WriteLog(_T("end_game, win_player:%s"), 
+        redis_connector::get_instance()->get_id(win_player_key).c_str()
+    );
       
-        iter = room_hashs_.erase(iter);
+    iter = room_hashs_.erase(iter);
 
-        return true;
-    }
-
-    return false;
-}
-
-bool logic_worker::destroy_room(std::string room_key)
-{
-    thread_sync sync;
-
-    if (redis_connector::get_instance()->remove_room_info(room_key))
-        return true;
-
-    return false;
+    return true;
 }

@@ -31,14 +31,13 @@ private:
 private:
     connected_session(boost::asio::io_service& io_service);
 
-    //void handle_accept(const boost::system::error_code& /*error*/, size_t /*bytes_transferred*/);
     void handle_read(const boost::system::error_code& error, size_t /*bytes_transferred*/);
-    bool handle_check_keep_alive();
-        
+    
     void process_packet_echo_ntf(logic_server::packet_echo_ntf packet);
     void process_packet_enter_req(logic_server::packet_enter_req packet);
     void process_packet_process_turn_ans(logic_server::packet_process_turn_ans packet);
     void process_packet_disconnect_room_ntf(logic_server::packet_disconnect_room_ntf packet);
+
     void porcess_packet_game_state_ntf(logic_server::packet_game_state_ntf packet);
 
 public:

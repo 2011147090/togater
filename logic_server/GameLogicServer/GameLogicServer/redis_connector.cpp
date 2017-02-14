@@ -16,12 +16,12 @@ bool redis_connector::init_singleton()
     std::string port;
     configurator::get_value("redis_server_port", port);
 
-    system_log->info("redis_connector:connect, ip:{}, port:{}", ip, port);
+    Log::WriteLog(_T("redis_connector:connect, ip: %s, port: %s"), ip.c_str(), port.c_str());
     conn = new redispp::Connection(ip, port, "password", false);
 
     if (conn == nullptr)
     {
-        system_log->error("redis_connector:conn_is_null");
+        Log::WriteLog(_T("redis_connector:conn_is_null"));
         return false;
     }
 
@@ -41,7 +41,7 @@ bool redis_connector::check_room(std::string room_key)
 
     if (!value.result().is_initialized())
     {
-        system_log->error("redis_connector:check_room, room_key_is_null");
+        Log::WriteLog(_T("redis_connector:check_room, room_key_is_null"));
         return false;
     }
     
@@ -63,7 +63,7 @@ bool redis_connector::remove_room_info(std::string room_key)
 
     if (!conn->del(room_key).result())
     {
-        system_log->error("redis_connector:remove_room_info, room_key_is_null");
+        Log::WriteLog(_T("redis_connector:remove_room_info, room_key_is_null"));
         return false;
     }
 
@@ -76,7 +76,7 @@ bool redis_connector::remove_player_info(std::string player_key)
 
     if (!conn->del(player_key).result())
     {
-        system_log->error("redis_connector:remove_player_info, player_key_is_null");
+        Log::WriteLog(_T("redis_connector:remove_player_info, player_key_is_null"));
         return false;
     }
 
@@ -91,7 +91,7 @@ std::string redis_connector::get_id(std::string player_key)
 
     if (!value.result().is_initialized())
     {
-        system_log->error("redis_connector:check_room, room_key_is_null");
+        Log::WriteLog(_T("redis_connector:get_id, player_id is null"));
         return false;
     }
 

@@ -1,5 +1,7 @@
 #include "pre_headers.h"
 #include "database_connector.h"
+#include "configurator.h"
+#include "log_manager.h"
 
 _DB_CONNECTION::_DB_CONNECTION()
 {
@@ -15,13 +17,21 @@ bool database_connector::init_singleton()
 
     mysql_init(&session_.conn);
 
+    std::string ip, user, password, db_name;
+    int port;
+    configurator::get_value("mysql_server_ip", ip);
+    configurator::get_value("mysql_server_port", port);
+    configurator::get_value("mysql_user", user);
+    configurator::get_value("mysql_password", password);
+    configurator::get_value("mysql_db_name", db_name);
+
     session_.connection_ = mysql_real_connect(
         &session_.conn,
-        DB_HOST,
-        DB_USER,
-        DB_PASS,
-        DB_NAME,
-        3306,
+        ip.c_str(),
+        user.c_str(),
+        password.c_str(),
+        db_name.c_str(),
+        port,
         (char*)NULL, 0
     );
 
@@ -78,14 +88,14 @@ void database_connector::process_queue()
 
         if (session_.query_state_ != 0)
         {
-            int k;
+            Log::WriteLog("error : query_stat_ != 0");
         }
 
         session_.sql_result_ = mysql_store_result(session_.connection_);
 
         if (session_.sql_result_ == nullptr)
         {
-            int aSD;
+            int k;//Log::WriteLog("error : sql_result_ == nullptr");
         }
 
         if (query.callback_func != nullptr)

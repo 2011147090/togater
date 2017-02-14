@@ -1,3 +1,4 @@
+#include "pre_header.h"
 #include "network_manager.h"
 #include "logic_session.h"
 #include "chat_session.h"
@@ -19,17 +20,25 @@ bool network_manager::init_singleton()
     if (session[0] == nullptr)
     {
         session[0] = new logic_session();
+        session[0]->create();
     }
 
     if (session[1] == nullptr)
     {
         session[1] = new chat_session();
+        session[1]->create();
     }
 
     if (session[2] == nullptr)
     {
         session[2] = new channel_session();
+        session[2]->create();
     }
+
+    for (int i = 0; i < 3; i++)
+        if (!session[i]->create())
+            return false;
+
     return true;
 }
 
@@ -39,7 +48,7 @@ bool network_manager::release_singleton()
 
     for (int i = 0; i < 3; i++)
         if (session[i] != nullptr)
-            if (!session[i]->disconnect())
+            if (!session[i]->destroy())
                 return false;
 
     delete[] session;
@@ -135,7 +144,7 @@ bool network_manager::try_login(std::string id, std::string password)
 
     http_request req(methods::POST);
     req.headers().add(L"Content-Type", L"application/x-www-form-urlencoded; charset=UTF-8");
-    
+
     std::string data = "id=" + id;
     data += "&password=" + password;
 
@@ -149,7 +158,7 @@ bool network_manager::try_login(std::string id, std::string password)
         char key[33] = "";
         std::wstring wkey = (result.substr(3, 32)).c_str();
         wcstombs(key, wkey.c_str(), 32);
-            
+
         key[32] += '\0';
 
         player_key_ = key;

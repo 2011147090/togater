@@ -35,25 +35,31 @@
     <ClCompile Include="chat_protobuf.pb.cc">
       <Filter>code\network_manager\protocol_buf</Filter>
     </ClCompile>
-    <ClCompile Include="network_manager.cpp">
-      <Filter>code\network_manager</Filter>
+    <ClCompile Include="random_generator.cpp">
+      <Filter>code\system</Filter>
     </ClCompile>
-    <ClCompile Include="channel_session.cpp">
-      <Filter>code\network_manager\session</Filter>
+    <ClCompile Include="logger.cpp">
+      <Filter>code\system</Filter>
     </ClCompile>
     <ClCompile Include="chat_session.cpp">
       <Filter>code\network_manager\session</Filter>
     </ClCompile>
-    <ClCompile Include="logic_session.cpp">
+    <ClCompile Include="channel_session.cpp">
       <Filter>code\network_manager\session</Filter>
     </ClCompile>
     <ClCompile Include="network_session.cpp">
       <Filter>code\network_manager\session</Filter>
     </ClCompile>
-    <ClCompile Include="random_generator.cpp">
-      <Filter>code\system</Filter>
+    <ClCompile Include="network_manager.cpp">
+      <Filter>code\network_manager</Filter>
     </ClCompile>
-    <ClCompile Include="logger.cpp">
+    <ClCompile Include="logic_session.cpp">
+      <Filter>code\network_manager\session</Filter>
+    </ClCompile>
+    <ClCompile Include="game_manager.cpp">
+      <Filter>code\network_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="configurator.cpp">
       <Filter>code\system</Filter>
     </ClCompile>
   </ItemGroup>
@@ -70,31 +76,37 @@
     <ClInclude Include="channel_protobuf.pb.h">
       <Filter>code\network_manager\protocol_buf</Filter>
     </ClInclude>
-    <ClInclude Include="network_manager.h">
-      <Filter>code\network_manager</Filter>
-    </ClInclude>
     <ClInclude Include="singleton.h">
       <Filter>code\system</Filter>
     </ClInclude>
     <ClInclude Include="my_thread_sync.h">
       <Filter>code\system</Filter>
     </ClInclude>
-    <ClInclude Include="channel_session.h">
-      <Filter>code\network_manager\session</Filter>
+    <ClInclude Include="logger.h">
+      <Filter>code\system</Filter>
+    </ClInclude>
+    <ClInclude Include="random_generator.h">
+      <Filter>code\system</Filter>
     </ClInclude>
     <ClInclude Include="chat_session.h">
       <Filter>code\network_manager\session</Filter>
     </ClInclude>
-    <ClInclude Include="logic_session.h">
+    <ClInclude Include="channel_session.h">
       <Filter>code\network_manager\session</Filter>
     </ClInclude>
     <ClInclude Include="network_session.h">
       <Filter>code\network_manager\session</Filter>
     </ClInclude>
-    <ClInclude Include="logger.h">
-      <Filter>code\system</Filter>
+    <ClInclude Include="network_manager.h">
+      <Filter>code\network_manager</Filter>
     </ClInclude>
-    <ClInclude Include="random_generator.h">
+    <ClInclude Include="logic_session.h">
+      <Filter>code\network_manager\session</Filter>
+    </ClInclude>
+    <ClInclude Include="game_manager.h">
+      <Filter>code\network_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="configurator.h">
       <Filter>code\system</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,6 +13,7 @@ public:
 
     static void print(std::string log)
     {
-        std::cout << log << std::endl;
+        if (debug_mode_)
+            std::cout << log << std::endl;
     }
-};
+}; 

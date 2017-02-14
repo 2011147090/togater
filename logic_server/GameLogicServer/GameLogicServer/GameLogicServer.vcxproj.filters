@@ -56,9 +56,6 @@
     <ClCompile Include="logic_worker.cpp">
       <Filter>code\server\logic_worker</Filter>
     </ClCompile>
-    <ClCompile Include="log_manager.cpp">
-      <Filter>code\system\log_manager</Filter>
-    </ClCompile>
     <ClCompile Include="redispp.cpp">
       <Filter>code\server\redis_manager\libarary_redispp</Filter>
     </ClCompile>

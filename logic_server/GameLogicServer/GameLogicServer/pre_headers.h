@@ -28,7 +28,7 @@
 #include <json_spirit.h>
 
 // speed Log
-#include <spdlog\spdlog.h>
+//#include <spdlog\spdlog.h>
 
 // redispp
 #include "redispp.h"
@@ -45,8 +45,8 @@
 
 #include "logic_server.pb.h"
 
-enum { BUFSIZE = 512 };
+enum { BUFSIZE = 1024 };
 
 using boost::asio::ip::tcp;
 
-namespace spd = spdlog;
+//namespace spd = spdlog;

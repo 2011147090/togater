@@ -10,7 +10,6 @@ tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
 
     connected_session_list_.reserve(1000);
 
-    count = 0;
     end = false;
 
     keep_arrive_thread = new std::thread(&tcp_server::check_connected_session, this);
@@ -32,7 +31,7 @@ void tcp_server::handle_accept(connected_session::pointer new_connection, const 
 {
     thread_sync sync;
 
-    system_log->info("accept_new_client, current_connection{}", connected_session_list_.size());
+    Log::WriteLog(_T("accept_new_client, current_connection_size: %d"), connected_session_list_.size());
 
     if (!error)
     {
@@ -40,7 +39,7 @@ void tcp_server::handle_accept(connected_session::pointer new_connection, const 
         wait_accept();
     }
     else
-        system_log->error(error.message());
+        Log::WriteLog(_T("%s"), error.message());
 }
 
 void tcp_server::end_server()
@@ -60,7 +59,7 @@ void tcp_server::check_connected_session()
 
         thread_sync sync;
 
-        for (auto iter = connected_session_list_.begin(); iter != connected_session_list_.end(); iter++)
+        for (auto iter = connected_session_list_.begin(); iter != connected_session_list_.end();)
         {
             if (!(*iter)->get_socket().is_open())
             {
@@ -69,7 +68,7 @@ void tcp_server::check_connected_session()
             
                 if (!(*iter)->is_safe_disconnect())
                 {
-                    system_log->error("keep arrive - is not safe disconnect. remove player redis cookie. key : {}", (*iter)->get_player_key());
+                    Log::WriteLog(_T("keep arrive - is not safe disconnect. remove player redis cookie. key : %s"), (*iter)->get_player_key());
                     
                     redis_connector::get_instance()->remove_player_info(
                         redis_connector::get_instance()->get_id((*iter)->get_player_key())
@@ -81,9 +80,13 @@ void tcp_server::check_connected_session()
                 if ((*iter)->accept_client())
                 {
                     iter = connected_session_list_.erase(iter);
-                    system_log->info("keep alive - erase session");
+                    Log::WriteLog(_T("keep alive - erase session"));
                 }
+                else
+                    iter++;
             }
+            else
+                iter++;
         }
     }
 }

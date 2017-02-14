@@ -6,21 +6,9 @@ connected_session::connected_session(boost::asio::io_service& io_service) : sock
 {
 }
 
-bool connected_session::handle_check_keep_alive()
-{
-    thread_sync sync;
-
-    boost::system::error_code error;
-
-    if (error)
-        return false;
-
-    return true;
-}
-
 void connected_session::handle_send(logic_server::message_type msg_type, const protobuf::Message& message)
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     MESSAGE_HEADER header;
     header.size = message.ByteSize();
@@ -34,12 +22,12 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
     socket_.write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
 
     if (error)
-        system_log->error(error.message());
+        Log::WriteLog(_T("%s"), error.message());
 }
 
 void connected_session::shut_down()
 {
-    thread_sync sync;
+   // thread_sync sync;
 
     if (socket_.is_open())
     {
@@ -50,21 +38,21 @@ void connected_session::shut_down()
 
 std::string connected_session::get_player_key()
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     return player_key_;
 }
 
 std::string connected_session::get_room_key()
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     return room_key_;
 }
 
 void connected_session::handle_read(const boost::system::error_code& error, size_t buf_size)
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     if (!error)
     {
@@ -148,7 +136,7 @@ void connected_session::handle_read(const boost::system::error_code& error, size
     }
     else
     {
-        system_log->error("handle_read_error:{}", error.message());
+        Log::WriteLog(_T("handle_read_error: %s"), error.message().c_str());
         
         if (is_connected())
         {
@@ -160,7 +148,7 @@ void connected_session::handle_read(const boost::system::error_code& error, size
 
 bool connected_session::is_connected()
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     if (socket_.is_open())
         return true;
@@ -170,21 +158,21 @@ bool connected_session::is_connected()
 
 connected_session::pointer connected_session::create(boost::asio::io_service& io_service)
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     return connected_session::pointer(new connected_session(io_service));
 }
 
 tcp::socket& connected_session::get_socket()
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     return socket_;
 }
 
 void connected_session::start()
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     socket_.async_read_some(boost::asio::buffer(recv_buf_),
         boost::bind(&connected_session::handle_read, shared_from_this(),
@@ -199,28 +187,28 @@ void connected_session::start()
 
 bool connected_session::is_safe_disconnect()
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     return safe_disconnect_;
 }
 
 bool connected_session::is_in_room()
 {
-    thread_sync sync;
+   // thread_sync sync;
 
     return enter_room_;
 }
 
 void connected_session::set_room_state(bool is_enter)
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     enter_room_ = is_enter;
 }
 
 bool connected_session::accept_client()
 {
-    thread_sync sync;
+    //thread_sync sync;
 
     return is_accept_;
 }

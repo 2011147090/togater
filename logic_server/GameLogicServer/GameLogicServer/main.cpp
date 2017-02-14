@@ -6,6 +6,8 @@
 #include "configurator.h"
 #include "database_connector.h"
 
+boost::thread_group io_thread;
+boost::asio::io_service service;
 tcp_server* server = nullptr;
 
 BOOL WINAPI ConsolHandler(DWORD handle)
@@ -18,17 +20,23 @@ BOOL WINAPI ConsolHandler(DWORD handle)
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
     default:
+        service.stop();
+
+        io_thread.join_all();
+
+        server->end_server();
+
         if (database_connector::get_instance()->release_singleton())
-            system_log->info("release_database_manager");
+            Log::WriteLog(_T("release_database_manager"));
 
         if (logic_worker::get_instance()->release_singleton())
-            system_log->info("release_logic_manager");
+            Log::WriteLog(_T("release_logic_manager"));
 
         if (redis_connector::get_instance()->release_singleton())
-            system_log->info("release_redis_manager");
+            Log::WriteLog(_T("release_redis_manager"));
 
-        system_log->info("server_close");
-        log_mgr->release_singleton();
+        Log::WriteLog(_T("server_close"));
+        //log_mgr->release_singleton();
 
         if (server != nullptr)
         {
@@ -42,83 +50,81 @@ BOOL WINAPI ConsolHandler(DWORD handle)
     return false;
 }
 
+std::string _itoa(int i)
+{
+    char temp[10] = "";
+    itoa(i, temp, 10);
+    
+    return temp;
+}
+
 int main(int argc, char* argv[])
 {
     SetConsoleCtrlHandler(ConsolHandler, true);
-    
+
+    Log::WriteLog(_T("start logic server"));
+
     try
     {
-        if (log_mgr->init_singleton())
-        {
-            log_mgr->set_debug_mode(true);
-
-            system_log->info("server_start");
-            system_log->info("init_log_manager");
-        }
-                
         if (!redis_connector::get_instance()->init_singleton())
         {
-            system_log->error("failed_init_redis_manager");
+            Log::WriteLog(_T("failed_init_redis_manager"));
 
             throw;
         }
         else
-            system_log->info("init_redis_manager");
+            Log::WriteLog(_T("init_redis_manager"));
 
         if (!logic_worker::get_instance()->init_singleton())
         {
-            system_log->error("failed_init_logic_worker");
+            Log::WriteLog(_T("failed_init_logic_worker"));
 
             throw;
         }
         else
-            system_log->info("init_logic_manager");
+            Log::WriteLog(_T("init_logic_manager"));
 
         if (!database_connector::get_instance()->init_singleton())
         {
-            system_log->info("failed_init_database_manager");
+            Log::WriteLog(_T("failed_init_database_manager"));
             throw;
         }
         else
-            system_log->info("init_database_manager");
+            Log::WriteLog(_T("init_database_manager"));
         
         int port;
 
         if (!configurator::get_value("port", port))
         {
-            system_log->error("configurator_error, get_value:{}", port);
+            Log::WriteLog(_T("configurator_error, get_value:%d"), port);
             throw;
         }
 
-        boost::asio::io_service service;
         server = new tcp_server(service, port);
-
-        boost::thread_group io_thread;
 
         for (int i = 0; i < 6; i++)
             io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
             
-        getchar();
-        service.stop();
+        //getchar();
+        //service.stop();
 
         io_thread.join_all();
-
     }
     catch (std::exception& e)
     {
-        system_log->error("{}", e.what());
+        Log::WriteLog(_T("%s"), e.what());
     }
 
     server->end_server();
 
     if (database_connector::get_instance()->release_singleton())
-        system_log->info("release_database_manager");
+        Log::WriteLog(_T("release_database_manager"));
 
     if (logic_worker::get_instance()->release_singleton())
-        system_log->info("release_logic_manager");
+        Log::WriteLog(_T("release_logic_manager"));
 
     if (redis_connector::get_instance()->release_singleton())
-        system_log->info("release_redis_manager");
+        Log::WriteLog(_T("release_redis_manager"));
 
     if (server != nullptr)
     {
@@ -126,9 +132,9 @@ int main(int argc, char* argv[])
         delete server;
     }
 
-    system_log->info("server_close");
+    Log::WriteLog(_T("server_close"));
 
-    log_mgr->release_singleton();
+    //log_mgr->release_singleton();
         
     return 0;
 }

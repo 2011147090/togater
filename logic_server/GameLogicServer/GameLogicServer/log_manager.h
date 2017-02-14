@@ -1,41 +1,106 @@
 #pragma once
-#include "pre_headers.h"
-#include "singleton.h"
 #include "critical_section.h"
+#include <tchar.h>
+#define MAX_BUFFER_LENGTH 512
 
-#define log_mgr log_manager::get_instance()
-
-typedef struct _LOGGER_INFO {
-    std::shared_ptr<spd::logger> logger;
-    int write_loop_num;
-    int cur_log_num;
-} LOGGER_INFO;
-
-class log_manager : public singleton<log_manager>, public multi_thread_sync<log_manager> {
-private:
-    std::map<std::string, LOGGER_INFO> logger_list_;
-    std::shared_ptr<spdlog::logger> console_;
-    bool is_debug_mode_;
-
-    std::string time_str_;
-    time_t cur_time_;
-
+class Log : public multi_thread_sync<Log>
+{
 public:
-    std::shared_ptr<spd::logger> get_logger(std::string logger_name, std::string file_name);
-    
-    std::string check_daily_time();
+    static BOOL	WriteLog(LPTSTR data, ...)
+    {
+        thread_sync sync;
 
-    bool set_logger(std::string name, int write_loop_num);
-    bool erase_logger(std::string name);
-    
-    virtual bool init_singleton();
-    virtual bool release_singleton();
+        SYSTEMTIME	SystemTime;
+        TCHAR		CurrentDate[32] = { 0, };
+        TCHAR		CurrentFileName[MAX_PATH] = { 0, };
+        FILE*		FilePtr = NULL;
+        TCHAR		DebugLog[MAX_BUFFER_LENGTH] = { 0, };
 
-    void set_debug_mode(bool is_debug_mode);
+        va_list		ap;
+        TCHAR		Log[MAX_BUFFER_LENGTH] = { 0, };
 
-    virtual ~log_manager();
-    log_manager();
+        va_start(ap, data);
+        _vstprintf(Log, data, ap);
+        va_end(ap);
+
+        GetLocalTime(&SystemTime);
+        _sntprintf(CurrentDate, 32, _T("%d-%d-%d %d:%d:%d"),
+            SystemTime.wYear,
+            SystemTime.wMonth,
+            SystemTime.wDay,
+            SystemTime.wHour,
+            SystemTime.wMinute,
+            SystemTime.wSecond);
+
+        _sntprintf(CurrentFileName, MAX_PATH, _T("LOG_%d-%d-%d %d.log"),
+            SystemTime.wYear,
+            SystemTime.wMonth,
+            SystemTime.wDay,
+            SystemTime.wHour);
+
+        FilePtr = _tfopen(CurrentFileName, _T("a"));
+        if (!FilePtr)
+            return FALSE;
+
+        _ftprintf(FilePtr, _T("[%s] %s\n"), CurrentDate, Log);
+        _sntprintf(DebugLog, MAX_BUFFER_LENGTH, _T("[%s] %s\n"), CurrentDate, Log);
+
+        fflush(FilePtr);
+
+        fclose(FilePtr);
+
+        OutputDebugString(DebugLog);
+        _tprintf(_T("%s"), DebugLog);
+
+        return TRUE;
+    }
+
+    static BOOL	WriteLogNoDate(LPTSTR data, ...)
+    {
+        thread_sync sync;
+
+        SYSTEMTIME	SystemTime;
+        TCHAR		CurrentDate[32] = { 0, };
+        TCHAR		CurrentFileName[MAX_PATH] = { 0, };
+        FILE*		FilePtr = NULL;
+        TCHAR		DebugLog[MAX_BUFFER_LENGTH] = { 0, };
+
+        va_list		ap;
+        TCHAR		Log[MAX_BUFFER_LENGTH] = { 0, };
+
+        va_start(ap, data);
+        _vstprintf(Log, data, ap);
+        va_end(ap);
+
+        GetLocalTime(&SystemTime);
+        _sntprintf(CurrentDate, 32, _T("%d-%d-%d %d:%d:%d"),
+            SystemTime.wYear,
+            SystemTime.wMonth,
+            SystemTime.wDay,
+            SystemTime.wHour,
+            SystemTime.wMinute,
+            SystemTime.wSecond);
+
+        _sntprintf(CurrentFileName, MAX_PATH, _T("LOG_%d-%d-%d %d.log"),
+            SystemTime.wYear,
+            SystemTime.wMonth,
+            SystemTime.wDay,
+            SystemTime.wHour);
+
+        FilePtr = _tfopen(CurrentFileName, _T("a"));
+        if (!FilePtr)
+            return FALSE;
+
+        _ftprintf(FilePtr, _T("%s"), Log);
+        _sntprintf(DebugLog, MAX_BUFFER_LENGTH, _T("%s"), Log);
+
+        fflush(FilePtr);
+
+        fclose(FilePtr);
+
+        OutputDebugString(DebugLog);
+        _tprintf(_T("%s"), DebugLog);
+
+        return TRUE;
+    }
 };
-
-#define system_log log_mgr->get_logger("logic_server", "system_log")
-#define log(name) log_mgr->get_logger("match_", name)
