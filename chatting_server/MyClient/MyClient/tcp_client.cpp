@@ -309,8 +309,8 @@ bool tcp_client::process_packet(const int size)
         
             normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
 
-            //std::cout << normal_message.user_id() << "> ";
-            //std::cout << normal_message.chat_message() << std::endl;
+            std::cout << normal_message.user_id() << "> ";
+            std::cout << normal_message.chat_message() << std::endl;
 
             //TEMP_COUNT++;
             //if (TEMP_COUNT >= 100)
@@ -329,7 +329,11 @@ bool tcp_client::process_packet(const int size)
 
     case chat_server::NOTICE:
         break;
-    }
 
+    default:
+        std::cout << "type: " << message_header->type << std::endl;
+        break;
+    }
+    
     return true;
 }

@@ -23,15 +23,6 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(file_log, logger_t)
             )
     );
 
-    logging::add_console_log(
-        std::cout,
-        boost::log::keywords::format = (
-            expr::stream << expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
-            << " [" << expr::attr< boost::log::trivial::severity_level >("Severity") << "]: "
-            << expr::smessage
-            )
-    );
-
     logging::core::get()->set_filter
     (
         logging::trivial::severity >= logging::trivial::info

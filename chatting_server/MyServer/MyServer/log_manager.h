@@ -7,7 +7,6 @@
 #define LOG_INFO BOOST_LOG_SEV(file_log::get(), boost::log::trivial::info)
 #define LOG_WARN BOOST_LOG_SEV(file_log::get(), boost::log::trivial::warning)
 #define LOG_ERROR BOOST_LOG_SEV(file_log::get(), boost::log::trivial::error)
-#define LOG_CHAT BOOST_LOG_SEV(file_log::get(), boost::log::trivial::chat)
 
 #define SYS_LOGFILE		"chatting_server_%Y%m%d.log"
 

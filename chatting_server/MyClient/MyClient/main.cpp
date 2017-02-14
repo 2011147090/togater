@@ -22,14 +22,13 @@ int main(int argc, char* argv[])
 
     chat_client.post_verify_req();
 
-    int count = 0;
     while (chat_client.is_login())
     {
-        //std::string message;
-        //std::getline(std::cin, message);
+        std::string message;
+        std::getline(std::cin, message);
 
-        Sleep(1000);
-        //chat_client.post_normal("Hi!");
+        //Sleep(1000);
+        chat_client.post_normal(message);
     }
 
     io_service.stop();

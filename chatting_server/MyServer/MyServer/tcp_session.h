@@ -26,6 +26,7 @@ private:
     std::string user_key_;
     std::string user_id_;
     user_status status_;
+    
     tcp_session* opponent_session_;
     tcp_server* server_;
 
@@ -47,14 +48,11 @@ public:
     tcp_session* get_opponent_session() { return opponent_session_; }
     user_status get_status() { return status_; }
     
-    void set_user_key(std::string user_key) { user_key_ = user_key; }
-    void set_user_id(std::string user_id) { user_id_ = user_id; }
-    void set_opponent_session(tcp_session* opponent_session) { opponent_session_ = opponent_session; }
-    void set_status(user_status status) { status_ = status; }
+    bool set_user_key(std::string user_key);
+    bool set_user_id(std::string user_id);
+    bool set_opponent_session(tcp_session* opponent_session);
+    bool set_status(user_status status);
 
-    void post_verify_ans(bool is_successful);
-    void post_logout_ans(bool is_successful);
-    void post_whisper_error();
     void post_send(const bool immediate, const int size, BYTE* data);
     void post_receive();
 };

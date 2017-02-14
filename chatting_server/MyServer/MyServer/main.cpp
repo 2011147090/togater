@@ -28,8 +28,12 @@ int main()
 
     tcp_server server(io_service, SERVER_PORT, MASTER_BUFFER_LEN);
 
-    server.init(MAX_SESSION_COUNT);
-    server.start();
+
+    if (!server.init(MAX_SESSION_COUNT))
+        return 0;
+    
+    if (!server.start())
+        return 0;
 
     
     boost::thread_group threads;
