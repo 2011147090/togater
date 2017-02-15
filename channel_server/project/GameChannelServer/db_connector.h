@@ -13,7 +13,7 @@ public:
     bool add_user_frineds_list(const std::string request_id, const std::string target_id);
     bool del_user_frineds_list(const std::string request_id, const std::string target_id);
     MYSQL *get_connection(int &index);
-    void set_connection(const int index);
+    void release_connection(const int index);
 
 private:
     bool check_repetition(MYSQL *con, const std::string request_id, const std::string target_id);

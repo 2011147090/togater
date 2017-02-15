@@ -13,13 +13,13 @@ public:
     bool lobby_login_process(session *login_session, const char *packet, const int packet_size);
     bool del_redis_token(std::string token);
     bool lobby_logout_process(session *logout_session, const char *packet, const int packet_size);
-    void search_user(session * request_session, std::string target_id, friends_response & message);
-    void add_friends(session *request_session, std::string target_id);
-    void del_friends(session *request_session, std::string target_id);
+    bool search_user(session * request_session, std::string target_id);
+    bool add_friends(session *request_session, std::string target_id);
+    bool del_friends(session *request_session, std::string target_id);
     void process_friends_function(session *request_session, const char *packet, const int packet_size);
     session * find_id_in_user_map(std::string target_id);
-    void del_id_in_user_map(std::string target_id);
-    void add_id_in_user_map(session *request_session, std::string request_id);
+    bool del_id_in_user_map(std::string target_id);
+    bool add_id_in_user_map(session *request_session, std::string request_id);
 private:
     redis_connector& redis_connector_;
     packet_handler& packet_handler_;

@@ -16,8 +16,8 @@ public:
     void make_matching_and_send_complete(session * player_1, session * player_2);
 private:
     void set_matching_que(session *request_session, rating request_rating);
-    void get_matching_que(std::deque<session *> &target_que);
-
+    bool get_matching_que(std::deque<session *> &target_que);
+    rating check_rating(const int rating);
     inline std::string generate_room_key() 
     { 
         boost::uuids::uuid random_uuid = boost::uuids::random_generator()();
@@ -26,12 +26,13 @@ private:
         ptr += sprintf(ptr, "Room:");
         for (auto t = random_uuid.begin(); t != random_uuid.end(); ++t)
         {
-            ptr += sprintf(ptr, "%0x", *t);
+            ptr += sprintf(ptr, "%02x", *t);
         }
         std::string ret_key = room_key;
         return ret_key;
     }
     
+    int timer_value_;
     packet_handler &packet_handler_;
     friends_manager &friends_manager_;
     redis_connector &redis_connection_;

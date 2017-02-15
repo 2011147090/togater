@@ -12,10 +12,7 @@ public:
     void set_log_mode();
     inline std::shared_ptr<spd::logger> get_logger()
     {
-        if (is)
-            return logger;
-        else
-            return nullptr;
+        return logger;
     }
 private:
     std::shared_ptr<spd::logger> logger;
