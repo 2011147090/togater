@@ -179,7 +179,7 @@
     <ClInclude Include="redis_connector.h" />
     <ClInclude Include="singleton.h" />
     <ClInclude Include="logic_worker.h" />
-    <ClInclude Include="log_manager.h" />
+    <ClInclude Include="log.h" />
     <ClInclude Include="pre_headers.h" />
     <ClInclude Include="tcp_server.h" />
   </ItemGroup>

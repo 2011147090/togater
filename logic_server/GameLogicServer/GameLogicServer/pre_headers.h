@@ -10,6 +10,7 @@
 #include <vector>
 #include <thread>
 #include <random>
+#include <tchar.h>
 
 // boost
 #include <boost/asio.hpp>

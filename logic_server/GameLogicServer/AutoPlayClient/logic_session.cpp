@@ -61,7 +61,7 @@ void logic_session::handle_read()
             break;
 
         boost::system::error_code error;
-        static boost::array<BYTE, 128> recv_buf_ori;
+        static boost::array<BYTE, BUFSIZE> recv_buf_ori;
 
         auto size = socket_->read_some(boost::asio::buffer(recv_buf_ori), error);
        

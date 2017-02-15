@@ -8,6 +8,7 @@
 typedef struct _PLAYER_INFO {
     bool submit_card_;
     int opponent_card_num_;
+    std::string id_;
 
     connected_session* session_;
 

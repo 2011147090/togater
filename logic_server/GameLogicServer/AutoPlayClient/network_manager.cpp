@@ -138,6 +138,8 @@ channel_server::game_history network_manager::get_player_history()
 
 bool network_manager::try_login(std::string id, std::string password)
 {
+    thread_sync sync;
+
     std::wcout.imbue(std::locale("kor"));  // windows only
 
     http_client client(U("http://192.168.1.203:3000/login"));

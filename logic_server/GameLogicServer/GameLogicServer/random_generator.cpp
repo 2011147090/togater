@@ -1,7 +1,8 @@
 #include "pre_headers.h"
 #include "random_generator.h"
 
-std::default_random_engine random_generator::engine;
+std::random_device randDeivce;
+std::default_random_engine random_generator::engine(randDeivce());
 
 random_generator::random_generator()
 {

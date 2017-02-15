@@ -1,6 +1,6 @@
 #include "pre_headers.h"
 #include "tcp_server.h"
-#include "log_manager.h"
+#include "log.h"
 #include "logic_worker.h"
 
 tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
@@ -8,7 +8,7 @@ tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
 {
     wait_accept();
 
-    connected_session_list_.reserve(1000);
+    connected_session_list_.reserve(2000);
 
     end = false;
 
@@ -39,7 +39,9 @@ void tcp_server::handle_accept(connected_session::pointer new_connection, const 
         wait_accept();
     }
     else
-        Log::WriteLog(_T("%s"), error.message());
+    {
+        Log::WriteLog(_T("%s"), error.message().c_str());
+    }
 }
 
 void tcp_server::end_server()
@@ -55,7 +57,7 @@ void tcp_server::check_connected_session()
 {
     while (!end)
     {
-        Sleep(3000);
+        Sleep(10000);
 
         thread_sync sync;
 
@@ -66,9 +68,9 @@ void tcp_server::check_connected_session()
                 if ((*iter)->is_in_room())
                     logic_worker::get_instance()->disconnect_room((*iter)->get_room_key(), (*iter)->get_player_key());
             
-                if (!(*iter)->is_safe_disconnect())
+                if (!(*iter)->is_safe_disconnect() && (*iter)->get_player_key() != "")
                 {
-                    Log::WriteLog(_T("keep arrive - is not safe disconnect. remove player redis cookie. key : %s"), (*iter)->get_player_key());
+                    Log::WriteLog(_T("keep alive - is not safe disconnect. remove player redis cookie. key : %s"), (*iter)->get_player_key().c_str());
                     
                     redis_connector::get_instance()->remove_player_info(
                         redis_connector::get_instance()->get_id((*iter)->get_player_key())

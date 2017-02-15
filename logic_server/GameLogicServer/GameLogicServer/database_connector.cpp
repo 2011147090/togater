@@ -1,7 +1,7 @@
 #include "pre_headers.h"
 #include "database_connector.h"
 #include "configurator.h"
-#include "log_manager.h"
+#include "log.h"
 
 _DB_CONNECTION::_DB_CONNECTION()
 {
@@ -37,7 +37,7 @@ bool database_connector::init_singleton()
 
     if (session_.connection_ == nullptr)
         return false;
-    
+
     work_thread = new std::thread(&database_connector::process_queue, this);
 
     if (work_thread == nullptr)
