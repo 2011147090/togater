@@ -1,10 +1,14 @@
 #include "pre_headers.h"
 #include "connected_session.h"
+#include "redis_connector.h"
 #include "log.h"
 
-connected_session::connected_session(boost::asio::io_service& io_service) : socket_(io_service), safe_disconnect_(true), enter_room_(false), is_accept_(false)
+connected_session::connected_session(boost::asio::io_service& io_service) : socket_(io_service), safe_disconnect_(false), is_accept_(false)
 {
     player_key_ = "";
+    room_key_ = "";
+    enter_room_ = true;
+    create_room_ = false;
 }
 
 void connected_session::handle_send(logic_server::message_type msg_type, const protobuf::Message& message)
@@ -21,7 +25,10 @@ void connected_session::handle_send(logic_server::message_type msg_type, const p
     socket_.write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
 
     if (error)
+    {
         Log::WriteLog(_T("%s"), error.message().c_str());
+        shut_down();
+    }
 }
 
 void connected_session::shut_down()
@@ -129,11 +136,7 @@ void connected_session::handle_read(const boost::system::error_code& error, size
     {
         Log::WriteLog(_T("handle_read_error: %s"), error.message().c_str());
         
-        /*if (is_connected())
-        {
-            safe_disconnect_ = false;
-            this->shut_down();
-        }*/
+        this->shut_down();
     }
 }
 
@@ -166,6 +169,11 @@ void connected_session::start()
     socket_.set_option(option);
 
     is_accept_ = true;
+}
+
+void connected_session::set_safe_disconnect(bool safe_disconnect)
+{
+    safe_disconnect_ = safe_disconnect;
 }
 
 bool connected_session::is_safe_disconnect()

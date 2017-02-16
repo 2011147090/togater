@@ -4,6 +4,7 @@
 #include "game_manager.h"
 #include "network_manager.h"
 #include "logger.h"
+#include "configurator.h"
 
 bool channel_session::create()
 {
@@ -164,6 +165,8 @@ void channel_session::process_packet_join_ans(channel_server::packet_join_ans pa
 {
     thread_sync sync;
 
+    network_logic->destroy();
+
     logger::print("channel_session : process_packet_join_ans");
 
     if (packet.success() == false)
@@ -294,8 +297,14 @@ void channel_session::process_packet_matching_complete_ans(channel_server::packe
     );
 
     network_mgr->set_room_key(packet.room_key());
-
-    game_mgr->state_ = game_manager::CONNECT;
+    
+    network_logic->create();
+    std::string logic_server_ip;
+    std::string logic_server_port;
+    configurator::get_value("logic_server_ip", logic_server_ip);
+    configurator::get_value("logic_server_port", logic_server_port);
+    network_logic->connect(logic_server_ip, logic_server_port);
+    network_logic->send_packet_enter_req(network_mgr->get_room_key(), network_mgr->get_player_key());
     
     send_packet_matching_confirm();
 }
@@ -378,6 +387,6 @@ void channel_session::send_packet_matching_confirm()
     channel_server::packet_matching_confirm packet;
 
     this->handle_send(channel_server::MATCH_CONFIRM, packet);
-
+    game_mgr->state_ = game_manager::CONNECT;
     this->destroy();
 }

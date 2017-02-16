@@ -658,6 +658,7 @@ void logic_worker::process_queue()
                 query.query_ = temp;
 
                 db_connector->push_query(query);
+                Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
 
                 db_query query2;
                 query2.callback_func = nullptr;
@@ -670,14 +671,15 @@ void logic_worker::process_queue()
                 query2.query_ = temp;
 
                 db_connector->push_query(query2);
+                Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
 
                 game_state_packet.set_win_player_key(iter->second.player_[win_index].session_->get_player_key());
 
                 for (int i = 0; i < 2; i++)
                 {
                     iter->second.player_[i].session_->set_room_state(false);
+                    iter->second.player_[i].session_->set_safe_disconnect(true);
                     iter->second.player_[i].session_->handle_send(logic_server::GAME_STATE_NTF, game_state_packet);
-
                     iter->second.player_[i].session_->shut_down();
                 }
 
@@ -694,7 +696,11 @@ void logic_worker::process_queue()
                     );
                 }
 
+                redis_connector::get_instance()->remove_room_info(iter->first);
+
                 iter = room_hashs_.erase(iter);
+
+                
                 continue;
             }
             break;
@@ -707,7 +713,17 @@ void logic_worker::process_queue()
     int  k = 0;
 }
 
-bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
+bool logic_worker::is_create_room(std::string room_key)
+{
+    auto iter = room_hashs_.find(room_key);
+
+    if (iter == room_hashs_.end())
+        return false;
+
+    return true;
+}
+
+bool logic_worker::give_up_game(std::string room_key, std::string player_key)
 {
     thread_sync sync;
 
@@ -716,7 +732,7 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
     if (iter == room_hashs_.end())
         return false;
 
-    std::string room_name = "id_" + iter->second.player_[0].id_ + "_" + iter->second.player_[1].id_;    
+    std::string room_name = "id_" + iter->second.player_[0].id_ + "_" + iter->second.player_[1].id_;
 
     Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("remove room info - room_key:%s"), room_key.c_str());
 
@@ -763,22 +779,122 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
         lose_player->id_.c_str()
     );
     query2.query_ = temp;
-    
+
     db_connector->push_query(query2);
     Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
-        
-    int disconnect_session = 0;
 
     for (int i = 0; i < 2; i++)
     {
         iter->second.player_[i].session_->set_room_state(false);
+        iter->second.player_[i].session_->set_safe_disconnect(true);
         iter->second.player_[i].session_->handle_send(logic_server::GAME_STATE_NTF, game_state_packet);
         iter->second.player_[i].session_->shut_down();
     }
 
-    Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("end_game, win_player:%s"), 
+    Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("end_game, win_player:%s"),
         win_player->id_.c_str()
     );
+
+    redis_connector::get_instance()->remove_room_info(iter->first);
+
+    iter = room_hashs_.erase(iter);
+
+    return true;
+}
+
+bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
+{
+    thread_sync sync;
+
+    auto iter = room_hashs_.find(room_key);
+
+    if (iter == room_hashs_.end())
+        return false;
+
+    std::string room_name = "id_" + iter->second.player_[0].id_ + "_" + iter->second.player_[1].id_;    
+
+    Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("remove room info - room_key:%s"), room_key.c_str());
+
+    PLAYER_INFO* win_player = nullptr;
+    PLAYER_INFO* lose_player = nullptr;
+
+    if (iter->second.player_[0].session_->get_player_key() == player_key)
+    {
+        win_player = &(iter->second.player_[1]);
+        lose_player = &(iter->second.player_[0]);
+    }
+    else
+    {
+        win_player = &(iter->second.player_[0]);
+        lose_player = &(iter->second.player_[1]);
+    }
+
+    if (win_player->id_ == "" || lose_player->id_ == "")
+    {
+        if (win_player->id_ != "")
+        {
+            win_player->session_->set_room_state(false);
+            win_player->session_->shut_down();
+        }
+
+        if (lose_player->id_ != "")
+        {
+            lose_player->session_->set_room_state(false);
+            lose_player->session_->shut_down();
+        }
+
+        redis_connector::get_instance()->remove_room_info(iter->first);
+
+        iter = room_hashs_.erase(iter);
+
+        return true;
+    }
+
+    logic_server::packet_game_state_ntf game_state_packet;
+
+    game_state_packet.set_state(2);
+    game_state_packet.set_win_player_key(win_player->session_->get_player_key());
+
+    db_query query;
+    query.callback_func = nullptr;
+
+        char temp[255] = "";
+        sprintf(
+            temp,
+            "UPDATE user_info SET win = win + 1, rating = rating + %d WHERE id = \'%s\';",
+            random_generator::get_random_int(30, 50),
+            win_player->id_.c_str()
+        );
+        query.query_ = temp;
+
+        db_connector->push_query(query);
+        Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
+
+        db_query query2;
+        query2.callback_func = nullptr;
+        sprintf(
+            temp,
+            "UPDATE user_info SET lose = lose + 1, rating = rating - %d WHERE id = \'%s\';",
+            random_generator::get_random_int(30, 50),
+            lose_player->id_.c_str()
+        );
+        query2.query_ = temp;
+
+        db_connector->push_query(query2);
+        Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
+
+        for (int i = 0; i < 2; i++)
+        {
+            iter->second.player_[i].session_->set_room_state(false);
+            iter->second.player_[i].session_->handle_send(logic_server::GAME_STATE_NTF, game_state_packet);
+            iter->second.player_[i].session_->shut_down();
+        }
+
+    Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("end_game, win_player:%s"),
+        win_player->id_.c_str()
+    );
+    
+    redis_connector::get_instance()->remove_room_info(iter->first);
       
     iter = room_hashs_.erase(iter);
 

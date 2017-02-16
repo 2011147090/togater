@@ -19,6 +19,7 @@ private:
     std::string room_key_;
     std::string player_key_;
 
+    bool create_room_;
     bool enter_room_;
     bool is_accept_;
 
@@ -43,6 +44,7 @@ public:
     void shut_down();
     
     bool is_connected();
+    void set_safe_disconnect(bool safe_disconnect);
     bool is_safe_disconnect();
 
     std::string get_player_key();
