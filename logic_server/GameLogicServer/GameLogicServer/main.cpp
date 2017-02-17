@@ -1,6 +1,6 @@
 #include "pre_headers.h"
 #include "tcp_server.h"
-#include "log_manager.h"
+#include "log.h"
 #include "redis_connector.h"
 #include "logic_worker.h"
 #include "configurator.h"

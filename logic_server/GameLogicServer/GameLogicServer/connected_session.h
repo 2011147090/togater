@@ -1,7 +1,6 @@
 #pragma once
 #include "pre_headers.h"
 #include "logic_server.pb.h"
-#include "critical_section.h"
 
 using namespace google;
 
@@ -12,7 +11,7 @@ typedef struct _MESSAGE_HEADER {
 
 const int message_header_size = sizeof(MESSAGE_HEADER);
 
-class connected_session : public boost::enable_shared_from_this<connected_session>, public multi_thread_sync<connected_session>
+class connected_session : public boost::enable_shared_from_this<connected_session>
 {
 private:
     tcp::socket socket_;
@@ -20,6 +19,7 @@ private:
     std::string room_key_;
     std::string player_key_;
 
+    bool create_room_;
     bool enter_room_;
     bool is_accept_;
 
@@ -44,6 +44,7 @@ public:
     void shut_down();
     
     bool is_connected();
+    void set_safe_disconnect(bool safe_disconnect);
     bool is_safe_disconnect();
 
     std::string get_player_key();

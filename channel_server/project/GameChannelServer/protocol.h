@@ -51,8 +51,8 @@ typedef enum session_status
 } status;
 
 /* protobuf struct */
-#define MAX_RATING 7
-
+#define MAX_RATING 8
+#define shared_que 7
 /* packet about join */
 typedef packet_join_req join_request;
 typedef packet_join_ans join_response;
@@ -102,17 +102,6 @@ public:
     inline void decode_message(protobuf::Message &message, const char *decoding_data, const int data_size)
     {
         message.ParseFromArray(decoding_data, data_size);
-    }
-    
-    rating check_rating(const int rating)
-    {
-        if (rating < 300) return rating::bronze;
-        else if (rating < 400) return rating::silver;
-        else if (rating < 500) return rating::gold;
-        else if (rating < 600) return rating::platinum;
-        else if (rating < 700) return rating::diamond;
-        else if (rating < 900) return rating::master;
-        else return rating::challenger;
     }
 private:
     char *incoding(const message_type type, const protobuf::Message& message)

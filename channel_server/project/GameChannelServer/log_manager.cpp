@@ -17,7 +17,6 @@ log_manager::log_manager()
             logger = spd::basic_logger_mt(log_mode.c_str(), "logs/channel_server_log.txt");
             is = true;
         }
-        //std::cout << log_mode << std::endl;
     }
 }
 
@@ -29,7 +28,7 @@ log_manager::~log_manager()
 
 std::string log_manager::get_log_mode()
 {
-    return std::string();
+    //return std::string();
 }
 
 void log_manager::set_log_mode()

@@ -6,6 +6,8 @@ tcp_server::tcp_server(boost::asio::io_service & io_service, friends_manager& fr
     , friends_manager_(friends)
     , match_manager_(match)
     , packet_handler_(packet_handler)
+    , connections(0)
+    , match_counts(0)
 {
     accepting_flag_ = false;
     load_server_config();
@@ -36,68 +38,67 @@ void tcp_server::init()
 
 void tcp_server::start()
 {
-    for (int i = 0; i < max_thread; ++i)
+    for (int i = 1; i < max_thread; ++i)
     {
         wait_accept();
         boost::thread t(boost::bind(&boost::asio::io_service::run, &acceptor_.get_io_service()));
     }
+    wait_accept();
+    std::cout << "\n\n[TCP Server START] \n\n -Thread:" << max_thread << " -Port:" << port << " -Max Session:" << max_session_count << "-Recv Buffer Size:" << max_buffer_len<<std::endl;
     log_manager::get_instance()->get_logger()->info("\n\n[TCP Server START] \n\n -Thread:{0:d} -Port:{1:d} -Max Session:{2:d} -Recv Buffer Size:{3:d}", max_thread, port, max_session_count, max_buffer_len);
 }
 
-void tcp_server::close_session(const int n_session_id, bool force)
+void tcp_server::close_session(const int n_session_id)
 {
-    
     session *request_session = session_list_[n_session_id];
     status request_status = request_session->get_status();
+
     if (request_status == status::LOGIN)
     {
-        //비정상 종료
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        log_manager::get_instance()->get_logger()->warn("[Close session]\n -Status:LOGIN -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->warn("[Close session] -Status:LOGIN -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
     }
     else if(request_status == status::LOGOUT)
     {
-        //정상 종료
-        log_manager::get_instance()->get_logger()->info("[Close session]\n -Status:LOGOUT -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Close session] -Status:LOGOUT -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
     }
     else if (request_status == status::MATCH_COMPLETE)
     {
-        log_manager::get_instance()->get_logger()->info("[Close session]\n -Status:MATCH_COMPLETE -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
-        //정상 종료
+        log_manager::get_instance()->get_logger()->info("[Close session] -Status:MATCH_COMPLETE -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
     }
     else if (request_status == status::MATCH_RECVER)
     {
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        log_manager::get_instance()->get_logger()->warn("[Close session]\n -Status:MATCH_RECVER -Session_id:{0:d} -User_id:{1:s}", n_session_id, request_session->get_user_id());
-        //비정상 종료
+        log_manager::get_instance()->get_logger()->warn("[Close session] -Status:MATCH_RECVER -Session_id:{0:d} -User_id:{1:s}", n_session_id, request_session->get_user_id());
     }
     else if (request_status == status::MATCH_REQUEST)
     {
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        log_manager::get_instance()->get_logger()->warn("[Close session]\n -Status:MATCH_REQUEST -Session_id:{0:d} -User_id:{1:s}", n_session_id, request_session->get_user_id());
-        //비정상 종료
+        log_manager::get_instance()->get_logger()->warn("[Close session] -Status:MATCH_REQUEST -Session_id:{0:d} -User_id:{1:s}", n_session_id, request_session->get_user_id());
     }
     else if(request_status == status::CONN)
     {
-        log_manager::get_instance()->get_logger()->warn("[Close session]\n -Status:CONN -Session_id:{0:d}", n_session_id);
+        log_manager::get_instance()->get_logger()->warn("[Close session] -Status:CONN -Session_id:{0:d}", n_session_id);
+    }
+    else
+    {
+        return;
     }
     
     request_session->set_status(status::WAIT);
-    if (force)
-    {
-        boost::asio::socket_base::linger option(true,0);
-        request_session->get_socket().set_option(option);
-    }
-    request_session->get_socket().close();
-    session_queue_.push_back(n_session_id);
 
+    request_session->get_socket().close();
+    --connections;
+    session_queue_mtx.lock();
+    session_queue_.push_back(n_session_id);
     if (accepting_flag_ == false)
     {
         wait_accept();
     }
+    session_queue_mtx.unlock();
 }
 
 void tcp_server::process_packet(const int n_session_id, const char * p_data)
@@ -109,48 +110,29 @@ void tcp_server::process_packet(const int n_session_id, const char * p_data)
     case message_type::FRIENDS_REQ:
     {
         friends_manager_.process_friends_function(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
-        return;
+        break;
     }
     case message_type::PLAY_FRIENDS_REL:
     {
         match_manager_.process_matching_with_friends(request_session, &p_data[packet_header_size], p_header->size);
-        return;
+        break;
     }
     case message_type::PLAY_RANK_REQ:
     {
         match_manager_.process_matching(request_session, &p_data[packet_header_size], p_header->size);
-        return;
+        break;
     }
     case message_type::JOIN_REQ:
     {
         friends_manager_.lobby_login_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
-        return;
+        break;
     }
     case message_type::LOGOUT_REQ:
     {
         friends_manager_.lobby_logout_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
-        return;
-    }
-    case message_type::MATCH_CONFIRM:
-    {
-        //session *request_session = get_session(n_session_id);
-        //if (request_session->get_status() == status::MATCH_COMPLETE)
-        //{
-        //    //close_session(n_session_id);
-        //}
-        //else
-        //{
-        //    error_report error_message;
-        //    error_message.set_error_string("Your did not request match!");
-        //    int send_data_size = error_message.ByteSize() + packet_header_size;
-        //    char *send_data = packet_handler_.incode_message(error_message);
-        //    
-        //    request_session->post_send(false, send_data_size, send_data);
-        //}
-        return;
+        break;
     }
     default:
-        // 정의하지 않은 메세지는 로그로 남김
         break;
     }
 }
@@ -167,6 +149,7 @@ bool tcp_server::wait_accept()
     if (session_queue_.empty())
     {
         accepting_flag_ = false;
+        session_queue_mtx.unlock();
         return false;
     }
     accepting_flag_ = true;
@@ -185,12 +168,10 @@ void tcp_server::handle_accept(session * p_session, const boost::system::error_c
     if (!error)
     {
         p_session->init();
-        boost::asio::socket_base::keep_alive op(true);
-        p_session->get_socket().set_option(op);
         p_session->wait_receive();
         p_session->set_status(status::CONN);
-        //p_session->control_timer_conn(100,true);
-        log_manager::get_instance()->get_logger()->info("[Session Connect] -Session_id [{0:d}]",p_session->get_session_id());
+        ++connections;
+        log_manager::get_instance()->get_logger()->info("[Session Connect] -Session_id [{0:d}] -Session_count [{1:d}]",p_session->get_session_id(),connections);
         wait_accept();
     }
     else

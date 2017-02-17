@@ -1,6 +1,6 @@
 #include "pre_headers.h"
 #include "tcp_server.h"
-#include "log_manager.h"
+#include "log.h"
 #include "logic_worker.h"
 
 tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
@@ -8,7 +8,7 @@ tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
 {
     wait_accept();
 
-    connected_session_list_.reserve(1000);
+    connected_session_list_.reserve(2000);
 
     end = false;
 
@@ -39,7 +39,9 @@ void tcp_server::handle_accept(connected_session::pointer new_connection, const 
         wait_accept();
     }
     else
-        Log::WriteLog(_T("%s"), error.message());
+    {
+        Log::WriteLog(_T("%s"), error.message().c_str());
+    }
 }
 
 void tcp_server::end_server()
@@ -55,35 +57,35 @@ void tcp_server::check_connected_session()
 {
     while (!end)
     {
-        Sleep(3000);
+        Sleep(5000);
 
         thread_sync sync;
 
         for (auto iter = connected_session_list_.begin(); iter != connected_session_list_.end();)
         {
-            if (!(*iter)->get_socket().is_open())
+            // 갑자기 끊긴 아이가 발생
+            if (!(*iter)->get_socket().is_open() && (*iter)->accept_client())
             {
-                if ((*iter)->is_in_room())
-                    logic_worker::get_instance()->disconnect_room((*iter)->get_room_key(), (*iter)->get_player_key());
-            
-                if (!(*iter)->is_safe_disconnect())
+                if (!(*iter)->is_in_room())
                 {
-                    Log::WriteLog(_T("keep arrive - is not safe disconnect. remove player redis cookie. key : %s"), (*iter)->get_player_key());
-                    
-                    redis_connector::get_instance()->remove_player_info(
-                        redis_connector::get_instance()->get_id((*iter)->get_player_key())
-                    );
+                    //if ((*iter)->get_player_key() != "" && !(*iter)->is_safe_disconnect())
+                     //   redis_connector::get_instance()->remove_player_info((*iter)->get_player_key());
 
-                    redis_connector::get_instance()->remove_player_info((*iter)->get_player_key());
-                }
-
-                if ((*iter)->accept_client())
-                {
                     iter = connected_session_list_.erase(iter);
                     Log::WriteLog(_T("keep alive - erase session"));
+                    continue;
                 }
-                else
-                    iter++;
+                
+                // 방이 생성되어 있는지를 확인
+                if (logic_worker::get_instance()->is_create_room((*iter)->get_room_key()))
+                    logic_worker::get_instance()->disconnect_room((*iter)->get_room_key(), (*iter)->get_player_key()); // 방을 삭제
+                else // 생성되어 있지 않으면 룸키를 제거
+                {
+                    (*iter)->set_room_state(false);
+                    redis_connector::get_instance()->remove_room_info((*iter)->get_room_key());
+                }
+
+                iter++;
             }
             else
                 iter++;

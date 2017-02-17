@@ -27,9 +27,6 @@
     <Filter Include="code\system">
       <UniqueIdentifier>{68215117-c384-4716-90ea-7632dabd6b34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\system\log_manager">
-      <UniqueIdentifier>{391de742-dad2-43ff-8cef-1235fab6f9d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\system\interface">
       <UniqueIdentifier>{1f84339d-fe6a-47ba-8ee7-381bc38e09ab}</UniqueIdentifier>
     </Filter>
@@ -41,6 +38,9 @@
     </Filter>
     <Filter Include="code\system\database_connector">
       <UniqueIdentifier>{86d9cb71-0787-4ef1-a78f-f6c9e88bf09f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\system\log">
+      <UniqueIdentifier>{391de742-dad2-43ff-8cef-1235fab6f9d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -88,9 +88,6 @@
     <ClInclude Include="logic_worker.h">
       <Filter>code\server\logic_worker</Filter>
     </ClInclude>
-    <ClInclude Include="log_manager.h">
-      <Filter>code\system\log_manager</Filter>
-    </ClInclude>
     <ClInclude Include="redispp.h">
       <Filter>code\server\redis_manager\libarary_redispp</Filter>
     </ClInclude>
@@ -117,6 +114,9 @@
     </ClInclude>
     <ClInclude Include="pre_headers.h">
       <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="log.h">
+      <Filter>code\system\log</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

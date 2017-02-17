@@ -8,6 +8,7 @@
 typedef struct _PLAYER_INFO {
     bool submit_card_;
     int opponent_card_num_;
+    std::string id_;
 
     connected_session* session_;
 
@@ -51,6 +52,8 @@ public:
     bool enter_room_player(connected_session* session, std::string room_key);
     bool process_turn(std::string room_key, std::string player_key, int money);
     bool disconnect_room(std::string room_key, std::string player_key);
+    bool give_up_game(std::string room_key, std::string player_key);
+    bool is_create_room(std::string room_key);
     bool ready_for_game(std::string room_key);
 
     void process_queue();

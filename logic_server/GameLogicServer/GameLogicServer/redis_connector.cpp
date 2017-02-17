@@ -1,6 +1,6 @@
 #include "pre_headers.h"
 #include "redis_connector.h"
-#include "log_manager.h"
+#include "log.h"
 #include "configurator.h"
 
 redis_connector::redis_connector() {}
@@ -41,7 +41,7 @@ bool redis_connector::check_room(std::string room_key)
 
     if (!value.result().is_initialized())
     {
-        Log::WriteLog(_T("redis_connector:check_room, room_key_is_null"));
+        Log::WriteLog(_T("redis_connector:check_room(%s), room_key_is_null", room_key.c_str()));
         return false;
     }
     
@@ -63,7 +63,7 @@ bool redis_connector::remove_room_info(std::string room_key)
 
     if (!conn->del(room_key).result())
     {
-        Log::WriteLog(_T("redis_connector:remove_room_info, room_key_is_null"));
+        Log::WriteLog(_T("redis_connector:remove_room_info(%s), room_key_is_null"), room_key.c_str());
         return false;
     }
 
@@ -76,7 +76,7 @@ bool redis_connector::remove_player_info(std::string player_key)
 
     if (!conn->del(player_key).result())
     {
-        Log::WriteLog(_T("redis_connector:remove_player_info, player_key_is_null"));
+        Log::WriteLog(_T("redis_connector:remove_player_info(%s), player_key_is_null", player_key.c_str()));
         return false;
     }
 
@@ -91,8 +91,8 @@ std::string redis_connector::get_id(std::string player_key)
 
     if (!value.result().is_initialized())
     {
-        Log::WriteLog(_T("redis_connector:get_id, player_id is null"));
-        return false;
+        Log::WriteLog(_T("redis_connector:get_id(%s), player_id is null", player_key.c_str()));
+        return "";
     }
 
     return value.result().get().c_str();

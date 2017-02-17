@@ -6,7 +6,6 @@ session::session(int session_id, boost::asio::io_service &io_service, tcp_server
     , socket_(io_service)
     , channel_serv_(p_channel_serv)
     , match_timer_(io_service)
-    , con_timer_(io_service)
     , token_size_(token_size)
     , max_buffer_len_(max_buffer_len)
 {
@@ -15,7 +14,6 @@ session::session(int session_id, boost::asio::io_service &io_service, tcp_server
     receive_buffer_ = new char[max_buffer_len_];
     temp_buffer_ = new char[max_buffer_len_];
     packet_buffer_ = new char[max_buffer_len_ * 2];
-    cancel_flag = false;
 }
 
 session::~session()
@@ -33,12 +31,10 @@ session::~session()
 void session::init()
 {
     packet_buffer_mark_ = 0;
-}
-
-void session::flush()
-{
-    control_timer_conn(0, false);
-    control_timer_rematch(0, false);
+    boost::asio::socket_base::keep_alive keep_alive_op(true);
+    socket_.set_option(keep_alive_op);
+    boost::asio::socket_base::linger time_wait_op(true, 0);
+    socket_.set_option(time_wait_op);
 }
 
 void session::wait_receive()
@@ -80,33 +76,9 @@ void session::wait_send(const bool immediately, const int send_data_size, char *
 
 void session::rematch(const boost::system::error_code & error)
 {
-    if (channel_serv_->rematching_request(this) == false)
-    {
-        control_timer_rematch(5, true);
-    }
+    if(stat_ == status::MATCH_REQUEST) channel_serv_->rematching_request(this);
 }
 
-void session::check_status(const boost::system::error_code & error)
-{
-    if (stat_ == status::CONN || stat_ == status::MATCH_COMPLETE || stat_ == status::LOGOUT)
-    {
-        channel_serv_->close_session(session_id_, true);
-    }
-}
-
-void session::control_timer_conn(int sec, bool is_set)                                            // true -> set , false -> cancle
-{
-    if (is_set && (sec > 0))
-    {
-        con_timer_.expires_from_now(std::chrono::seconds(sec));
-        con_timer_.async_wait(boost::bind(&session::check_status, this, boost::asio::placeholders::error));
-    }
-    else
-    {
-        log_manager::get_instance()->get_logger()->critical("conn timer done session_id {0:d}", session_id_);
-        con_timer_.cancel();
-    }
-}
 
 void session::control_timer_rematch(int sec, bool is_set)
 {
@@ -114,11 +86,6 @@ void session::control_timer_rematch(int sec, bool is_set)
     {
         match_timer_.expires_from_now(std::chrono::seconds(sec));
         match_timer_.async_wait(boost::bind(&session::rematch, this, boost::asio::placeholders::error));
-    }
-    else
-    {
-        log_manager::get_instance()->get_logger()->critical("[*rematch timer*] done usr_id {0:s}", this->get_user_id());
-        match_timer_.cancel();
     }
 }
 
@@ -134,7 +101,8 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
             delete[] send_data_queue_.front();
             send_data_queue_.pop_front();
         }
-        //control_timer_conn(60, true);
+        match_timer_.expires_at();
+        channel_serv_->close_session(session_id_);
         return;
     }
 
@@ -146,20 +114,19 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
     }
 }
 
-void session::handle_receive(const boost::system::error_code & error, size_t bytes_transferred) // bytes_transferred 크기가 MAX_BUFFER_LEN * 2 보다 클수도 있다
+void session::handle_receive(const boost::system::error_code & error, size_t bytes_transferred)
 {
     if (error)
     {
         if (error == boost::asio::error::eof)
         {
             log_manager::get_instance()->get_logger()->info("[Client Socket Close] [Socket Info : -session_id {0:d}]",session_id_);
-            channel_serv_->close_session(session_id_, false);
+            channel_serv_->close_session(session_id_);
         }
         else if (error == boost::asio::error::connection_reset)
         {
             log_manager::get_instance()->get_logger()->info("[Connection terminate] [Socket Info : -session_id {0:d}]", session_id_);
-            channel_serv_->close_session(session_id_, true);
-            control_timer_conn(0, false);
+            channel_serv_->close_session(session_id_);
         }
         else
         {
@@ -172,7 +139,6 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
 
         int n_packet_data = packet_buffer_mark_ + bytes_transferred;
         int n_read_data = 0;
-
         while (n_packet_data > 0) 
         {
             if (n_packet_data < packet_header_size)
@@ -185,7 +151,6 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
             if (p_header->size + packet_header_size <= n_packet_data)
             {
                 channel_serv_->process_packet(session_id_, &packet_buffer_[n_read_data]);
-
                 n_packet_data -= (p_header->size + packet_header_size);
                 n_read_data += (p_header->size + packet_header_size);
             }
@@ -203,7 +168,6 @@ void session::handle_receive(const boost::system::error_code & error, size_t byt
         } 
 
         packet_buffer_mark_ = n_packet_data;
-
         wait_receive();
     }
 }

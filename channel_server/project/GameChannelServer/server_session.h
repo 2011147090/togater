@@ -21,10 +21,12 @@ public:
     inline int get_battle_history() { return battle_history_; }
     inline int get_win() { return win_; }
     inline int get_lose() { return lose_; }
-    inline const char* get_user_id() { return user_id_.c_str(); }
+    inline std::string get_user_id() { return user_id_; }
+    inline void set_friends_count(int count) { friends_count_ = count; }
+    inline int get_friends_count() { return friends_count_; }
 
 private:
-    int rating_score_, battle_history_ ,win_ ,lose_;
+    int rating_score_, battle_history_ ,win_ ,lose_, friends_count_;
     std::string user_id_;
 };
 
@@ -39,7 +41,6 @@ public:
     
     
     void init();
-    void flush();
     void wait_receive();
     void wait_send(const bool immediately, const int send_data_size, char *send_data);
 
@@ -51,31 +52,25 @@ public:
 
     inline void set_status(status state) { stat_ = state; }
     inline status get_status() { return stat_; } 
-    inline void lock_status() { status_mtx.lock(); }
-    inline void unlock_status() { status_mtx.unlock(); }
-
-    void rematch(const boost::system::error_code & error);
-    void check_status(const boost::system::error_code & error);
-    void control_timer_conn(int sec, bool is_set);
+    
     void control_timer_rematch(int sec, bool is_set);
+    void rematch(const boost::system::error_code & error);
 private:
     void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
-
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
 
     std::string token_;
     int token_size_, max_buffer_len_;
     boost::atomic<status> stat_;
-    boost::mutex status_mtx;
     int session_id_;
     boost::asio::ip::tcp::socket socket_;
-    boost::asio::steady_timer match_timer_, con_timer_;
 
+    boost::asio::steady_timer match_timer_;
+ 
     char *receive_buffer_,*temp_buffer_;
     int packet_buffer_mark_;
     char *packet_buffer_;
 
     std::deque<char *> send_data_queue_;
-    boost::atomic<bool> cancel_flag;
     tcp_server *channel_serv_;
 };

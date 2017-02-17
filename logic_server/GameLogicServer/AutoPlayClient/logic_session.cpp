@@ -15,12 +15,17 @@ bool logic_session::create()
     if (socket_ == nullptr)
         socket_ = new tcp::socket(io_service_);
 
+    work_thread_ = nullptr;
+
     return true;
 }
 
 bool logic_session::destroy()
 {
     thread_sync sync;
+
+    if (!is_connected_)
+        return false;
 
     disconnect();
 
@@ -61,7 +66,7 @@ void logic_session::handle_read()
             break;
 
         boost::system::error_code error;
-        static boost::array<BYTE, 128> recv_buf_ori;
+        static boost::array<BYTE, BUFSIZE> recv_buf_ori;
 
         auto size = socket_->read_some(boost::asio::buffer(recv_buf_ori), error);
        
@@ -231,6 +236,11 @@ void logic_session::process_packet_game_state_ntf(logic_server::packet_game_stat
     {
         logger::print("process_packet_game_state_ntf");
         logger::print("end game");
+
+        network_lobby->create();
+        network_lobby->connect(CHANNEL_SERVER_IP, CHANNEL_SEFVER_PORT);
+        network_lobby->send_packet_join_req(network_mgr->get_player_key(), network_mgr->get_player_id());
+
         game_mgr->end_game_ = true;
     }
 }
