@@ -188,7 +188,13 @@ void tcp_server::close_session(const int session_id)
         connected_session_map_.erase(user_id);
 
     LOG_INFO << "Client connection closed. session_id: " << session_id;
-    
+
+
+    redis_connector::get_instance()->del(user_key);
+
+    LOG_INFO << "Redis key deleted. user_key: " << user_key << " / user_id: " << user_id;
+
+
     session_list_[session_id]->get_socket().close();
     session_queue_.push_back(session_id);
 

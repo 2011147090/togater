@@ -24,11 +24,11 @@ int main(int argc, char* argv[])
 
     while (chat_client.is_login())
     {
-        std::string message;
-        std::getline(std::cin, message);
+        //std::string message;
+        //std::getline(std::cin, message);
 
-        //Sleep(1000);
-        chat_client.post_normal(message);
+        Sleep(1000);
+        chat_client.post_normal("ÇÏ´ÃÇÏ´Ã ÇÑ±ÛÇÑ±Û");// message);
     }
 
     io_service.stop();

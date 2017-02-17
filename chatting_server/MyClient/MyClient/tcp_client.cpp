@@ -305,12 +305,12 @@ bool tcp_client::process_packet(const int size)
 
     case chat_server::NORMAL:
         {
-            chat_server::packet_chat_normal normal_message;
+            //chat_server::packet_chat_normal normal_message;
         
-            normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+            //normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
 
-            std::cout << normal_message.user_id() << "> ";
-            std::cout << normal_message.chat_message() << std::endl;
+            //std::cout << normal_message.user_id() << "> ";
+            //std::cout << normal_message.chat_message() << std::endl;
 
             //TEMP_COUNT++;
             //if (TEMP_COUNT >= 100)
