@@ -11,7 +11,9 @@ public:
     match_manager(packet_handler &packet_handler, friends_manager &friends_manager, redis_connector &redis_connection);
     ~match_manager();
     void process_matching(session *request_session, const char *packet, const int data_size);
+    bool process_match_confirm(session *request_session, const char *packet, const int data_size);
     void process_matching_with_friends(session *request_session, const char *packet, const int data_size);
+
     bool rematching_start(session *request_session);
     void make_matching_and_send_complete(session * player_1, session * player_2);
 private:

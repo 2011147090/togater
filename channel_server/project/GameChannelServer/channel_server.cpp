@@ -8,6 +8,7 @@ tcp_server::tcp_server(boost::asio::io_service & io_service, friends_manager& fr
     , packet_handler_(packet_handler)
     , connections(0)
     , match_counts(0)
+    , room_key_del(0)
 {
     accepting_flag_ = false;
     load_server_config();
@@ -57,34 +58,44 @@ void tcp_server::close_session(const int n_session_id)
     {
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        log_manager::get_instance()->get_logger()->warn("[Close session] -Status:LOGIN -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->warn("[Close] -Status:LOGIN -User_id:{0:s}", request_session->get_user_id());
     }
     else if(request_status == status::LOGOUT)
     {
-        log_manager::get_instance()->get_logger()->info("[Close session] -Status:LOGOUT -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Close] -Status:LOGOUT -User_id:{0:s}", request_session->get_user_id());
+    }
+    else if (request_status == status::MATCH_CONFIRM)
+    {
+        friends_manager_.del_id_in_user_map(request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Close] -Status:MATCH_CONFIRM -User_id:{0:s}", request_session->get_user_id());
     }
     else if (request_status == status::MATCH_COMPLETE)
     {
-        log_manager::get_instance()->get_logger()->info("[Close session] -Status:MATCH_COMPLETE -Session_id:{0:d} -User_id:{1:s}",n_session_id, request_session->get_user_id());
+        friends_manager_.del_redis_token(request_session->get_room_key());
+        ++room_key_del;
+        friends_manager_.del_redis_token(request_session->get_token());
+        friends_manager_.del_id_in_user_map(request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Close] -Status:MATCH_COMPLETE -User_id:{0:s}", request_session->get_user_id());
     }
     else if (request_status == status::MATCH_RECVER)
     {
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        log_manager::get_instance()->get_logger()->warn("[Close session] -Status:MATCH_RECVER -Session_id:{0:d} -User_id:{1:s}", n_session_id, request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->warn("[Close] -Status:MATCH_RECVER -User_id:{0:s}", request_session->get_user_id());
     }
     else if (request_status == status::MATCH_REQUEST)
     {
         friends_manager_.del_redis_token(request_session->get_token());
         friends_manager_.del_id_in_user_map(request_session->get_user_id());
-        log_manager::get_instance()->get_logger()->warn("[Close session] -Status:MATCH_REQUEST -Session_id:{0:d} -User_id:{1:s}", n_session_id, request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->warn("[Close] -Status:MATCH_REQUEST -User_id:{0:s}", request_session->get_user_id());
     }
     else if(request_status == status::CONN)
     {
-        log_manager::get_instance()->get_logger()->warn("[Close session] -Status:CONN -Session_id:{0:d}", n_session_id);
+        log_manager::get_instance()->get_logger()->warn("[Close] -Status:CONN -Session_id:{0:d}", n_session_id);
     }
     else
     {
+        log_manager::get_instance()->get_logger()->critical("[Close] -Status:WAIT -User_id:{0:s}", request_session->get_user_id());
         return;
     }
     
@@ -124,17 +135,56 @@ void tcp_server::process_packet(const int n_session_id, const char * p_data)
     }
     case message_type::JOIN_REQ:
     {
-        friends_manager_.lobby_login_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
+        friends_manager_.lobby_login_process(request_session, &p_data[packet_header_size], p_header->size);
         break;
     }
     case message_type::LOGOUT_REQ:
     {
-        friends_manager_.lobby_logout_process(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
+        friends_manager_.lobby_logout_process(request_session, &p_data[packet_header_size], p_header->size);
+        break;
+    }
+    case message_type::MATCH_CONFIRM:
+    {
+        if (match_manager_.process_match_confirm(request_session, &p_data[packet_header_size], p_header->size))
+        {
+            close_session(n_session_id);
+        }
+        break;
+    }
+    case message_type::ERROR_MSG:
+    {
+        process_config(get_session(n_session_id), &p_data[packet_header_size], p_header->size);
         break;
     }
     default:
         break;
     }
+}
+
+void tcp_server::process_config(session *request_session, const char *packet, const int data_size)
+{
+    error_report message;
+    packet_handler_.decode_message(message, packet, data_size);
+    char cmd[50] = { 0, };
+    if (message.error_string() == "get session count")
+    {
+        sprintf(cmd, "session count : %d", connections);
+        message.set_error_string(cmd);
+    }
+    else if(message.error_string() == "alive")
+    {
+        message.set_error_string("yes");
+    }
+    else if (message.error_string() == "get room key del")
+    {
+        sprintf(cmd, "room key del : %d", room_key_del);
+        message.set_error_string(cmd);
+    }
+    else
+    {
+        message.set_error_string("Not Found Command");
+    }
+    request_session->wait_send(false, message.ByteSize() + packet_header_size, packet_handler_.incode_message(message));
 }
 
 bool tcp_server::rematching_request(session * request_session)

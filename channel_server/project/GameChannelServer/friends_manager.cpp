@@ -7,6 +7,7 @@ friends_manager::friends_manager(redis_connector& redis_connector, packet_handle
     : redis_connector_(redis_connector)
     , packet_handler_(handler)
     , db_connector_(mysql)
+    , del_count(0)
 {
 }
 
@@ -24,7 +25,7 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
         std::string token = message.token();
         std::string id;
         join_response response_message;
-        if (redis_connector_.get_redis_kv(token, id))
+        if ((redis_connector_.get_redis_kv(token, id)) && (find_id_in_user_map(id) == nullptr))
         {
             response_message.set_success(true);
             game_history *history = response_message.mutable_history();
@@ -70,6 +71,7 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
             }
 
             add_id_in_user_map(request_session, request_session->get_user_id());
+        
             history->set_total_games(total_games);
             history->set_rating_score(rating);
             history->set_win(win);
@@ -84,6 +86,7 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
         {
             log_manager::get_instance()->get_logger()->warn("[Join Fail] -Session_id [{0:d}]", request_session->get_session_id());
             request_session->set_status(status::LOGOUT);
+            response_message.set_success(false);
             request_session->wait_send(false, response_message.ByteSize() + packet_header_size, packet_handler_.incode_message(response_message));
             return false;
         }
@@ -93,14 +96,8 @@ bool friends_manager::lobby_login_process(session *request_session, const char *
 
 bool friends_manager::del_redis_token(std::string token)
 {
-    std::string id;
-    if (redis_connector_.get_redis_kv(token,id))
-    {
-        redis_connector_.del_redis_key(id);
-        redis_connector_.del_redis_key(token);
-        return true;
-    }
-    return false;
+    bool ret = redis_connector_.del_redis_key(token);
+    return ret;
 }
 
 bool friends_manager::lobby_logout_process(session *request_session, const char *packet, const int packet_size)
@@ -135,11 +132,11 @@ bool friends_manager::search_user(session * request_session, std::string target_
     session *target_session = find_id_in_user_map(target_id);
     int total_games, win, lose, rating;
     total_games = win = lose = rating = 0;
+    message.set_type(friends_response::SEARCH_SUCCESS);
     if ( target_session == nullptr)
     {
         if (db_connector_.get_query_user_info(target_id, win, lose, rating))
         {
-            message.set_type(friends_response::SEARCH_SUCCESS);
             message.set_online(false);
             total_games = win + lose;
         }
@@ -147,13 +144,10 @@ bool friends_manager::search_user(session * request_session, std::string target_
         {
             message.set_type(friends_response::SEARCH_FAIL);
             log_manager::get_instance()->get_logger()->warn("[Search Fail] -Req_id [{0:s}] -Target_id [{1:s}]",request_session->get_user_id(), target_id);
-            //request_session->wait_send(false, message.ByteSize() + packet_header_size, packet_handler_.incode_message(message));
-            //return false;
         }
     }
     else
     {
-        message.set_type(friends_response::SEARCH_SUCCESS);
         message.set_online(true);
         total_games = target_session->get_battle_history();
         lose = target_session->get_lose();
@@ -162,7 +156,6 @@ bool friends_manager::search_user(session * request_session, std::string target_
         target_id = target_session->get_user_id();
     }
 
-    //message.set_type(friends_response::SEARCH_SUCCESS);
     history->set_total_games(total_games);
     history->set_win(win);
     history->set_lose(lose);

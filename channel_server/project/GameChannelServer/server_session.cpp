@@ -35,6 +35,13 @@ void session::init()
     socket_.set_option(keep_alive_op);
     boost::asio::socket_base::linger time_wait_op(true, 0);
     socket_.set_option(time_wait_op);
+
+    while (send_data_queue_.empty() == false)
+    {
+        delete[] send_data_queue_.front();
+        send_data_queue_.pop_front();
+    }
+
 }
 
 void session::wait_receive()
@@ -94,15 +101,13 @@ void session::handle_write(const boost::system::error_code & error, size_t bytes
     delete[] send_data_queue_.front();
     send_data_queue_.pop_front();
 
-    if (stat_ == status::MATCH_COMPLETE || stat_ == status::LOGOUT) 
+    if (stat_ == status::LOGOUT) 
     {
         while (send_data_queue_.empty() == false)
         {
             delete[] send_data_queue_.front();
             send_data_queue_.pop_front();
         }
-        match_timer_.expires_at();
-        channel_serv_->close_session(session_id_);
         return;
     }
 

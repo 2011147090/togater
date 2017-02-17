@@ -18,6 +18,7 @@ public:
     
     void close_session(const int n_session_id);
     void process_packet(const int n_session_id, const char *p_data);
+    void process_config(session * request_session, const char * packet, const int data_size);
     bool rematching_request(session *request_session);
     session* get_session(const int n_session_id) { return session_list_[n_session_id]; }
 
@@ -44,6 +45,8 @@ private:
     int max_session_count, port;
 
     boost::atomic<int> connections;
+    boost::atomic<int> room_key_del;
+    boost::atomic<int> token_del;
     boost::atomic<int> match_counts;
 };
 

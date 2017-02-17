@@ -44,12 +44,11 @@ public:
     void wait_receive();
     void wait_send(const bool immediately, const int send_data_size, char *send_data);
 
-    inline void set_token(std::string token) 
-    { 
-        token_ = token;
-    }
+    inline void set_token(std::string token) { token_ = token; }
     inline std::string get_token() { return token_; }
 
+    inline void set_room_key(std::string room_key) { room_key_ = room_key; }
+    inline std::string get_room_key() { return room_key_; }
     inline void set_status(status state) { stat_ = state; }
     inline status get_status() { return stat_; } 
     
@@ -60,6 +59,8 @@ private:
     void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
 
     std::string token_;
+    std::string room_key_;
+
     int token_size_, max_buffer_len_;
     boost::atomic<status> stat_;
     int session_id_;
