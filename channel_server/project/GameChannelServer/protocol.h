@@ -48,6 +48,7 @@ typedef enum session_status
     , MATCH_APPLY
     , MATCH_RECVER
     , MATCH_COMPLETE
+    , MATCH_CONFIRM
 } status;
 
 /* protobuf struct */

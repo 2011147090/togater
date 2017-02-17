@@ -21,6 +21,7 @@ public:
     bool del_id_in_user_map(std::string target_id);
     bool add_id_in_user_map(session *request_session, std::string request_id);
 private:
+    boost::atomic<int> del_count;
     redis_connector& redis_connector_;
     packet_handler& packet_handler_;
     std::unordered_map<std::string, session *> user_id_map_;

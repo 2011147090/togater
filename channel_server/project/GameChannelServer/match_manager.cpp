@@ -14,6 +14,7 @@ match_manager::match_manager(packet_handler & packet_handler, friends_manager & 
 match_manager::~match_manager()
 { }
 
+
 /*
 랭크 게임 매칭
  *랭크 게임 매칭에 필요한 패킷은 게임을 원하는 사용자의 정보만 필요하다.
@@ -31,6 +32,16 @@ void match_manager::process_matching(session *request_session, const char *packe
     set_matching_que(request_session, rating_name_);
 }
 
+bool match_manager::process_match_confirm(session * request_session, const char * packet, const int data_size)
+{
+    if (request_session->get_status() == status::MATCH_COMPLETE)
+    {
+        request_session->set_status(status::MATCH_CONFIRM);
+        log_manager::get_instance()->get_logger()->info("[Match CONFIRM] -User_id [{0:s}]", request_session->get_user_id());
+        return true;
+    }
+    return false;
+}
 
 /*
 친구와 게임하기 매칭
@@ -125,9 +136,19 @@ void match_manager::make_matching_and_send_complete(session *player_1, session *
 
     match_complete message[2];
     user_info *match_info[2];
-    std::string redis_room_key = generate_room_key();
+    std::string redis_room_key;
 
-    redis_connection_.set_reids_kv(redis_room_key, "0");
+    while (1)
+    {
+        redis_room_key = generate_room_key();
+        std::string val;
+
+        if (!redis_connection_.get_redis_kv(redis_room_key, val))
+        {
+            redis_connection_.set_reids_kv(redis_room_key, "0");            
+            break;
+        }
+    }
 
     match_info[0] = message[1].mutable_opponent_player();
     match_info[1] = message[0].mutable_opponent_player();
@@ -147,8 +168,8 @@ void match_manager::make_matching_and_send_complete(session *player_1, session *
     for (int i = 0; i < 2; i++)
     {
         player[i]->set_status(status::MATCH_COMPLETE);
+        player[i]->set_room_key(redis_room_key);
         player[i]->wait_send(false, message[i].ByteSize() + packet_header_size, packet_handler_.incode_message(message[i]));
-        friends_manager_.del_id_in_user_map(player[i]->get_user_id());
     }
 
     log_manager::get_instance()->get_logger()->info("[Match Complete] -Player_1 [{0:s}] -Player_2 [{1:s}]", player[0]->get_user_id(), player[1]->get_user_id());
@@ -161,13 +182,13 @@ void match_manager::set_matching_que(session * request_session, rating request_r
     request_session->set_status(status::MATCH_REQUEST);
     if (get_matching_que(matching_que[request_rating]))
     {
-        log_manager::get_instance()->get_logger()->info("[Match Request & complete] -Req_id:{0:s}", request_session->get_user_id());
+        log_manager::get_instance()->get_logger()->info("[Match Request & Complete] -Req_id:{0:s}", request_session->get_user_id());
     }
     else
     {
         if (timer_value_ > 0)
         {
-            log_manager::get_instance()->get_logger()->info("[ReMatch Request] -Req_id:{0:s}", request_session->get_user_id());
+            log_manager::get_instance()->get_logger()->info("[Match Request & Rematch] -Req_id:{0:s}", request_session->get_user_id());
             request_session->control_timer_rematch(timer_value_, true);
         }
     }
@@ -186,7 +207,7 @@ bool match_manager::rematching_start(session * request_session)
     return true;
 }
 
-bool match_manager::get_matching_que(std::deque<session *> &target_que) //shared_resouce
+bool match_manager::get_matching_que(std::deque<session *> &target_que)
 {
     if (target_que.size() > 1)
     {
