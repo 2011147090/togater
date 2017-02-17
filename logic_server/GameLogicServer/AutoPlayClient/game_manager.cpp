@@ -45,7 +45,6 @@ void game_manager::play_game(std::string id, std::string password)
     network_chat->connect(chat_server_ip, chat_server_port);
     network_chat->send_packet_verify_req(network_mgr->get_player_key(), id);
 
-Lobby_Scene:
     network_lobby->create();
     std::string channel_server_ip;
     std::string channel_server_port;
@@ -53,7 +52,9 @@ Lobby_Scene:
     configurator::get_value("channel_server_port", channel_server_port);
     network_lobby->connect(CHANNEL_SERVER_IP, CHANNEL_SEFVER_PORT);
     network_lobby->send_packet_join_req(network_mgr->get_player_key(), id);
-    
+
+Lobby_Scene:
+
     do {
         Sleep(5000);
 
@@ -131,14 +132,6 @@ Loading_Scene:
         {
             if (state_ == CONNECT)
             {
-                network_logic->create();
-                std::string logic_server_ip;
-                std::string logic_server_port;
-                configurator::get_value("logic_server_ip", logic_server_ip);
-                configurator::get_value("logic_server_port", logic_server_port);
-                network_logic->connect(logic_server_ip, logic_server_port);
-                network_logic->send_packet_enter_req(network_mgr->get_room_key(), network_mgr->get_player_key());
-
                 wait_result = false;
                 goto Play_Scene;
             }
@@ -182,17 +175,9 @@ Loading_Scene:
 
 #pragma region Play_Scene
 Play_Scene:
-    do {
-        Sleep(3000);
-        
+    do {                
         if (end_game_)
-        {
-            network_logic->destroy();
-            
-            network_lobby->create();
-            network_lobby->connect(CHANNEL_SERVER_IP, CHANNEL_SEFVER_PORT);
-            network_lobby->send_packet_join_req(network_mgr->get_player_key(), id);
-
+        {            
             state_ = READY;
 
             end_game_ = false;
@@ -200,10 +185,7 @@ Play_Scene:
             goto Lobby_Scene;
         }
 
-        int branch = random_generator::get_random_int(0, 100);
-
-        //if (branch < 5)
-            //network_logic->send_packet_disconnect_room_ntf();
+        Sleep(3000);
     } while (true);
 #pragma endregion
 }

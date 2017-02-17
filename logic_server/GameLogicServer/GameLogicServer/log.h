@@ -53,8 +53,8 @@ public:
 
         fclose(FilePtr);
         
-        /*OutputDebugString(DebugLog);
-        _tprintf(_T("%s"), DebugLog);*/
+        //OutputDebugString(DebugLog);
+        //_tprintf(_T("%s"), DebugLog);
 
         return TRUE;
     }

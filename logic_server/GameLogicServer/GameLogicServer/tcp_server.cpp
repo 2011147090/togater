@@ -57,35 +57,35 @@ void tcp_server::check_connected_session()
 {
     while (!end)
     {
-        Sleep(10000);
+        Sleep(5000);
 
         thread_sync sync;
 
         for (auto iter = connected_session_list_.begin(); iter != connected_session_list_.end();)
         {
-            if (!(*iter)->get_socket().is_open())
+            // 갑자기 끊긴 아이가 발생
+            if (!(*iter)->get_socket().is_open() && (*iter)->accept_client())
             {
-                if ((*iter)->is_in_room())
-                    logic_worker::get_instance()->disconnect_room((*iter)->get_room_key(), (*iter)->get_player_key());
-            
-                if (!(*iter)->is_safe_disconnect() && (*iter)->get_player_key() != "")
+                if (!(*iter)->is_in_room())
                 {
-                    Log::WriteLog(_T("keep alive - is not safe disconnect. remove player redis cookie. key : %s"), (*iter)->get_player_key().c_str());
-                    
-                    redis_connector::get_instance()->remove_player_info(
-                        redis_connector::get_instance()->get_id((*iter)->get_player_key())
-                    );
+                    //if ((*iter)->get_player_key() != "" && !(*iter)->is_safe_disconnect())
+                     //   redis_connector::get_instance()->remove_player_info((*iter)->get_player_key());
 
-                    redis_connector::get_instance()->remove_player_info((*iter)->get_player_key());
-                }
-
-                if ((*iter)->accept_client())
-                {
                     iter = connected_session_list_.erase(iter);
                     Log::WriteLog(_T("keep alive - erase session"));
+                    continue;
                 }
-                else
-                    iter++;
+                
+                // 방이 생성되어 있는지를 확인
+                if (logic_worker::get_instance()->is_create_room((*iter)->get_room_key()))
+                    logic_worker::get_instance()->disconnect_room((*iter)->get_room_key(), (*iter)->get_player_key()); // 방을 삭제
+                else // 생성되어 있지 않으면 룸키를 제거
+                {
+                    (*iter)->set_room_state(false);
+                    redis_connector::get_instance()->remove_room_info((*iter)->get_room_key());
+                }
+
+                iter++;
             }
             else
                 iter++;
