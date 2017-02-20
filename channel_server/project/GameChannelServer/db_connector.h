@@ -16,6 +16,7 @@ public:
     void release_connection(const int index);
 
 private:
+    bool reconncet(const int index);
     bool check_repetition(MYSQL *con, const std::string request_id, const std::string target_id);
     void load_mysql_config();
     boost::mutex connection_mtx;

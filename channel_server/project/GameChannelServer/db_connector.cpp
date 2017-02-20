@@ -145,6 +145,11 @@ bool db_connector::del_user_frineds_list(const std::string request_id, const std
     return true;
 }
 
+bool db_connector::reconncet(const int index)
+{
+    return false;
+}
+
 bool db_connector::check_repetition(MYSQL *con, const std::string request_id, const std::string target_id)
 {
     char query[100] = { 0, };
