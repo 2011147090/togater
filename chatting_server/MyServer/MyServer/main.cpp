@@ -16,14 +16,31 @@ int main()
     //for (int n = 0; n < 1000; n++)
     //    redis_connector::get_instance()->set("user" + std::to_string(n), "user" + std::to_string(n));
 
+    //return 0;
+
     boost::asio::io_service io_service;
     
     int SERVER_PORT;
     int MASTER_BUFFER_LEN;
     int MAX_SESSION_COUNT;
-    config::get_value("SERVER_PORT", SERVER_PORT);
-    config::get_value("MASTER_BUFFER_LEN", MASTER_BUFFER_LEN);
-    config::get_value("MAX_SESSION_COUNT", MAX_SESSION_COUNT);
+
+    if (!config::get_value("SERVER_PORT", SERVER_PORT))
+    {
+        LOG_ERROR << "main() - Cannot read a configuration file : SERVER_PORT";
+        return 0;
+    }
+    
+    if (!config::get_value("MASTER_BUFFER_LEN", MASTER_BUFFER_LEN))
+    {
+        LOG_ERROR << "main() - Cannot read a configuration file : MASTER_BUFFER_LEN";
+        return 0;
+    }
+    
+    if (!config::get_value("MAX_SESSION_COUNT", MAX_SESSION_COUNT))
+    {
+        LOG_ERROR << "main() - Cannot read a configuration file : SERVER_PORT";
+        return 0;
+    }
 
 
     tcp_server server(io_service, SERVER_PORT, MASTER_BUFFER_LEN);

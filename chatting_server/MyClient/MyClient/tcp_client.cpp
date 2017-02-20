@@ -6,8 +6,7 @@ tcp_client::tcp_client(boost::asio::io_service& io_service)
     :io_service_(io_service), socket_(io_service)
 {
     InitializeCriticalSectionAndSpinCount(&lock_, 4000);
-    is_login_ = false;
-    TEMP_COUNT = 0;
+    is_login_ = true;
 }
 
 tcp_client::~tcp_client()
@@ -305,12 +304,12 @@ bool tcp_client::process_packet(const int size)
 
     case chat_server::NORMAL:
         {
-            chat_server::packet_chat_normal normal_message;
+            //chat_server::packet_chat_normal normal_message;
         
-            normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+            //normal_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
 
-            std::cout << normal_message.user_id() << "> ";
-            std::cout << normal_message.chat_message() << std::endl;
+            //std::cout << normal_message.user_id() << "> ";
+            //std::cout << normal_message.chat_message() << std::endl;
 
             //TEMP_COUNT++;
             //if (TEMP_COUNT >= 100)
@@ -328,6 +327,14 @@ bool tcp_client::process_packet(const int size)
         break;
 
     case chat_server::NOTICE:
+    {
+        chat_server::packet_chat_notice notice_message;
+
+        notice_message.ParseFromArray(packet_buffer_.begin() + message_header_size, message_header->size);
+
+        std::cout << notice_message.user_id() << "> ";
+        std::cout << notice_message.chat_message() << std::endl;
+    }
         break;
 
     default:

@@ -17,9 +17,23 @@ bool redis_connector::init_singleton()
     std::string REDIS_PORT;
     std::string REDIS_PW;
 
-    config::get_value("REDIS_IP", REDIS_IP);
-    config::get_value("REDIS_PORT", REDIS_PORT);
-    config::get_value("REDIS_PW", REDIS_PW);
+    if (!config::get_value("REDIS_IP", REDIS_IP))
+    {
+        LOG_ERROR << "redis_connector::init_singleton() - Cannot read a configuration file : REDIS_IP";
+        return 0;
+    }
+    
+    if (!config::get_value("REDIS_PORT", REDIS_PORT))
+    {
+        LOG_ERROR << "redis_connector::init_singleton() - Cannot read a configuration file : REDIS_PORT";
+        return 0;
+    }
+    
+    if (!config::get_value("REDIS_PW", REDIS_PW))
+    {
+        LOG_ERROR << "redis_connector::init_singleton() - Cannot read a configuration file : REDIS_PW";
+        return 0;
+    }
 
 
     conn_ = new redispp::Connection(REDIS_IP, REDIS_PORT, REDIS_PW, false);
@@ -55,4 +69,16 @@ std::string redis_connector::get(std::string key)
         return conn_->get(key);
 
     return "";
+}
+
+bool redis_connector::del(std::string key)
+{
+    conn_->del(key);
+
+    return true;
+}
+
+void redis_connector::set(std::string key, std::string value)
+{
+    conn_->set(key, value);
 }

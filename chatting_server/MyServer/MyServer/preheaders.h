@@ -1,9 +1,14 @@
 #pragma once
 
+
 // standard
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <locale>
+
+// windows
+#include <atlstr.h>
 
 // boost::log
 #include <boost/log/expressions.hpp>
