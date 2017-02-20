@@ -322,7 +322,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             master_data_queue_.push_back(send_data);
 
             LOG_INFO << "[CHAT_normal] " << normal_message.user_id() << ": " << normal_message.chat_message();
-
+            
             for (auto iter = connected_session_map_.begin(); iter != connected_session_map_.end(); ++iter)
             {
                 if (iter->second->get_socket().is_open() && iter->second->get_status() == lobby)
@@ -453,7 +453,10 @@ void tcp_server::handle_accept(tcp_session* session, const boost::system::error_
     }
     else
     {
-        LOG_WARN << "handle_accept() - Error Message: " << error.message();
+        // UTF-8 º¯È¯
+        std::string err_msg = CW2A(CA2W(error.message().c_str()), CP_UTF8);
+
+        LOG_WARN << "handle_accept() - Error Message: " << err_msg;
         io_service_.post(strand_accept_.wrap(boost::bind(&tcp_server::post_accept, this)));
     }
 }

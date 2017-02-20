@@ -1,17 +1,17 @@
 #include "tcp_client.h"
-
+#include <atlstr.h>
 
 int main(int argc, char* argv[])
 {
     boost::asio::io_service io_service;
 
     auto endpoint = boost::asio::ip::tcp::endpoint(
-        boost::asio::ip::address::from_string("192.168.1.8"), PORT_NUMBER);
+        boost::asio::ip::address::from_string("192.168.1.202"), PORT_NUMBER);
 
     tcp_client chat_client(io_service);
         
     // --------------------------
-    std::string id = argv[1];
+    std::string id = "Admin";//argv[1];
     chat_client.set_id(id);
     chat_client.set_key(id);
     // --------------------------
@@ -20,15 +20,17 @@ int main(int argc, char* argv[])
 
     boost::thread thread(boost::bind(&boost::asio::io_service::run, &io_service));
 
-    chat_client.post_verify_req();
-
+    //chat_client.post_verify_req();
+    
     while (chat_client.is_login())
     {
-        //std::string message;
-        //std::getline(std::cin, message);
+        std::string message;
+        std::getline(std::cin, message);
+       
+        std::wstring strUni = CA2W(message.c_str());
+        std::string strUTF8 = CW2A(strUni.c_str(), CP_UTF8);
 
-        Sleep(1000);
-        chat_client.post_normal("ÇÏ´ÃÇÏ´Ã ÇÑ±ÛÇÑ±Û");// message);
+        chat_client.post_notice(strUTF8);
     }
 
     io_service.stop();

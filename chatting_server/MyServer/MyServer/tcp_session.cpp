@@ -89,13 +89,16 @@ void tcp_session::handle_receive(const boost::system::error_code& error, size_t 
     }
     else
     {
+        // UTF-8 º¯È¯
+        std::string err_msg = CW2A(CA2W(error.message().c_str()), CP_UTF8);
+
         if (error == boost::asio::error::eof || error.value() == 10054)
         {
-            LOG_INFO << "Disconnected with client. " << error.message();
+            LOG_INFO << "Disconnected with client. " << err_msg;
             server_->get_io_service().post(server_->strand_close_.wrap(boost::bind(&tcp_server::close_session, server_, session_id_)));
         }
         else
-            LOG_WARN << "handle_receive() - Error Message: " << error.message();
+            LOG_WARN << "handle_receive() - Error Message: " << err_msg;
     }
 }
 

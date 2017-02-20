@@ -25,7 +25,7 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(file_log, logger_t)
     );
 
     // The sink will perform character code conversion as needed, according to the locale set with imbue()
-    std::locale base_locale = boost::locale::generator()("Korean");
+    std::locale base_locale = boost::locale::generator()("en_US.UTF-8");
     sink->imbue(base_locale);
     
     
