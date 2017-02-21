@@ -54,7 +54,7 @@ public class LoginManager : MonoBehaviour
 		
 	}
 
-	private bool IsValidEmail(string strIn) 
+    public bool IsValidEmail(string strIn) 
 	{ 
 		return Regex.IsMatch(strIn, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"); 
 	} 
@@ -72,8 +72,9 @@ public class LoginManager : MonoBehaviour
 
 		if (loginIdInputField.text == "" || loginPasswordInputField.text == "") 
 		{
-			GUIManager.Instance.ShowMessageBox ("ID 또는 비밀번호를 입력하세요.", null);
-			StopCoroutine ("Login");
+            GUIManager.Instance.ShowMessageBox ("ID 또는 비밀번호를 입력하세요.", null, MESSAGE_BOX_TYPE.SIMPLE);
+            yield break;
+			//StopCoroutine ("Login");
 		}
 
 		UnityWebRequest www;
@@ -90,17 +91,17 @@ public class LoginManager : MonoBehaviour
         }
 		else if(www.downloadHandler.text == "already login")
 		{
-			GUIManager.Instance.ShowMessageBox ("게임 또는 웹페이지에 로그인 되어 있습니다.", null);
+            GUIManager.Instance.ShowMessageBox ("이미 로그인 되어 있습니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
 		}
 		else 
 		{
-			GUIManager.Instance.ShowMessageBox ("ID 또는 비밀번호가 존재하지 않습니다.", null);
+            GUIManager.Instance.ShowMessageBox ("ID 또는 비밀번호가 존재하지 않습니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
 		}
 	}
 
 	public void OnForgotId()
 	{
-		GUIManager.Instance.ShowPrompt ("Your E-mail", PromptAnswerForgotIDEvent);
+		GUIManager.Instance.ShowPrompt ("Your E-mail", "Enter Email...", PromptAnswerForgotIDEvent);
 	}
 
 	public void PromptAnswerForgotIDEvent(string command)
@@ -115,8 +116,9 @@ public class LoginManager : MonoBehaviour
 
 		if (command == "") 
 		{
-			GUIManager.Instance.ShowMessageBox ("Email을 입력하세요.", null);
-			StopCoroutine ("FindID");
+            GUIManager.Instance.ShowMessageBox ("Email을 입력하세요.", null, MESSAGE_BOX_TYPE.SIMPLE);
+            yield break;
+			//StopCoroutine ("FindID");
 		}
 
 		UnityWebRequest www;
@@ -125,17 +127,17 @@ public class LoginManager : MonoBehaviour
 		yield return www.Send();
 
 		if (www.downloadHandler.text != "find fail") {
-			GUIManager.Instance.ShowMessageBox ("ID : " + www.downloadHandler.text, null);
+            GUIManager.Instance.ShowMessageBox ("ID : " + www.downloadHandler.text, null, MESSAGE_BOX_TYPE.SIMPLE);
 		} 
 		else 
 		{
-			GUIManager.Instance.ShowMessageBox ("찾는 ID가 없습니다.", null);
+            GUIManager.Instance.ShowMessageBox ("찾는 ID가 없습니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
 		}
 	}
 
 	public void OnForgotPassword()
 	{
-		GUIManager.Instance.ShowPrompt ("Your ID", PromptAnswerForgotPasswordEvent);
+		GUIManager.Instance.ShowPrompt ("Your ID", "Enter ID...", PromptAnswerForgotPasswordEvent);
 	}
 
 	public void PromptAnswerForgotPasswordEvent(string command)
@@ -151,8 +153,9 @@ public class LoginManager : MonoBehaviour
 
 		if (command == "") 
 		{
-			GUIManager.Instance.ShowMessageBox ("ID를 입력하세요.", null);
-			StopCoroutine ("RequestToken");
+            GUIManager.Instance.ShowMessageBox ("ID를 입력하세요.", null, MESSAGE_BOX_TYPE.SIMPLE);
+            yield break;
+			//StopCoroutine ("RequestToken");
 		}
 
 		UnityWebRequest www;
@@ -163,9 +166,9 @@ public class LoginManager : MonoBehaviour
 		Debug.Log (www.downloadHandler.text);
 
 		if (www.downloadHandler.text == "sent email") 
-			GUIManager.Instance.ShowPrompt("전송된 토큰을 입력하세요.", PromptAnswerInputTokenEvent);
+			GUIManager.Instance.ShowPrompt("전송된 토큰을 입력하세요.", "Enter Token...", PromptAnswerInputTokenEvent);
 		 else 
-			GUIManager.Instance.ShowMessageBox ("이메일 에러 !!", null);
+            GUIManager.Instance.ShowMessageBox ("이메일 에러 !!", null, MESSAGE_BOX_TYPE.SIMPLE);
 	}
 
 	public void PromptAnswerInputTokenEvent(string command)
@@ -188,11 +191,11 @@ public class LoginManager : MonoBehaviour
 
 		if (www.downloadHandler.text == "success auth") 
 		{
-			GUIManager.Instance.ShowPrompt("새로운 비밀번호를 입력하세요.", PromptAnswerNewPasswordEvent);
+			GUIManager.Instance.ShowPrompt("새로운 비밀번호를 입력하세요.", "Enter New Password...", PromptAnswerNewPasswordEvent);
 		} 
 		else 
 		{
-			GUIManager.Instance.ShowMessageBox ("토큰이 틀렸습니다 !", null);
+            GUIManager.Instance.ShowMessageBox ("토큰이 틀렸습니다 !", null, MESSAGE_BOX_TYPE.SIMPLE);
 		}
 	}
 
@@ -217,7 +220,7 @@ public class LoginManager : MonoBehaviour
 		Debug.Log (www.downloadHandler.text);
 
 		if (www.downloadHandler.text == "success")
-			GUIManager.Instance.ShowMessageBox ("비밀번호가 변경되었습니다.", null);
+            GUIManager.Instance.ShowMessageBox ("비밀번호가 변경되었습니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
 	}
 
 	public void OnRegisterEmailCheck()
@@ -232,14 +235,16 @@ public class LoginManager : MonoBehaviour
 
 		if (registerEmailInputField.text == "") 
 		{
-			GUIManager.Instance.ShowMessageBox ("Email을 입력하세요.", null);
-			StopCoroutine ("RegisterEmailCheck");
+            GUIManager.Instance.ShowMessageBox ("Email을 입력하세요.", null, MESSAGE_BOX_TYPE.SIMPLE);
+            yield break;
+			//StopCoroutine ("RegisterEmailCheck");
 		}
             
         if (IsValidEmail(registerEmailInputField.text) == false)
         {
-            GUIManager.Instance.ShowMessageBox ("올바른 Email이 아닙니다.", null);
-            StopCoroutine ("RegisterEmailCheck");
+            GUIManager.Instance.ShowMessageBox ("올바른 Email이 아닙니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
+            yield break;
+            //StopCoroutine ("RegisterEmailCheck");
         }
 
 		UnityWebRequest www;
@@ -250,14 +255,14 @@ public class LoginManager : MonoBehaviour
 		if (www.downloadHandler.text == "email ok") 
 		{
 			isRegisterCheckEmail = true;
-			GUIManager.Instance.ShowMessageBox ("이메일 체크 성공 !", null);
+            GUIManager.Instance.ShowMessageBox ("이메일 체크 성공 !", null, MESSAGE_BOX_TYPE.SIMPLE);
 			registerEmailInputField.readOnly = true;
 			registerEmailInputField.targetGraphic.color = Color.gray;
 		} 
 		else 
 		{
 			isRegisterCheckEmail = false;
-			GUIManager.Instance.ShowMessageBox ("중복 된 이메일 입니다.", null);
+            GUIManager.Instance.ShowMessageBox ("중복 된 이메일 입니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
 		}
 	}
 
@@ -273,8 +278,9 @@ public class LoginManager : MonoBehaviour
 
 		if (registerIDInputField.text == "") 
 		{
-			GUIManager.Instance.ShowMessageBox ("ID를 입력하세요.", null);
-			StopCoroutine ("RegisterIDCheck");
+            GUIManager.Instance.ShowMessageBox ("ID를 입력하세요.", null, MESSAGE_BOX_TYPE.SIMPLE);
+            yield break;
+			//StopCoroutine ("RegisterIDCheck");
 		}
 
 		UnityWebRequest www;
@@ -285,14 +291,14 @@ public class LoginManager : MonoBehaviour
 		if (www.downloadHandler.text == "id ok")
 		{
 			isRegisterCheckID = true;
-			GUIManager.Instance.ShowMessageBox ("ID 체크 성공 !", null);
+            GUIManager.Instance.ShowMessageBox ("ID 체크 성공 !", null, MESSAGE_BOX_TYPE.SIMPLE);
 			registerIDInputField.readOnly = true;
 			registerIDInputField.targetGraphic.color = Color.gray;
 		} 
 		else 
 		{
 			isRegisterCheckID = false;
-			GUIManager.Instance.ShowMessageBox ("중복 된 ID 입니다.", null);
+            GUIManager.Instance.ShowMessageBox ("중복 된 ID 입니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
 		}
 	}
 
@@ -331,12 +337,12 @@ public class LoginManager : MonoBehaviour
 				registerEmailInputField.targetGraphic.color = Color.white;
 				registerIDInputField.targetGraphic.color = Color.white;
 
-				GUIManager.Instance.ShowMessageBox ("회원가입 성공 !", null);
+                GUIManager.Instance.ShowMessageBox ("회원가입 성공 !", null, MESSAGE_BOX_TYPE.SIMPLE);
 			}
 		} 
 		else 
 		{
-			GUIManager.Instance.ShowMessageBox ("ID 또는 Email의 중복을 체크하세요.", null);
+            GUIManager.Instance.ShowMessageBox ("ID 또는 Email의 중복을 체크하세요.", null, MESSAGE_BOX_TYPE.SIMPLE);
 		}
 	}
 }

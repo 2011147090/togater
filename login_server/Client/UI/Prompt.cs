@@ -9,7 +9,6 @@ public class Prompt : MonoBehaviour
 	private UnityAction<string> commandEvent;
 
 	private Text titleText;
-	private Text answerText;
 
 	private Button okButton;
 	private Button cancleButton;
@@ -28,7 +27,7 @@ public class Prompt : MonoBehaviour
 
 	}
 
-	public void Initialize(string titleMessage, UnityAction<string> action)
+	public void Initialize(string titleMessage, string placeHolder, UnityAction<string> action)
 	{
 		rectTransform = GetComponent<RectTransform> ();
 		rectTransform.SetParent (GameObject.Find ("Main Panel").transform);
@@ -45,7 +44,7 @@ public class Prompt : MonoBehaviour
 		titleText = transform.FindChild ("Title Text").GetComponent<Text> ();
 		titleText.text = titleMessage;
 
-		answerText = transform.FindChild ("Answer").GetComponent<Text> ();
+        transform.FindChild("InputField").GetComponent<InputField>().transform.FindChild("Placeholder").GetComponent<Text>().text = placeHolder;
 
 		inputField = transform.FindChild ("InputField").GetComponent<InputField> ();
 	}

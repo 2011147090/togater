@@ -26,7 +26,6 @@ public class DashboardManager : MonoBehaviour
 {
     public static DashboardManager Instance;
     public static string userToken;
-    private bool allowQuitting = false;
 
     public Transform profilePanel;
     public Transform accountPanel;
@@ -63,6 +62,50 @@ public class DashboardManager : MonoBehaviour
         StartCoroutine("StartMembershipWithdrawal");
     }
 
+    public void OnUpdateEmail()
+    {
+        GUIManager.Instance.ShowPrompt("Update Email", "Enter Email...", UpdateEmail);
+    }
+
+    private void UpdateEmail(string command)
+    {
+        StartCoroutine("StartUpdateEmail");
+    }
+
+    private IEnumerator StartUpdateEmail(string command)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField ("userToken", userToken);
+        form.AddField ("email", command);
+
+        if (command == "") 
+        {
+            GUIManager.Instance.ShowMessageBox ("Email을 입력하세요.", null, MESSAGE_BOX_TYPE.SIMPLE);
+            //StopCoroutine (corutine);
+            yield break;
+        }
+
+        if (LoginManager.Instance.IsValidEmail(command) == false)
+        {
+            GUIManager.Instance.ShowMessageBox ("올바른 Email이 아닙니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
+            yield break;
+            //StopCoroutine (corutine);
+        }
+
+        UnityWebRequest www;
+        www = UnityWebRequest.Post(LoginManager.Instance.serverIP + "/dashboard/update/email", form);
+
+        yield return www.Send();
+
+        if (www.downloadHandler.text == "update email") {
+            GUIManager.Instance.ShowMessageBox ("Email이 수정되었습니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
+        } 
+        else 
+        {
+            GUIManager.Instance.ShowMessageBox ("Email을 다시 입력해주세요.", null, MESSAGE_BOX_TYPE.SIMPLE);
+        }
+    }
+
     private IEnumerator StartMembershipWithdrawal()
     {
         WWWForm form = new WWWForm();
@@ -75,11 +118,11 @@ public class DashboardManager : MonoBehaviour
 
         if (www.downloadHandler.text == "success")
         {
-            GUIManager.Instance.ShowMessageBox("탈퇴 되었습니다.", null);
+            GUIManager.Instance.ShowMessageBox("탈퇴 되었습니다.", null, MESSAGE_BOX_TYPE.SIMPLE);
             SceneManager.LoadScene("Main");
         }
         else
-            GUIManager.Instance.ShowMessageBox("회원 탈퇴 에러", null);
+            GUIManager.Instance.ShowMessageBox("회원 탈퇴 에러", null, MESSAGE_BOX_TYPE.SIMPLE);
     }
 
     private IEnumerator RequestProfile()

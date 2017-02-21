@@ -30,23 +30,23 @@ public class GUIManager : MonoBehaviour
 		
 	}
 
-	public void ShowPrompt(string titleMessage, UnityAction<string> answerAction)
-	{
-		GameObject promptWindow = (GameObject)Resources.Load ("prefabs/prompt");
-		Prompt prompt = Instantiate(promptWindow).GetComponent<Prompt>();
-		prompt.Initialize (titleMessage, answerAction);
+    public void ShowPrompt(string titleMessage, string placeHolder, UnityAction<string> answerAction)
+    {
+        GameObject promptWindow = (GameObject)Resources.Load ("prefabs/prompt");
+        Prompt prompt = Instantiate(promptWindow).GetComponent<Prompt>();
+        prompt.Initialize (titleMessage, placeHolder, answerAction);
 
-		prompt.name = titleMessage + " Prompt";
-	}
+        prompt.name = titleMessage + " Prompt";
+    }
 
-	public void ShowMessageBox(string message, UnityAction closeAction)
+	/*public void ShowMessageBox(string message, UnityAction closeAction)
 	{
 		GameObject window = (GameObject)Resources.Load ("prefabs/message box");
 		MessageBox messagebox = Instantiate(window).GetComponent<MessageBox> ();
 		messagebox.Initialize (message, closeAction);
 
 		messagebox.name = message + " MessageBox";
-	}
+	}*/
 
     public void ShowMessageBox(string message, UnityAction closeAction, MESSAGE_BOX_TYPE type)
     {

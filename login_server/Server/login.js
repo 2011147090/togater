@@ -2,8 +2,6 @@
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var mysql = require('mysql');
-var logger = require('morgan');
-//var session = require('express-session');
 var redis = require('redis');
 var redisClient = redis.createClient(6379, '192.168.1.201');
 //var redisClient = redis.createClient(6379, 'localhost');
@@ -29,6 +27,18 @@ var smtpTransport = nodemailer.createTransport("SMTP", {
     }
 });
 
+var winston = require('winston');
+var moment = require('moment');
+
+winston.add ( winston.transports.File, {
+  level: 'debug',
+  json: false,
+  filename: 'login.log',
+  timestamp: function(){
+      return moment().format("YYYY-MM-DD HH:mm:ss.SSS");
+  }
+});
+
 var app = require('express')();
 var server = require('http').Server(app);
 
@@ -43,12 +53,6 @@ app.use(express.static('public'));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended : false}));
 
-/*app.use(session({
-  secret : 'secret key',
-  resave : false,
-  saveUninitialized : true
-}));*/
-
 var headers = {
   "Content-Type": "text/html",
   'ACCESS-CONTROL-ALLOW-CREDENTIALS' : 'true',
@@ -56,14 +60,6 @@ var headers = {
   'ACCESS-CONTROL-ALLOW-METHODS' : 'GET, POST, OPTIONS',
   'ACCESS-CONTROL-ALLOW-HEADERS' : 'Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time'
 };
-
-    //TODO
-    /*
-    로그인 시도
-    디비 정보와 로그인 정보 비교 (디비에는 id 솔트, password 솔트 2개 존재, 솔트는 회원가입할때 UUID를 솔트로 이용)
-    로그인 성공 시 아이디와 솔트를 합한 해시값 생성(md5 : 32자, sha256 : 64자)
-    생성된 해시값을 클라이언트에 전달, 서버 레디스에 저장
-    */
 
 app.get('/', function(request, response){
   response.send('/public/index.html');
@@ -86,11 +82,12 @@ redisClient.get(md5(sha256(request.body.id)), function(err, reply) {
                 var accessToken = md5(sha256(userID));
                 response.end('ok:' + accessToken);
                 redisClient.set(accessToken, userID);
-                console.log('Success Login : ' + userID);
+                winston.info('Login : ' + userID + ' : -> Success');
             }
             else if(secondRows.length === 0)  //로그인 실패
             {
                 response.end('login fail');
+                winston.info('Login : ' + userID + ' -> Can\' Find ID');
             }
             connection.release();
 
@@ -100,15 +97,11 @@ redisClient.get(md5(sha256(request.body.id)), function(err, reply) {
         });
     }
     else{
-      console.log('Already Login : ' + request.body.id);
+      winston.info('Login : ' + request.body.id + ' -> Already Connect ID');
       response.writeHead(200, headers);
       response.end('already login');
     }
   });
-});
-
-app.post('/login/webpage', function(request, response){
-
 });
 
 app.post('/forgot/id', function(request, response){
@@ -119,11 +112,12 @@ app.post('/forgot/id', function(request, response){
           if(rows.length === 1)   //만약 ID를 찾았다면
           {
               response.end(rows[0].id);
-              console.log('Find ID : ' + rows[0].id);
+              winston.info('Find ID : ' + rows[0].id + ' -> Success');
           }
           else if(rows.length === 0)  //찾기 실패
           {
               response.end('find fail');
+              winston.info('Find ID -> Fail');
           }
           connection.release();
           if(err)
@@ -139,25 +133,28 @@ app.post('/forgot/password/request', function(request, response){
 
   mysqlPool.getConnection(function(err, connection){
       connection.query('select email from user_info where id =  BINARY(?)', [id] , function(err, rows){
-        console.log(rows[0].email);
-          let mailOptions = {
-              from: '로그인 서버 <servercamp.togater@gmail.com>',
-              to: rows[0].email,
-              subject: 'TOGATER 로그인 서버 입니다.',
-              html: '비밀번호를 재설정 하려면 아래 토큰을 해당 페이지에서 입력 후 재설정 하시기 바랍니다. <p>토큰 : ' + resetUUID + '</p>'
-          };
+          if(rows.length === 1){
+              let mailOptions = {
+                  from: '로그인 서버 <servercamp.togater@gmail.com>',
+                  to: rows[0].email,
+                  subject: 'TOGATER 로그인 서버 입니다.',
+                  html: '비밀번호를 재설정 하려면 아래 토큰을 해당 페이지에서 입력 후 재설정 하시기 바랍니다. <p>토큰 : ' + resetUUID + '</p>'
+              };
 
-          smtpTransport.sendMail(mailOptions, function(err, res){
-              if (err){
-                  console.log(err);
-              } else {
-                  console.log("Message sent : " + res.message);
-
-                  response.send('sent email');
-                  redisClient.set(resetUUID, id);
-              }
-          });
-          connection.release();
+              smtpTransport.sendMail(mailOptions, function(err, res){
+                  if (err){
+                      winston.info(err);
+                  } else {
+                      winston.info("Password Reset Email Sent -> Success");
+                      response.send('sent email');
+                      redisClient.set(resetUUID, id);
+                  }
+              });
+              connection.release();
+          }else{
+              winston.info("Password Reset Email Sent -> Can\' Find Email");
+              response.send('fail email sent');
+          }
       });
   });
 });
@@ -168,10 +165,12 @@ app.post('/forgot/password/auth', function(request, response){
 
   redisClient.get(uuid, function(err, reply) {
       if(reply){
+           winston.info("password Reset Email Auth -> Success");
            response.send('success auth');
            redisClient.del(uuid);
       }else{
            response.send('fail reset password');
+           winston.info("password Reset Email Auth -> Fail");
       }
   });
 });
@@ -183,6 +182,7 @@ app.post('/forgot/password/reset', function(request, response){
   mysqlPool.getConnection(function(err, connection){
       connection.query('update user_info set password = BINARY(?) where id =  BINARY(?)', [newPassword, id] , function(err, rows){
           response.send('success');
+          winston.info("Password Reset -> Success");
           connection.release();
       });
   });
@@ -194,16 +194,19 @@ app.post('/register/overlap/email', function (request, response) {
         response.writeHead(200, headers);
         if(rows.length === 1)   //email 중복
         {
+            winston.info("Email Check -> Overlap");
             response.end('email overlap');
         }
         else if(rows.length === 0)  //중복 아님
         {
+            winston.info("Email Check -> Success");
             response.end('email ok');
         }
         connection.release();
 
-        if(err)
-          console.log(err);
+        if(err){
+            winston.error("Email Check -> ERROR");
+        }
       });
   });
 });
@@ -214,17 +217,20 @@ app.post('/register/overlap/id', function (request, response) {
         response.writeHead(200, headers);
         if(rows.length === 1)   //id 중복
         {
+            winston.info("ID Check -> Overlap");
             response.end('id overlap');
         }
         else if(rows.length === 0)  //중복 아님
         {
+            winston.info("ID Check -> Success");
             response.end('id ok');
         }
 
         connection.release();
 
-        if(err)
-          console.log(err);
+        if(err){
+            winston.error("ID Check -> ERROR");
+        }
       });
   });
 });
@@ -240,11 +246,12 @@ app.post('/register', function (request, response) {
       [userID, encryptedPassword, email, 0, 0, 400], function(err, rows){
           response.writeHead(200, headers);
           response.end('register ok');
-
+          winston.info("Register -> Success");
           connection.release();
 
-          if(err)
-            console.log(err);
+          if(err){
+              winston.error("Register -> ERROR");
+          }
       });
   });
 });
@@ -252,6 +259,7 @@ app.post('/register', function (request, response) {
 app.post('/dashboard/logout', function(request, response){
   redisClient.del(request.body.userToken);
   response.send('redis delete');
+  winston.info("Homepage Logout -> Success");
 });
 
 app.post('/dashboard/withdrawal', function(request, response){
@@ -260,10 +268,11 @@ app.post('/dashboard/withdrawal', function(request, response){
           mysqlPool.getConnection(function(err, connection){
               connection.query('delete from user_info where id =  BINARY(?)', [reply] , function(err, rows){
                 if(err)
-                    console.log(err);
+                    winston.error("Withdrawal -> ERROR");
                 else{
                     redisClient.del(request.body.userToken);
                     response.send('success');
+                    winston.info("Account Withdrawal -> Success");
                 }
             connection.release();
               });
@@ -283,6 +292,7 @@ app.post('/dashboard/profile', function(request, response){
                       "lose" : rows[0].lose,
                       "rating" : rows[0].rating
                   });
+                  winston.info("Get Profile Info -> Success");
             connection.release();
               });
           });
@@ -290,18 +300,42 @@ app.post('/dashboard/profile', function(request, response){
   });
 });
 
-
 app.post('/dashboard/account', function(request, response){
   redisClient.get(request.body.userToken, function(err, reply) {
       if(reply){
           mysqlPool.getConnection(function(err, connection){
               connection.query('select id, email from user_info where id =  BINARY(?)', [reply] , function(err, rows){
-
                   response.send({
                       "ID" : rows[0].id,
                       "email" : rows[0].email
                   });
-            connection.release();
+                  winston.info("Get Account Info -> Success");
+                  connection.release();
+              });
+          });
+      }
+  });
+});
+
+app.post('/dashboard/update/email', function(request, response){
+  redisClient.get(request.body.userToken, function(err, reply) {
+      if(reply){
+          mysqlPool.getConnection(function(err, connection){
+              connection.query('select email from user_info where email = BINARY(?)', [request.body.email] , function(err, rows){
+                  if(rows.length === 1){    //email 중복
+                      response.writeHead(200, headers);
+                      response.end('overlap email');
+                      winston.info("Update Email -> Overlap");
+                      connection.release();
+                      return;
+                  }
+                  connection.query('update user_info set email = BINARY(?) where id =  BINARY(?)', [request.body.email,reply] , function(err, rows){
+                      response.writeHead(200, headers);
+                      response.end('update email');
+                      winston.info("Update Email -> Success");
+                      connection.release();
+                  });
+
               });
           });
       }
