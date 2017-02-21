@@ -52,7 +52,10 @@ void network_session::disconnect()
     thread_sync sync;
 
     if (socket_->is_open())
+    {
+        socket_->shutdown(boost::asio::socket_base::shutdown_both);
         socket_->close();
+    }
 }
 
 bool network_session::is_socket_open()
