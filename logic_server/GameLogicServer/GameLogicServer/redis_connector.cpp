@@ -41,7 +41,7 @@ bool redis_connector::check_room(std::string room_key)
 
     if (!value.result().is_initialized())
     {
-        Log::WriteLog(_T("redis_connector:check_room(%s), room_key_is_null", room_key.c_str()));
+        Log::WriteLog(_T("redis_connector:check_room(%s), room_key_is_null"), room_key.c_str());
         return false;
     }
     
@@ -76,7 +76,7 @@ bool redis_connector::remove_player_info(std::string player_key)
 
     if (!conn->del(player_key).result())
     {
-        Log::WriteLog(_T("redis_connector:remove_player_info(%s), player_key_is_null", player_key.c_str()));
+        Log::WriteLog(_T("redis_connector:remove_player_info(%s), player_key_is_null"), player_key.c_str());
         return false;
     }
 
@@ -91,7 +91,7 @@ std::string redis_connector::get_id(std::string player_key)
 
     if (!value.result().is_initialized())
     {
-        Log::WriteLog(_T("redis_connector:get_id(%s), player_id is null", player_key.c_str()));
+        Log::WriteLog(_T("redis_connector:get_id(%s), player_id is null"), player_key.c_str());
         return "";
     }
 

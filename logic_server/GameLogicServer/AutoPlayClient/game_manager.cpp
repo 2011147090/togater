@@ -58,9 +58,6 @@ Lobby_Scene:
     do {
         Sleep(5000);
 
-        if (accept_friend_match_)
-            goto Loading_Scene;
-
         int branch = random_generator::get_random_int(0, 6);
 
         switch (branch) {
@@ -104,18 +101,6 @@ Lobby_Scene:
         case 4:
             goto Loading_Scene;
             break;
-            
-        case 5:
-        {
-            /*char temp[5] = "";
-            itoa(random_generator::get_random_int(0, 999), temp, 10);
-
-            friend_match_id_ = temp;
-            send_friend_match_ = false;
-
-            goto Loading_Scene;*/
-        }
-        break;
         }
 
     } while (true);
@@ -127,6 +112,12 @@ Loading_Scene:
         Sleep(3000);
 
         static bool wait_result = false;
+
+        if (!wait_result)
+        {
+            network_lobby->send_packet_rank_game_req(true);
+            wait_result = true;
+        }
 
         if (wait_result)
         {
@@ -140,35 +131,6 @@ Loading_Scene:
                 wait_result = false;
                 goto Lobby_Scene;
             }
-        
-            continue;
-        }
-
-        if (!send_friend_match_)
-        {
-            network_lobby->send_packet_rank_game_req(true);
-            wait_result = true;
-        }
-        else
-        {
-            if (!accept_friend_match_)
-            {
-                network_lobby->send_packet_play_friend_game_rel(
-                    channel_server::packet_play_friends_game_rel_req_type_APPLY,
-                    friend_match_id_
-                );
-
-                wait_result = true;
-            }
-            else
-            {
-                network_lobby->send_packet_play_friend_game_rel(
-                    channel_server::packet_play_friends_game_rel_req_type_ACCEPT,
-                    friend_match_id_
-                );
-
-                wait_result = true;
-            }
         }
     } while (true);
 #pragma endregion
@@ -176,6 +138,8 @@ Loading_Scene:
 #pragma region Play_Scene
 Play_Scene:
     do {                
+        Sleep(3000);
+            
         if (end_game_)
         {            
             state_ = READY;
@@ -184,8 +148,6 @@ Play_Scene:
 
             goto Lobby_Scene;
         }
-
-        Sleep(3000);
     } while (true);
 #pragma endregion
 }

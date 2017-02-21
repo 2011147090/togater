@@ -44,7 +44,14 @@ void chat_session::handle_send(chat_server::message_type msg_type, const protobu
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
-    socket_->write_some(boost::asio::buffer(send_buf_, message_header_size + header.size));
+    boost::system::error_code error;
+    socket_->write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
+
+    if (error)
+    {
+        logger::print(error.message().c_str());
+        return;
+    }
 }
 
 void chat_session::handle_read()
@@ -61,7 +68,10 @@ void chat_session::handle_read()
         socket_->receive(boost::asio::buffer(recv_buf_), i, error);
 
         if (error)
+        {
+            logger::print(error.message().c_str());
             return;
+        }
         
         thread_sync sync;
 

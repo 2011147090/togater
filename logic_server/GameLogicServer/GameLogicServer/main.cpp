@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 
         server = new tcp_server(service, port);
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 7; i++)
             io_thread.create_thread(boost::bind(&boost::asio::io_service::run, &service));
             
         //getchar();

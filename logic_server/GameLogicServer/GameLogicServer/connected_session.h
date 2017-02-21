@@ -23,6 +23,13 @@ private:
     bool enter_room_;
     bool is_accept_;
 
+    bool is_remain;
+    int pre_remain_size;
+
+    boost::array<BYTE, BUFSIZE> remain_buf;
+    boost::array<BYTE, BUFSIZE> packet_buf;
+    boost::array<BYTE, BUFSIZE> temp_buf;
+
     boost::array<BYTE, BUFSIZE> recv_buf_;
     boost::array<BYTE, BUFSIZE> send_buf_;
 

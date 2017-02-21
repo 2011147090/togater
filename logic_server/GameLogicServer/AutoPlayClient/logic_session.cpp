@@ -11,9 +11,8 @@ bool logic_session::create()
     thread_sync sync;
 
     is_connected_ = false;
-
-    if (socket_ == nullptr)
-        socket_ = new tcp::socket(io_service_);
+        
+    socket_ = new tcp::socket(io_service_);
 
     work_thread_ = nullptr;
 
@@ -56,6 +55,12 @@ void logic_session::handle_send(logic_server::message_type msg_type, const proto
 
     boost::system::error_code error;
     socket_->write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
+
+    if (error)
+    {
+        logger::print(error.message().c_str());
+        return;
+    }
 }
 
 void logic_session::handle_read()
@@ -73,7 +78,10 @@ void logic_session::handle_read()
         thread_sync sync;         
 
         if (error)
+        {
+            logger::print(error.message().c_str());
             return;
+        }
 
         int remain_size = size;
         int process_size = 0;
@@ -159,6 +167,7 @@ void logic_session::process_packet_enter_ans(logic_server::packet_enter_ans pack
 
     logger::print("logic_session : process_packet_enter_ans");
 
+    network_lobby->send_packet_matching_confirm();
     network_logic->send_packet_game_state_ntf();
 }
 

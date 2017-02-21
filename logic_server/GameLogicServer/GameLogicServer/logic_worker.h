@@ -51,6 +51,7 @@ public:
     
     bool enter_room_player(connected_session* session, std::string room_key);
     bool process_turn(std::string room_key, std::string player_key, int money);
+    bool process_turn_v2(std::string room_key, std::string player_key, int money);
     bool disconnect_room(std::string room_key, std::string player_key);
     bool give_up_game(std::string room_key, std::string player_key);
     bool is_create_room(std::string room_key);

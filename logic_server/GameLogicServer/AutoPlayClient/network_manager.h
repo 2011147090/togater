@@ -32,7 +32,7 @@ public:
     std::string get_player_key();
     std::string get_player_id();
     std::string get_room_key();
-
+    
     void set_player_key(std::string key);
     void set_player_id(std::string id);
     void set_room_key(std::string key);

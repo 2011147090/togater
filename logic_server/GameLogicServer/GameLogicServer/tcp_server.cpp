@@ -8,7 +8,7 @@ tcp_server::tcp_server(boost::asio::io_service& io_service, unsigned short port)
 {
     wait_accept();
 
-    connected_session_list_.reserve(2000);
+    connected_session_list_.reserve(5000);
 
     end = false;
 
@@ -30,8 +30,6 @@ void tcp_server::wait_accept()
 void tcp_server::handle_accept(connected_session::pointer new_connection, const boost::system::error_code& error)
 {
     thread_sync sync;
-
-    Log::WriteLog(_T("accept_new_client, current_connection_size: %d"), connected_session_list_.size());
 
     if (!error)
     {
@@ -61,6 +59,10 @@ void tcp_server::check_connected_session()
 
         thread_sync sync;
 
+        int leave_sessions = connected_session_list_.size();
+        Log::WriteLog(_T("current_sessions : %d"), leave_sessions);
+        //std::cout << "sessions : " << connected_session_list_.size() << std::endl;
+
         for (auto iter = connected_session_list_.begin(); iter != connected_session_list_.end();)
         {
             // °©ÀÚ±â ²÷±ä ¾ÆÀÌ°¡ ¹ß»ý
@@ -68,11 +70,7 @@ void tcp_server::check_connected_session()
             {
                 if (!(*iter)->is_in_room())
                 {
-                    //if ((*iter)->get_player_key() != "" && !(*iter)->is_safe_disconnect())
-                     //   redis_connector::get_instance()->remove_player_info((*iter)->get_player_key());
-
                     iter = connected_session_list_.erase(iter);
-                    Log::WriteLog(_T("keep alive - erase session"));
                     continue;
                 }
                 
@@ -90,5 +88,7 @@ void tcp_server::check_connected_session()
             else
                 iter++;
         }
+
+        Log::WriteLog(_T("leave_sessions : %d"), leave_sessions - connected_session_list_.size());
     }
 }

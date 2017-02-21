@@ -11,7 +11,7 @@ bool channel_session::create()
     thread_sync sync;
 
     is_connected_ = false;
-
+    
     socket_ = new tcp::socket(io_service_);
 
     return true;
@@ -21,7 +21,7 @@ bool channel_session::destroy()
 {
     thread_sync sync;
 
-    //socket_->shutdown(boost::asio::socket_base::send);
+    socket_->shutdown(boost::asio::socket_base::shutdown_send);
     this->disconnect();
 
     is_connected_ = false;
@@ -54,6 +54,12 @@ void channel_session::handle_send(channel_server::message_type msg_type, const p
 
     boost::system::error_code error;
     socket_->write_some(boost::asio::buffer(send_buf_, message_header_size + header.size), error);
+
+    if (error)
+    {
+        logger::print(error.message().c_str());
+        return;
+    }
 }
 
 void channel_session::handle_read()
@@ -70,7 +76,10 @@ void channel_session::handle_read()
         socket_->receive(boost::asio::buffer(recv_buf_), i, error);
 
         if (error)
+        {
+            logger::print(error.message().c_str());
             return;
+        }
 
         thread_sync sync;
 
@@ -305,8 +314,6 @@ void channel_session::process_packet_matching_complete_ans(channel_server::packe
     configurator::get_value("logic_server_port", logic_server_port);
     network_logic->connect(logic_server_ip, logic_server_port);
     network_logic->send_packet_enter_req(network_mgr->get_room_key(), network_mgr->get_player_key());
-    
-    send_packet_matching_confirm();
 }
 
 void channel_session::process_packet_error_message(channel_server::packet_error_message packet)

@@ -93,10 +93,9 @@ void database_connector::process_queue()
 
         session_.sql_result_ = mysql_store_result(session_.connection_);
 
-        if (session_.sql_result_ == nullptr)
+        /*if (session_.sql_result_ == nullptr)
         {
-            int k;//Log::WriteLog("error : sql_result_ == nullptr");
-        }
+        }*/
 
         if (query.callback_func != nullptr)
             query.callback_event(session_.sql_result_);

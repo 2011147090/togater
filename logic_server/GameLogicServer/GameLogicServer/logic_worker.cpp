@@ -64,7 +64,7 @@ bool logic_worker::init_singleton()
 
     end_server_ = true;
 
-    room_hashs_.reserve(size_t(1000));
+    room_hashs_.reserve(5000);
 
     return true;
 }
@@ -149,6 +149,467 @@ bool logic_worker::process_turn(std::string room_key, std::string player_key, in
     return false;
 }
 
+bool logic_worker::process_turn_v2(std::string room_key, std::string player_key, int money)
+{
+    thread_sync sync;
+
+    if (room_hashs_.empty())
+        return false;
+    
+    auto iter = room_hashs_.find(room_key);
+
+    if (iter == room_hashs_.end())
+        return false;
+
+    if (iter->second.player_[0].session_->get_player_key() == player_key)
+    {
+        iter->second.player_[0].submit_card_ = true;
+        iter->second.player_[0].submit_money_ = money;
+    }
+    else if (iter->second.player_[1].session_->get_player_key() == player_key)
+    {
+        iter->second.player_[1].submit_card_ = true;
+        iter->second.player_[1].submit_money_ = money;
+    }
+
+    std::string room_name = "id_" + iter->second.player_[0].id_ + "_" + iter->second.player_[1].id_;
+
+    if (iter->second.state_ == ROOM_INFO::PLAYING)
+    {
+        if (iter->second.turn_player_->submit_card_)
+        {
+            iter->second.turn_player_->submit_card_ = false;
+            iter->second.turn_player_->sum_money_ += iter->second.turn_player_->submit_money_;
+
+            enum TURN_TYPE { TURN_PASS = 0, CHECK_CARD, GIVE_UP, END_TURN };
+
+            TURN_TYPE turn_type = TURN_PASS;
+
+            if (iter->second.player_[0].sum_money_ == iter->second.player_[1].sum_money_)
+            {
+                if (iter->second.hide_card_ == true)
+                    turn_type = CHECK_CARD;
+                else
+                    turn_type = END_TURN;
+            }
+
+            if (iter->second.turn_player_->submit_money_ == 0)
+                turn_type = GIVE_UP;
+
+            if (iter->second.turn_player_->remain_money_ - iter->second.turn_player_->sum_money_ <= 0)
+                turn_type = END_TURN;
+
+            if (turn_type == TURN_PASS)
+            {
+                logic_server::packet_process_turn_req turn_req_packet;
+
+                if (iter->second.turn_player_ == &iter->second.player_[0])
+                {
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()),
+                        _T("turn_type:%d, submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
+                        turn_type,
+                        iter->second.turn_player_->id_.c_str(),
+                        iter->second.turn_player_->sum_money_,
+                        iter->second.player_[1].sum_money_
+                    );
+
+                    iter->second.turn_player_ = &iter->second.player_[1];
+
+                    turn_req_packet.set_my_money(iter->second.player_[1].sum_money_);
+                    turn_req_packet.set_opponent_money(iter->second.player_[0].sum_money_);
+                }
+                else
+                {
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()),
+                        _T("turn_type:%d, submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
+                        turn_type,
+                        iter->second.turn_player_->id_.c_str(),
+                        iter->second.turn_player_->sum_money_,
+                        iter->second.player_[0].sum_money_
+                    );
+
+                    iter->second.turn_player_ = &iter->second.player_[0];
+
+                    turn_req_packet.set_my_money(iter->second.player_[0].sum_money_);
+                    turn_req_packet.set_opponent_money(iter->second.player_[1].sum_money_);
+                }
+
+                iter->second.turn_player_->session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
+            }
+            else if (turn_type == CHECK_CARD)
+            {
+                iter->second.hide_card_ = false;
+
+                logic_server::packet_process_turn_req turn_req_packet;
+
+                if (iter->second.turn_player_ == &iter->second.player_[0])
+                {
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()),
+                        _T("turn_type:%d, submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
+                        turn_type,
+                        iter->second.turn_player_->id_.c_str(),
+                        iter->second.turn_player_->sum_money_,
+                        iter->second.player_[1].sum_money_
+                    );
+
+                    iter->second.turn_player_ = &iter->second.player_[1];
+
+                    turn_req_packet.set_my_money(iter->second.player_[1].sum_money_);
+                    turn_req_packet.set_opponent_money(iter->second.player_[0].sum_money_);
+                }
+                else
+                {
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()),
+                        _T("turn_type:%d, submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
+                        turn_type,
+                        iter->second.turn_player_->id_.c_str(),
+                        iter->second.turn_player_->sum_money_,
+                        iter->second.player_[0].sum_money_
+                    );
+
+                    iter->second.turn_player_ = &iter->second.player_[0];
+
+                    turn_req_packet.set_my_money(iter->second.player_[0].sum_money_);
+                    turn_req_packet.set_opponent_money(iter->second.player_[1].sum_money_);
+                }
+
+                iter->second.turn_player_->session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
+
+                logic_server::packet_process_check_card_ntf check_card_packet;
+                check_card_packet.set_result(1);
+
+                for (int i = 0; i < 2; i++)
+                    iter->second.player_[i].session_->handle_send(logic_server::PROCESS_CHECK_CARD_NTF, check_card_packet);
+            }
+            else if (turn_type == GIVE_UP)
+            {
+                if (iter->second.turn_player_ == &iter->second.player_[0])
+                {
+                    iter->second.player_[0].remain_money_ -= iter->second.player_[0].sum_money_;
+                    iter->second.player_[1].remain_money_ += iter->second.player_[0].sum_money_;
+
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()),
+                        _T("turn_type:%d, submit_player:%s), remain_coin:%d, other_player_remain_coin:%d"),
+                        turn_type,
+                        iter->second.turn_player_->id_.c_str(),
+                        iter->second.turn_player_->remain_money_,
+                        iter->second.player_[1].remain_money_
+                    );
+                }
+                else
+                {
+                    iter->second.player_[0].remain_money_ += iter->second.player_[1].sum_money_;
+                    iter->second.player_[1].remain_money_ -= iter->second.player_[1].sum_money_;
+
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()),
+                        _T("turn_type:%d, submit_player:%s, remain_coin:%d, other_player_remain_coin:%d"),
+                        turn_type,
+                        iter->second.turn_player_->id_.c_str(),
+                        iter->second.turn_player_->remain_money_,
+                        iter->second.player_[0].remain_money_
+                    );
+                }
+
+                for (int i = 0; i < 2; i++)
+                    iter->second.player_[i].sum_money_ = 1;
+
+                iter->second.hide_card_ = true;
+
+                logic_server::packet_process_turn_ntf turn_ntf_packet;
+
+                iter->second.public_card_[0] = iter->second.get_card();
+                iter->second.public_card_[1] = iter->second.get_card();
+                turn_ntf_packet.set_public_card_number_1(iter->second.public_card_[0]);
+                turn_ntf_packet.set_public_card_number_2(iter->second.public_card_[1]);
+
+                for (int i = 0; i < 2; i++)
+                {
+                    iter->second.player_[i].opponent_card_num_ = iter->second.get_card();
+
+                    turn_ntf_packet.set_opponent_card_number(iter->second.player_[i].opponent_card_num_);
+                    turn_ntf_packet.set_remain_money(iter->second.player_[i].remain_money_);
+                    turn_ntf_packet.set_opponent_money(0);
+                    turn_ntf_packet.set_my_money(0);
+
+                    iter->second.player_[i].session_->handle_send(logic_server::PROCESS_TURN_NTF, turn_ntf_packet);
+                }
+
+                logic_server::packet_process_turn_req turn_req_packet;
+
+                if (iter->second.turn_player_ == &iter->second.player_[0])
+                {
+                    iter->second.turn_player_ = &iter->second.player_[1];
+
+                    turn_req_packet.set_my_money(iter->second.player_[1].sum_money_);
+                    turn_req_packet.set_opponent_money(iter->second.player_[0].sum_money_);
+                }
+                else
+                {
+                    iter->second.turn_player_ = &iter->second.player_[0];
+
+                    turn_req_packet.set_my_money(iter->second.player_[0].sum_money_);
+                    turn_req_packet.set_opponent_money(iter->second.player_[1].sum_money_);
+                }
+
+                iter->second.turn_player_->session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
+            }
+            else if (turn_type == END_TURN) {
+
+                HOLDEM_HANDS player_1_result = check_card_mix(
+                    iter->second.player_[1].opponent_card_num_,
+                    iter->second.public_card_[0],
+                    iter->second.public_card_[1]
+                );
+
+                HOLDEM_HANDS player_2_result = check_card_mix(
+                    iter->second.player_[0].opponent_card_num_,
+                    iter->second.public_card_[0],
+                    iter->second.public_card_[1]
+                );
+
+                Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("turn_type:%d"),
+                    turn_type
+                );
+
+                Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("-> player:%s, card_deck:%d, card_num:%d"),
+                    iter->second.player_[0].id_.c_str(),
+                    player_1_result,
+                    iter->second.player_[1].opponent_card_num_
+                );
+
+                Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("-> player:%s, card_deck:%d, card_num:%d"),
+                    iter->second.player_[1].id_.c_str(),
+                    player_2_result,
+                    iter->second.player_[0].opponent_card_num_
+                );
+
+                bool completely_same = true;
+
+                if (player_1_result > player_2_result)
+                {
+                    iter->second.player_[0].remain_money_ += iter->second.player_[1].sum_money_;
+                    iter->second.player_[1].remain_money_ -= iter->second.player_[1].sum_money_;
+
+                    completely_same = false;
+                }
+                else if (player_1_result < player_2_result)
+                {
+                    iter->second.player_[0].remain_money_ -= iter->second.player_[0].sum_money_;
+                    iter->second.player_[1].remain_money_ += iter->second.player_[0].sum_money_;
+
+                    completely_same = false;
+                }
+                else
+                {
+                    if (iter->second.player_[0].opponent_card_num_ > iter->second.player_[1].opponent_card_num_)
+                    {
+                        iter->second.player_[1].remain_money_ += iter->second.player_[0].sum_money_;
+                        iter->second.player_[0].remain_money_ -= iter->second.player_[0].sum_money_;
+
+                        completely_same = false;
+                    }
+                    else if (iter->second.player_[0].opponent_card_num_ < iter->second.player_[1].opponent_card_num_)
+                    {
+                        iter->second.player_[1].remain_money_ -= iter->second.player_[1].sum_money_;
+                        iter->second.player_[0].remain_money_ += iter->second.player_[1].sum_money_;
+
+                        completely_same = false;
+                    }
+                }
+
+                if (iter->second.player_[0].remain_money_ <= 0 || iter->second.player_[1].remain_money_ <= 0)
+                {
+                    iter->second.state_ = ROOM_INFO::END;
+                    goto END_GAME;
+                }
+
+                if (completely_same)
+                {
+                    logic_server::packet_process_turn_ntf turn_ntf_packet;
+
+                    iter->second.public_card_[0] = iter->second.get_card();
+                    iter->second.public_card_[1] = iter->second.get_card();
+
+                    turn_ntf_packet.set_public_card_number_1(iter->second.public_card_[0]);
+                    turn_ntf_packet.set_public_card_number_2(iter->second.public_card_[1]);
+
+                    for (int i = 0; i < 2; i++)
+                    {
+                        iter->second.player_[i].opponent_card_num_ = iter->second.get_card();
+
+                        turn_ntf_packet.set_opponent_card_number(iter->second.player_[i].opponent_card_num_);
+                        turn_ntf_packet.set_remain_money(iter->second.player_[i].remain_money_);
+
+                        if (i == 0)
+                        {
+                            turn_ntf_packet.set_opponent_money(iter->second.player_[1].sum_money_++);
+                            turn_ntf_packet.set_my_money(iter->second.player_[0].sum_money_);
+                        }
+                        else
+                        {
+                            turn_ntf_packet.set_opponent_money(iter->second.player_[0].sum_money_++);
+                            turn_ntf_packet.set_my_money(iter->second.player_[1].sum_money_);
+                        }
+
+                        iter->second.player_[i].session_->handle_send(logic_server::PROCESS_TURN_NTF, turn_ntf_packet);
+                    }
+
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("-> completely_same:true, player_1:%d, player_2:%d"),
+                        iter->second.player_[0].remain_money_,
+                        iter->second.player_[1].remain_money_
+                    );
+                }
+                else
+                {
+                    if (iter->second.player_[0].remain_money_ <= 0 || iter->second.player_[1].remain_money_ <= 0)
+                    {
+                        iter->second.state_ = ROOM_INFO::END;
+                        goto END_GAME;
+                    }
+
+                    logic_server::packet_process_turn_ntf turn_ntf_packet;
+
+                    iter->second.public_card_[0] = iter->second.get_card();
+                    iter->second.public_card_[1] = iter->second.get_card();
+                    turn_ntf_packet.set_public_card_number_1(iter->second.public_card_[0]);
+                    turn_ntf_packet.set_public_card_number_2(iter->second.public_card_[1]);
+
+                    for (int i = 0; i < 2; i++)
+                    {
+                        iter->second.player_[i].opponent_card_num_ = iter->second.get_card();
+
+                        turn_ntf_packet.set_opponent_card_number(iter->second.player_[i].opponent_card_num_);
+                        turn_ntf_packet.set_remain_money(iter->second.player_[i].remain_money_);
+                        turn_ntf_packet.set_opponent_money(0);
+                        turn_ntf_packet.set_my_money(0);
+
+                        iter->second.player_[i].session_->handle_send(logic_server::PROCESS_TURN_NTF, turn_ntf_packet);
+                    }
+
+                    for (int i = 0; i < 2; i++)
+                        iter->second.player_[i].sum_money_ = 1;
+
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("-> completely_same:false"));
+                }
+
+                iter->second.hide_card_ = true;
+
+                logic_server::packet_process_turn_req turn_req_packet;
+
+                if (iter->second.turn_player_ == &iter->second.player_[0])
+                {
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("-> submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
+                        iter->second.player_[0].id_.c_str(),
+                        iter->second.turn_player_->sum_money_,
+                        iter->second.player_[1].sum_money_
+                    );
+
+                    iter->second.turn_player_ = &iter->second.player_[1];
+
+                    turn_req_packet.set_my_money(iter->second.player_[1].sum_money_);
+                    turn_req_packet.set_opponent_money(iter->second.player_[0].sum_money_);
+                }
+                else
+                {
+                    Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("-> submit_player:%s, sum_coin:%d, other_player_sum_coin:%d"),
+                        iter->second.player_[0].id_.c_str(),
+                        iter->second.turn_player_->sum_money_,
+                        iter->second.player_[0].sum_money_
+                    );
+
+                    iter->second.turn_player_ = &iter->second.player_[0];
+
+                    turn_req_packet.set_my_money(iter->second.player_[0].sum_money_);
+                    turn_req_packet.set_opponent_money(iter->second.player_[1].sum_money_);
+                }
+
+                iter->second.turn_player_->session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
+            }
+
+        }
+    }
+
+END_GAME:
+    if (iter->second.state_ == ROOM_INFO::END)
+    {
+        logic_server::packet_game_state_ntf game_state_packet;
+
+        game_state_packet.set_state(2);
+
+        Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("end_game, database_update."));
+
+        int win_index = 0;
+        int lose_index = 0;
+
+        if (iter->second.player_[0].remain_money_ >= iter->second.player_[1].remain_money_)
+        {
+            win_index = 0;
+            lose_index = 1;
+        }
+        else
+        {
+            win_index = 1;
+            lose_index = 0;
+        }
+
+        char temp[255] = "";
+
+        db_query query;
+        sprintf(
+            temp,
+            "UPDATE user_info SET win = win + 1, rating = rating + %d WHERE id = \'%s\';",
+            random_generator::get_random_int(30, 50),
+            iter->second.player_[win_index].id_.c_str()
+        );
+        query.query_ = temp;
+
+        db_connector->push_query(query);
+        Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
+
+        db_query query2;
+        query2.callback_func = nullptr;
+        sprintf(
+            temp,
+            "UPDATE user_info SET lose = lose + 1, rating = rating - %d WHERE id = \'%s\';",
+            random_generator::get_random_int(30, 50),
+            iter->second.player_[lose_index].id_.c_str()
+        );
+        query2.query_ = temp;
+
+        db_connector->push_query(query2);
+        Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
+
+        game_state_packet.set_win_player_key(iter->second.player_[win_index].session_->get_player_key());
+
+        for (int i = 0; i < 2; i++)
+        {
+            iter->second.player_[i].session_->set_room_state(false);
+            iter->second.player_[i].session_->set_safe_disconnect(true);
+            iter->second.player_[i].session_->handle_send(logic_server::GAME_STATE_NTF, game_state_packet);
+            iter->second.player_[i].session_->shut_down();
+        }
+
+        if (iter->second.player_[0].remain_money_ != 0)
+        {
+            Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("end_game, win_player:%s"),
+                iter->second.player_[0].id_.c_str()
+            );
+        }
+        else
+        {
+            Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("end_game, win_player:%s"),
+                iter->second.player_[1].id_.c_str()
+            );
+        }
+
+        redis_connector::get_instance()->remove_room_info(iter->first);
+
+        room_hashs_.erase(iter);
+    }
+
+    return true;
+}
+
 bool comp(int const& a, int const& b) {
     if (a < b) return true;
 
@@ -162,7 +623,60 @@ bool logic_worker::ready_for_game(std::string room_key)
     auto iter = room_hashs_.find(room_key);
 
     if (iter != room_hashs_.end())
+    {
         iter->second.ready_player_num_++;
+    
+        /*if (iter->second.ready_player_num_ >= 2)
+        {
+            iter->second.state_ = ROOM_INFO::PLAYING;
+
+            logic_server::packet_game_state_ntf start_ntf_packet;
+
+            start_ntf_packet.set_win_player_key("temp");
+            start_ntf_packet.set_state(1);
+
+            iter->second.player_[0].session_->handle_send(logic_server::GAME_STATE_NTF, start_ntf_packet);
+            iter->second.player_[1].session_->handle_send(logic_server::GAME_STATE_NTF, start_ntf_packet);
+
+            logic_server::packet_process_turn_ntf turn_ntf_packet;
+
+            iter->second.public_card_[0] = iter->second.get_card();
+            iter->second.public_card_[1] = iter->second.get_card();
+            turn_ntf_packet.set_public_card_number_1(iter->second.public_card_[0]);
+            turn_ntf_packet.set_public_card_number_2(iter->second.public_card_[1]);
+
+            for (int i = 0; i < 2; i++)
+            {
+                iter->second.player_[i].opponent_card_num_ = iter->second.get_card();
+
+                turn_ntf_packet.set_opponent_card_number(iter->second.player_[i].opponent_card_num_);
+                turn_ntf_packet.set_remain_money(iter->second.player_[i].remain_money_);
+                turn_ntf_packet.set_opponent_money(0);
+                turn_ntf_packet.set_my_money(0);
+
+                iter->second.player_[i].session_->handle_send(logic_server::PROCESS_TURN_NTF, turn_ntf_packet);
+            }
+
+            logic_server::packet_process_turn_req turn_req_packet;
+
+            if (random_generator::get_random_int(0, 100) < 50)
+            {
+                iter->second.turn_player_ = &iter->second.player_[0];
+
+                turn_req_packet.set_my_money(iter->second.player_[0].sum_money_);
+                turn_req_packet.set_opponent_money(iter->second.player_[1].sum_money_);
+            }
+            else
+            {
+                iter->second.turn_player_ = &iter->second.player_[1];
+
+                turn_req_packet.set_my_money(iter->second.player_[1].sum_money_);
+                turn_req_packet.set_opponent_money(iter->second.player_[0].sum_money_);
+            }
+
+            iter->second.turn_player_->session_->handle_send(logic_server::PROCESS_TURN_REQ, turn_req_packet);
+        }*/
+    }
     else
         return false;
 
@@ -709,8 +1223,6 @@ void logic_worker::process_queue()
             iter++;
         }
     }
-
-    int  k = 0;
 }
 
 bool logic_worker::is_create_room(std::string room_key)
@@ -858,37 +1370,37 @@ bool logic_worker::disconnect_room(std::string room_key, std::string player_key)
     db_query query;
     query.callback_func = nullptr;
 
-        char temp[255] = "";
-        sprintf(
-            temp,
-            "UPDATE user_info SET win = win + 1, rating = rating + %d WHERE id = \'%s\';",
-            random_generator::get_random_int(30, 50),
-            win_player->id_.c_str()
-        );
-        query.query_ = temp;
+    char temp[255] = "";
+    sprintf(
+        temp,
+        "UPDATE user_info SET win = win + 1, rating = rating + %d WHERE id = \'%s\';",
+        random_generator::get_random_int(30, 50),
+        win_player->id_.c_str()
+    );
+    query.query_ = temp;
 
-        db_connector->push_query(query);
-        Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
+    db_connector->push_query(query);
+    Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
 
-        db_query query2;
-        query2.callback_func = nullptr;
-        sprintf(
-            temp,
-            "UPDATE user_info SET lose = lose + 1, rating = rating - %d WHERE id = \'%s\';",
-            random_generator::get_random_int(30, 50),
-            lose_player->id_.c_str()
-        );
-        query2.query_ = temp;
+    db_query query2;
+    query2.callback_func = nullptr;
+    sprintf(
+        temp,
+        "UPDATE user_info SET lose = lose + 1, rating = rating - %d WHERE id = \'%s\';",
+        random_generator::get_random_int(30, 50),
+        lose_player->id_.c_str()
+    );
+    query2.query_ = temp;
 
-        db_connector->push_query(query2);
-        Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
+    db_connector->push_query(query2);
+    Log::RoomLog(const_cast<char*>(room_name.c_str()), "query - %s", temp);
 
-        for (int i = 0; i < 2; i++)
-        {
-            iter->second.player_[i].session_->set_room_state(false);
-            iter->second.player_[i].session_->handle_send(logic_server::GAME_STATE_NTF, game_state_packet);
-            iter->second.player_[i].session_->shut_down();
-        }
+    for (int i = 0; i < 2; i++)
+    {
+        iter->second.player_[i].session_->set_room_state(false);
+        iter->second.player_[i].session_->handle_send(logic_server::GAME_STATE_NTF, game_state_packet);
+        iter->second.player_[i].session_->shut_down();
+    }
 
     Log::RoomLog(const_cast<char*>(room_name.c_str()), _T("end_game, win_player:%s"),
         win_player->id_.c_str()

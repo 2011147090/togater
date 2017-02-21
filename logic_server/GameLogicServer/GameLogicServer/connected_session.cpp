@@ -9,6 +9,9 @@ connected_session::connected_session(boost::asio::io_service& io_service) : sock
     room_key_ = "";
     enter_room_ = true;
     create_room_ = false;
+
+    is_remain = false;
+    pre_remain_size = 0;
 }
 
 void connected_session::handle_send(logic_server::message_type msg_type, const protobuf::Message& message)
@@ -54,20 +57,41 @@ void connected_session::handle_read(const boost::system::error_code& error, size
 {
     if (!error)
     {
-        socket_.async_read_some(boost::asio::buffer(recv_buf_),
+        socket_.async_read_some(boost::asio::buffer(temp_buf),
             boost::bind(&connected_session::handle_read, shared_from_this(),
                 boost::asio::placeholders::error,
                 boost::asio::placeholders::bytes_transferred));
 
-        static boost::array<BYTE, BUFSIZE> packet_buf;
-
-        int remain_size = buf_size;
+        if (is_remain)
+            CopyMemory(recv_buf_.begin(), remain_buf.begin(), pre_remain_size);
+        
+        CopyMemory(recv_buf_.begin() + pre_remain_size, temp_buf.begin(), buf_size);
+        
         int process_size = 0;
+        int remain_size = buf_size + pre_remain_size;
 
         do
         {
+            if (message_header_size > remain_size)
+            {
+                CopyMemory(remain_buf.begin(), recv_buf_.begin() + process_size, remain_size);
+                pre_remain_size = remain_size;
+                is_remain = true;
+                break;
+            }
+
             MESSAGE_HEADER message_header;
+            ZeroMemory(&message_header, sizeof(message_header));
             CopyMemory(&message_header, recv_buf_.begin() + process_size, message_header_size);
+            
+            if (message_header_size + message_header.size > remain_size)
+            {
+                CopyMemory(remain_buf.begin(), recv_buf_.begin() + process_size, remain_size);
+                pre_remain_size = remain_size;
+                is_remain = true;
+                break;
+            }
+
             CopyMemory(packet_buf.begin(), recv_buf_.begin() + process_size, message_header.size + message_header_size);
 
             process_size += message_header_size + message_header.size;
@@ -78,7 +102,7 @@ void connected_session::handle_read(const boost::system::error_code& error, size
             case logic_server::ENTER_REQ:
             {
                 logic_server::packet_enter_req message;
-
+                
                 if (false == message.ParseFromArray(packet_buf.begin() + message_header_size, message_header.size))
                     break;
 
@@ -130,13 +154,36 @@ void connected_session::handle_read(const boost::system::error_code& error, size
             }
             break;
             }
+
+            if (remain_size == 0)
+            {
+                is_remain = false;
+                pre_remain_size = 0;
+            }
+
         } while (remain_size > 0);
     }
     else
     {
-        Log::WriteLog(_T("handle_read_error: %s"), error.message().c_str());
-        
-        this->shut_down();
+        if (error == boost::asio::error::eof)
+        {
+            Log::WriteLog(_T("error_eof : %s"), error.message().c_str());
+
+            this->shut_down();
+
+        }
+        else if (error == boost::asio::error::shut_down)
+        {
+            Log::WriteLog(_T("shut_down_socket: %s"), error.message().c_str());
+
+            this->shut_down();
+        }
+        else if (error.value() == 10054)
+        {
+            Log::WriteLog(_T("shut_down_socket: %s"), error.message().c_str());
+
+            this->shut_down();
+        }
     }
 }
 
@@ -160,7 +207,7 @@ tcp::socket& connected_session::get_socket()
 
 void connected_session::start()
 {
-    socket_.async_read_some(boost::asio::buffer(recv_buf_),
+    socket_.async_read_some(boost::asio::buffer(temp_buf),
         boost::bind(&connected_session::handle_read, shared_from_this(),
             boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred));
