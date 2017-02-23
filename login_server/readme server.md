@@ -2,7 +2,7 @@
 ---
 Node.js(version: 6.9.4)를 기반으로 개발된 Login Server
 
-####개발 환경
+#### 개발 환경
 ---
 * 개발 OS : Windows 10
 * 서버 개발 Editor : Atom Editor
@@ -14,7 +14,7 @@ Node.js(version: 6.9.4)를 기반으로 개발된 Login Server
 * 서버 DB : MySQL 5.5.53
 * 캐쉬 DB : Redis
 
-####주요 기능
+#### 주요 기능
 ---
 * 회원가입 (자체 DB에 저장)
 * 사용자 인증 (ID를 해싱하여 AccessToken 생성)
@@ -24,7 +24,7 @@ Node.js(version: 6.9.4)를 기반으로 개발된 Login Server
 * ID 찾기 / 패스워드 초기화 (이메일 인증)
 * WebGL로 빌드된 Unity3D 웹 클라이언트
 
-####Rest API
+#### Rest API
 ---
 방식 | API 주소 | 기능 | 파라미터 | 리턴 값
 ----------|----------|----------|----------|--------
@@ -42,7 +42,7 @@ POST | /dashboard/profile | 대시보드 상에서 게임 프로필 요청 | Acc
 POST | /dashboard/account | 대시보드 상에서 게임 계정 요청 | AccessToken |성공 : {"ID" : ID, "email" : email}
 POST | /dashboard/update/email | 대시보드 상에서 이메일 수정 | AccessToken |성공 : 'update email', 실패 : 'overlap email'
 
-####종속 라이브러리
+#### 종속 라이브러리
 ---
 * body-parser : 1.16.0 (Post data 파싱)
 * connect-redis : 3.2.0 (Redis 연결)
