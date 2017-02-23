@@ -92,6 +92,7 @@ void tcp_session::handle_receive(const boost::system::error_code& error, size_t 
         // UTF-8 변환
         std::string err_msg = CW2A(CA2W(error.message().c_str()), CP_UTF8);
 
+        // Error.10054 : 현재 연결은 원격 호스트에 의해 강제로 끊겼습니다.
         if (error == boost::asio::error::eof || error.value() == 10054)
         {
             LOG_INFO << "Disconnected with client. " << err_msg;
