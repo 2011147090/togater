@@ -1,4 +1,4 @@
-#include "log_manager.h"
+﻿#include "log_manager.h"
 
 
 namespace attrs = boost::log::attributes;

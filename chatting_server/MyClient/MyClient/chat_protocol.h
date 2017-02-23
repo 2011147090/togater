@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "chat_protobuf.pb.h"
 

@@ -1,4 +1,4 @@
-#include "preheaders.h"
+﻿#include "preheaders.h"
 
 #include "config.h"
 #include "log_manager.h"

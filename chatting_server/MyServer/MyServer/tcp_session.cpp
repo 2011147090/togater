@@ -1,4 +1,4 @@
-#include "log_manager.h"
+ï»¿#include "log_manager.h"
 #include "redis_connector.h"
 
 #include "tcp_server.h"
@@ -89,10 +89,10 @@ void tcp_session::handle_receive(const boost::system::error_code& error, size_t 
     }
     else
     {
-        // UTF-8 º¯È¯
+        // UTF-8 ë³€í™˜
         std::string err_msg = CW2A(CA2W(error.message().c_str()), CP_UTF8);
 
-        // Error.10054 : ÇöÀç ¿¬°áÀº ¿ø°İ È£½ºÆ®¿¡ ÀÇÇØ °­Á¦·Î ²÷°å½À´Ï´Ù.
+        // Error.10054 : í˜„ì¬ ì—°ê²°ì€ ì›ê²© í˜¸ìŠ¤íŠ¸ì— ì˜í•´ ê°•ì œë¡œ ëŠê²¼ìŠµë‹ˆë‹¤.
         if (error == boost::asio::error::eof || error.value() == 10054)
         {
             LOG_INFO << "Disconnected with client. " << err_msg;

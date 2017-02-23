@@ -1,4 +1,4 @@
-#include "tcp_client.h"
+ï»¿#include "tcp_client.h"
 #include <atlstr.h>
 
 int main(int argc, char* argv[])
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     thread.join();
     chat_client.close();
 
-    std::cout << "Å¬¶óÀÌ¾ðÆ®¸¦ Á¾·áÇØ ÁÖ¼¼¿ä" << std::endl;
+    std::cout << "í´ë¼ì´ì–¸íŠ¸ë¥¼ ì¢…ë£Œí•´ ì£¼ì„¸ìš”" << std::endl;
 
     return 0;
 }

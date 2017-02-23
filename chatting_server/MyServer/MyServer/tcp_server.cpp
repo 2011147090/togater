@@ -1,4 +1,4 @@
-#include "config.h"
+ï»¿#include "config.h"
 #include "log_manager.h"
 #include "redis_connector.h"
 
@@ -216,7 +216,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             std::string redis_key = verify_message.key_string();
             std::string redis_value = verify_message.value_user_id();
 
-            // ·¹µğ½º ÀÎÁõ Å° ÀÏÄ¡
+            // ë ˆë””ìŠ¤ ì¸ì¦ í‚¤ ì¼ì¹˜
             if (redis_connector::get_instance()->get(redis_key) == redis_value)
             {
                 if (!session_list_[session_id]->set_user_key(redis_key) || !session_list_[session_id]->set_user_id(redis_value) || !session_list_[session_id]->set_status(lobby))
@@ -228,7 +228,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
                 session_list_[session_id]->post_send(false, reserved_message_size[VERIFY_TRUE], reserved_message[VERIFY_TRUE].begin());
 
 
-                // ÀÔÀå ¸Ş¼¼Áö
+                // ì…ì¥ ë©”ì„¸ì§€
                 chat_server::packet_chat_normal normal_message;
                 normal_message.set_user_id("SYSTEM");
                 normal_message.set_chat_message("<" + redis_value + "> entered \nthe lobby.");
@@ -254,7 +254,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
                 }
                 
             }
-            // ºÒÀÏÄ¡
+            // ë¶ˆì¼ì¹˜
             else
             {
                 LOG_WARN << "process_packet() - Client cookie does not verified. user_id: " << session_list_[session_id]->get_user_id();
@@ -271,7 +271,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
 
     //        std::string user_id = logout_message.user_id();
 
-    //        // ÀÇ¹Ì¾ø´Â if¹®
+    //        // ì˜ë¯¸ì—†ëŠ” ifë¬¸
     //        if (user_id == session_list_[session_id]->get_user_id())
     //        {
     //            LOG_INFO << "Client logout successed. user_id: " << session_list_[session_id]->get_user_id();
@@ -343,7 +343,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
             auto iter = connected_session_map_.find(whisper_message.target_id());
             if (session_list_[session_id]->get_socket().is_open() && iter != connected_session_map_.end())
             {
-                // º»ÀÎ¿¡°Ô ±Ó¼Ó¸»À» ÇÑ °æ¿ì
+                // ë³¸ì¸ì—ê²Œ ê·“ì†ë§ì„ í•œ ê²½ìš°
                 if (session_list_[session_id]->get_user_id() == iter->second->get_user_id())
                 {
                     master_data_queue_.pop_back();
@@ -352,7 +352,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
                     
                     session_list_[session_id]->post_send(false, reserved_message_size[WHISPER_ERROR], reserved_message[WHISPER_ERROR].begin());
                 }
-                // Á¤»óÀûÀÎ °æ¿ì
+                // ì •ìƒì ì¸ ê²½ìš°
                 else
                 {
                     LOG_INFO << "[CHAT_whisper] " << whisper_message.user_id() << "->" << whisper_message.target_id() << ": " << whisper_message.chat_message();
@@ -361,7 +361,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
                     iter->second->post_send(false, size, master_data_queue_.back().begin());
                 }
             }
-            // ±Ó¼Ó¸» »ó´ë°¡ ¾ø´Â °æ¿ì
+            // ê·“ì†ë§ ìƒëŒ€ê°€ ì—†ëŠ” ê²½ìš°
             else
             {
                 master_data_queue_.pop_back();
@@ -412,7 +412,7 @@ void tcp_server::process_packet(const int session_id, const int size, BYTE* pack
         break;
 
 
-    // ÆĞÅ¶ Å¸ÀÔ ºÒ¸í
+    // íŒ¨í‚· íƒ€ì… ë¶ˆëª…
     default:
         LOG_WARN << "process_packet() - Message type is unknown. : " << message_header->type;
         break;
@@ -453,7 +453,7 @@ void tcp_server::handle_accept(tcp_session* session, const boost::system::error_
     }
     else
     {
-        // UTF-8 º¯È¯
+        // UTF-8 ë³€í™˜
         std::string err_msg = CW2A(CA2W(error.message().c_str()), CP_UTF8);
 
         LOG_WARN << "handle_accept() - Error Message: " << err_msg;
