@@ -4,7 +4,6 @@ var cookieParser = require('cookie-parser');
 var mysql = require('mysql');
 var redis = require('redis');
 var redisClient = redis.createClient(6379, '192.168.1.201');
-//var redisClient = redis.createClient(6379, 'localhost');
 var md5 = require('md5');
 var sha256 = require('sha256');
 var uuid = require('uuid/v4');
@@ -13,7 +12,6 @@ var nodemailer = require('nodemailer');
 var mysqlPool = mysql.createPool({
     connectionLimit : 20,
     host : '192.168.1.251',
-    //host : 'localhost',
     user : 'togater',
     password : 'togater',
     database : 'togater'
@@ -42,9 +40,6 @@ winston.add ( winston.transports.File, {
 var app = require('express')();
 var server = require('http').Server(app);
 
-var resetPasswordUserList = [];
-
-
 server.listen(3000, function(){
   console.log('listen......');
 });
@@ -65,43 +60,42 @@ app.get('/', function(request, response){
   response.send('/public/index.html');
 });
 
-//TODO 레디스에서 아이디를 가져오는게 아니라 솔트를 가져와야 한다.
 app.post('/login', function (request, response) {
-redisClient.get(md5(sha256(request.body.id)), function(err, reply) {
-    if(reply === null){
+    redisClient.get(md5(sha256(request.body.id)), function(err, reply) {
+        if(reply === null){
 
-      var userID = request.body.id;
-      var encryptedPassword = sha256(request.body.password);
+            var userID = request.body.id;
+            var encryptedPassword = sha256(request.body.password);
 
-      mysqlPool.getConnection(function(err, connection){
-          connection.query('select * from user_info where id =  BINARY(?) and password =  BINARY(?)', [userID, encryptedPassword] , function(err, secondRows){
-            response.writeHead(200, headers);
+          mysqlPool.getConnection(function(err, connection){
+              connection.query('select * from user_info where id =  BINARY(?) and password =  BINARY(?)', [userID, encryptedPassword] , function(err, secondRows){
+                response.writeHead(200, headers);
 
-            if(secondRows.length === 1)   //만약 로그인에 성공했다면
-            {
-                var accessToken = md5(sha256(userID));
-                response.end('ok:' + accessToken);
-                redisClient.set(accessToken, userID);
-                winston.info('Login : ' + userID + ' : -> Success');
-            }
-            else if(secondRows.length === 0)  //로그인 실패
-            {
-                response.end('login fail');
-                winston.info('Login : ' + userID + ' -> Can\' Find ID');
-            }
-            connection.release();
+                if(secondRows.length === 1)   //만약 로그인에 성공했다면
+                {
+                    var accessToken = md5(sha256(userID));
+                    response.end('ok:' + accessToken);
+                    redisClient.set(accessToken, userID);
+                    winston.info('Login : ' + userID + ' : -> Success');
+                }
+                else if(secondRows.length === 0)  //로그인 실패
+                {
+                    response.end('login fail');
+                    winston.info('Login : ' + userID + ' -> Can\' Find ID');
+                }
+                connection.release();
 
-            if(err)
-              console.log(err);
-          });
-        });
-    }
-    else{
-      winston.info('Login : ' + request.body.id + ' -> Already Connect ID');
-      response.writeHead(200, headers);
-      response.end('already login');
-    }
-  });
+                if(err)
+                  console.log(err);
+              });
+            });
+        }
+        else{
+          winston.info('Login : ' + request.body.id + ' -> Already Connect ID');
+          response.writeHead(200, headers);
+          response.end('already login');
+        }
+    });
 });
 
 app.post('/forgot/id', function(request, response){
