@@ -9,6 +9,7 @@
 #include "chat_session.h"
 #include "logic_session.h"
 #include "channel_session.h"
+#include <SimpleAudioEngine.h>
 
 USING_NS_CC;
 
@@ -31,6 +32,9 @@ bool main_scene::init()
         return false;
 
 #pragma region Init_UI
+    if (game_mgr->bgm_)
+        CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("game_bgm.mp3", true);
+    
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -56,24 +60,24 @@ bool main_scene::init()
     label_info_1->setPosition(middle_pos + cocos2d::Vec2(-180, -35));
     this->addChild(label_info_1, 1);
 
-    auto label_info_2 = cocos2d::Label::createWithTTF("Public Card", "fonts/arial.ttf", 10);
+    auto label_info_2 = cocos2d::Label::createWithTTF("Public Card", "fonts/D2Coding.ttf", 10);
     label_info_2->setColor(cocos2d::Color3B::WHITE);
     label_info_2->setPosition(middle_pos + cocos2d::Vec2(-80, -35));
     this->addChild(label_info_2, 1);
 
-    auto label_info_3 = cocos2d::Label::createWithTTF("Opponent Card", "fonts/arial.ttf", 10);
+    auto label_info_3 = cocos2d::Label::createWithTTF("Opponent Card", "fonts/D2Coding.ttf", 10);
     label_info_3->setColor(cocos2d::Color3B::WHITE);
     label_info_3->setPosition(middle_pos + cocos2d::Vec2(-130, 85));
     this->addChild(label_info_3, 1);
 
-    auto bet_coin_user = cocos2d::Label::createWithTTF("Bet : 0", "fonts/arial.ttf", 15);
+    auto bet_coin_user = cocos2d::Label::createWithTTF("Bet : 0", "fonts/D2Coding.ttf", 17);
     bet_coin_user->setColor(cocos2d::Color3B::ORANGE);
     bet_coin_user->setPosition(cocos2d::Vec2(visibleSize.width - 100, 150));
     this->addChild(bet_coin_user, 1);
 
-    auto opponent_info = cocos2d::Label::createWithTTF("ID : Temp\nWin : 0, Defeat : 0\nRating : 1200\nBet : 0", "fonts/arial.ttf", 15);
+    auto opponent_info = cocos2d::Label::createWithTTF("ID : Temp\nWin : 0, Defeat : 0\nRating : 1200\nBet : 0", "fonts/D2Coding.ttf", 17);
     opponent_info->setColor(cocos2d::Color3B::RED);
-    opponent_info->setPosition(cocos2d::Vec2(visibleSize.width - 100, visibleSize.height - 100));
+    opponent_info->setPosition(cocos2d::Vec2(visibleSize.width - 100, visibleSize.height - 90));
     this->addChild(opponent_info, 1);
 
     auto card_pack = Sprite::create("card_pack.png");
@@ -81,7 +85,7 @@ bool main_scene::init()
     card_pack->setPosition(middle_pos - Vec2(150, 110));
     this->addChild(card_pack, 1);
 
-    auto label_card_pack = cocos2d::Label::createWithTTF("Server\nCamp", "fonts/arial.ttf", 15, Size::ZERO, cocos2d::TextHAlignment::CENTER);
+    auto label_card_pack = cocos2d::Label::createWithTTF("Server\nCamp", "fonts/D2Coding.ttf", 15, Size::ZERO, cocos2d::TextHAlignment::CENTER);
     label_card_pack->setColor(cocos2d::Color3B::BLACK);
     label_card_pack->setPosition(middle_pos - Vec2(155, 110));
     this->addChild(label_card_pack, 2);
@@ -92,7 +96,7 @@ bool main_scene::init()
     this->addChild(chat_background, 4);
 
     room_chat_field = ui::TextField::create("Input Chat Here", "fonts/D2Coding.ttf", 15);
-    room_chat_field->setMaxLength(8);
+    room_chat_field->setMaxLength(15);
     room_chat_field->setColor(cocos2d::Color3B::BLACK);
     room_chat_field->setMaxLength(true);
     room_chat_field->setAnchorPoint(Vec2(0, 0));
@@ -105,13 +109,13 @@ bool main_scene::init()
     chat_list->setDirection(ui::ListView::Direction::VERTICAL);
     chat_list->setClippingEnabled(true);
     chat_list->setTouchEnabled(true);
-    chat_list->setContentSize(Size(150, 260));
+    chat_list->setContentSize(Size(130, 400));
     chat_list->setAnchorPoint(Vec2(0, 1));
     chat_list->setBounceEnabled(false);
     chat_list->setScrollBarEnabled(true);
     chat_list->setScrollBarPositionFromCorner(Vec2(0, 0));
     chat_list->setItemsMargin(2.0f);
-    chat_list->setPosition(Vec2(10, visibleSize.height - 50));
+    chat_list->setPosition(Vec2(15, visibleSize.height - 50));
     this->addChild(chat_list, 5);
 
     auto chat_button = ui::Button::create("button3_normal.png", "button3_pressed.png");
@@ -122,7 +126,7 @@ bool main_scene::init()
     chat_button->setTitleColor(Color3B::BLACK);
     chat_button->setScale(0.6f, 0.6f);
     chat_button->setAnchorPoint(Vec2(0.5, 0.5));
-    chat_button->setPosition(Vec2(140, 13));
+    chat_button->setPosition(Vec2(143, 14));
 
     auto bet_button = ui::Button::create("bet_button_normal.png", "bet_button_pressed.png", "bet_button_disable.png");
     bet_button->setTitleText("BET");
@@ -148,7 +152,8 @@ bool main_scene::init()
         switch (type)
         {
         case ui::Widget::TouchEventType::ENDED:
-            game_mgr->betting();
+            if (is_end == false)
+                game_mgr->betting();
             break;
         }
     });
@@ -207,7 +212,8 @@ bool main_scene::init()
         switch (type)
         {
         case ui::Widget::TouchEventType::ENDED:
-            network_logic->send_packet_disconnect_room_ntf();
+            if (is_end == false)
+                network_logic->send_packet_disconnect_room_ntf();
             break;
         }
     });
@@ -220,6 +226,8 @@ bool main_scene::init()
 #pragma endregion
 
 #pragma region GameManager Member Settings
+    is_end = false;
+    end_timer = 0;
 
     game_mgr->scene_ = this;
     game_mgr->scheduler_[game_manager::ROOM] = this->getScheduler();
@@ -246,11 +254,43 @@ bool main_scene::init()
     network_logic->send_packet_enter_req(network_mgr->get_room_key(), network_mgr->get_player_key());
 #pragma endregion 
 
+    scheduleUpdate();
+
     return true;
+}
+
+void main_scene::update(float delta)
+{
+    if (is_end)
+    {
+        if (end_timer < 10)
+            end_timer += delta;
+
+        if (end_timer > 10)
+        {
+            this->end();
+            end_timer = 10;
+        }
+    }
+}
+
+void main_scene::show_result(std::string msg)
+{
+    auto end_info = cocos2d::Label::createWithTTF(msg, "fonts/D2Coding.ttf", 30);
+    end_info->enableShadow();
+    end_info->setHorizontalAlignment(cocos2d::TextHAlignment::CENTER);
+    end_info->setColor(cocos2d::Color3B::RED);
+    end_info->setPosition(cocos2d::Vec2(400, 240));
+    this->addChild(end_info, 10);
+
+    is_end = true;
 }
 
 void main_scene::end()
 {
+    if (game_mgr->bgm_)
+        CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("main_bgm.mp3", true);
+
     game_mgr->send_friend_match_ = false;
     game_mgr->accept_friend_match_ = false;
     game_mgr->friend_list_->removeAllItems();
@@ -286,6 +326,9 @@ void main_scene::end()
             network_chat
         )
     );
+
+    is_end = false;
+    end_timer = 0;
   
     Director::getInstance()->popScene();
     Director::getInstance()->popScene();
@@ -374,12 +417,10 @@ void main_scene::on_touch_ended(cocos2d::Touch* touch, Event *unused_event)
     if (move_coin)
     {
         int bet_size = game_mgr->user_->get_bet_coin_size();
-        char temp[5] = "";
-        itoa(bet_size, temp, 10);
-
-        std::string bet_text = "Bet : ";
-        bet_text += temp;
-
+        char temp[20] = "";
+        sprintf(temp, "Bet : %d", bet_size);
+        
+        std::string bet_text = temp;
         game_mgr->user_bet_text_->setString(bet_text);
     }
 }

@@ -7,13 +7,16 @@
 #include "channel_session.h"
 #include "chat_session.h"
 #include "CCShake.h"
+#include <SimpleAudioEngine.h>
 
 bool game_manager::init_singleton()
 {
     public_card_ = nullptr;
     opponent_card_ = nullptr;
     send_friend_match_ = false;
+    bgm_ = true;
     accept_friend_match_ = false;
+    rating_image = nullptr;
 
     return true;
 }
@@ -45,8 +48,9 @@ game_manager::game_manager()
 
 void game_manager::set_opponent_info(std::string id, int win, int defeat, int rating)
 {
-    char temp[256] = "ID : %s\nWin : %d, Lose : %d\nRating : %d";
-    sprintf(temp, id.c_str(), win, defeat, rating);
+    char temp[256] = "";
+
+    sprintf(temp, "ID : %s\nWin : %d\nLose : %d\nRating : %d", id.c_str(), win, defeat, rating);
 
     opponent_id_ = id;
     opponent_info_ = temp;
@@ -54,6 +58,9 @@ void game_manager::set_opponent_info(std::string id, int win, int defeat, int ra
 
 void game_manager::new_turn(int public_card_1, int public_card_2, int opponent_card, int remain_money, int my_money, int opponent_money)
 {
+    if (game_mgr->bgm_)
+        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("turn_sound.mp3");
+        
     scene_->runAction(CCShake::actionWithDuration(1.0f, 10.0f));
 
     auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
@@ -111,10 +118,11 @@ void game_manager::new_turn(int public_card_1, int public_card_2, int opponent_c
 
 void game_manager::set_tear(int rating)
 {
-    static cocos2d::Sprite* rating_image = nullptr;
-
     if (rating_image != nullptr)
+    {
         rating_image->removeFromParent();
+        rating_image = nullptr;
+    }
 
     if (rating < 300)
         rating_image = cocos2d::Sprite::create("bronze.png");
@@ -163,11 +171,10 @@ void game_manager::opponent_turn_end(int my_money, int opponent_money)
 
     bet_button_->setEnabled(true);
 
-    char temp[5] = "";
-    itoa(opponent_->get_bet_coin_size(), temp, 10);
-
-    std::string opponent_bet_text = "\nBet : ";
-    opponent_bet_text += temp;
+    char temp[20] = "";
+    sprintf(temp, "\nBet : %d", opponent_->get_bet_coin_size());
+    
+    std::string opponent_bet_text = temp;
     
     opponent_info_text_->setString(opponent_info_ + opponent_bet_text);
 }
@@ -182,14 +189,6 @@ void game_manager::start_game()
     auto scene = main_scene::createScene();
     
     cocos2d::Director::getInstance()->pushScene(cocos2d::TransitionFade::create(1, scene));
-
-    this->scheduler_[(int)scene_type_]->performFunctionInCocosThread(
-        CC_CALLBACK_0(
-            chat_session::send_packet_enter_match_ntf,
-            network_chat,
-            opponent_id_
-        )
-    );
 }
 
 cocos2d::Scheduler* game_manager::get_scheduler()
@@ -206,6 +205,11 @@ void game_manager::update_chat(std::string id, std::string str, CHAT_TYPE type)
 {
     std::string message = id;
 
+    bool is_system = false;
+
+    if (id == "SYSTEM")
+        is_system = true;
+
     if (scene_type_ == LOBBY)
     {
         message += " : ";
@@ -213,12 +217,17 @@ void game_manager::update_chat(std::string id, std::string str, CHAT_TYPE type)
     }
     else if (scene_type_ == ROOM)
     {
-        message = str;
+        if (id.find("[w]") != std::string::npos)
+            message += " : " + str;
+        else
+            message = str;
     }
 
     auto label = cocos2d::ui::Text::create(message, "fonts/D2Coding.ttf", 15);
 
-    if (id == network_mgr->get_player_id())
+    if (is_system)
+        label->setTextColor(cocos2d::Color4B::ORANGE);
+    else if (id == network_mgr->get_player_id())
         label->setTextColor(cocos2d::Color4B::BLUE);
     else if (type == CHAT_TYPE::NORMAL)
         label->setTextColor(cocos2d::Color4B::BLACK);
@@ -231,11 +240,17 @@ void game_manager::update_chat(std::string id, std::string str, CHAT_TYPE type)
 
     if (scene_type_ == LOBBY)
     {
+        if (this->lobby_chat_list_->getChildrenCount() > 100)
+            this->lobby_chat_list_->removeAllItems();
+
         this->lobby_chat_list_->pushBackCustomItem(label);
         this->lobby_chat_list_->scrollToBottom(1, true);
     }
     else if (scene_type_ == ROOM)
     {
+        if (this->room_chat_list_->getChildrenCount() > 100)
+            this->room_chat_list_->removeAllItems();
+
         this->room_chat_list_->pushBackCustomItem(label);
         this->room_chat_list_->scrollToBottom(1, true);
     }
@@ -270,23 +285,11 @@ void game_manager::del_friend_in_list(std::string id)
 
 void game_manager::set_history(int win, int lose, int rating)
 {
-    char temp[10] = "";
+    char temp[255] = "";
+    sprintf(temp, "ID : %s\nWin : %d\nLose : %d\nTotal Game : %d\nRating : %d", network_mgr->get_player_id().c_str(),
+        win, lose, win + lose, rating);
 
-    std::string str = "ID : ";
-    str += network_mgr->get_player_id();
-    str += "\nWin : ";
-    itoa(win, temp, 10);
-    str += temp;
-    str += "\nLose : ";
-    itoa(lose, temp, 10);
-    str += temp;
-    str += "\nTotal Game : ";
-    itoa(win + lose, temp, 10);
-    str += temp;
-    str += "\nRating : ";
-    itoa(rating, temp, 10);
-    str += temp;
-    str += "\0";
+    std::string str = temp;
 
     history_->setText(str);
 }

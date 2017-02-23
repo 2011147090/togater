@@ -10,6 +10,7 @@
 #include "chat_session.h"
 #include "channel_session.h"
 #include "friend_match_dialog.h"
+#include <SimpleAudioEngine.h>
 
 using namespace cocos2d;
 
@@ -29,6 +30,8 @@ Scene* lobby_scene::createScene()
 bool lobby_scene::init()
 {
 #pragma region Init UI
+    //CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("main_bgm.mp3", true);
+
     if (!LayerColor::initWithColor(Color4B(0, 255, 0, 255)))
         return false;
 
@@ -123,7 +126,7 @@ bool lobby_scene::init()
     chat_list->setItemsMargin(2.0f);
     chat_list->setPosition(Vec2(145, visibleSize.height - 160));
 
-    auto label = ui::Text::create("--Welcom Our Game--", "fonts/D2Coding.ttf", 15);
+    auto label = ui::Text::create("--Welcome Our Game--", "fonts/D2Coding.ttf", 15);
     label->setTextColor(Color4B::BLACK);
     label->setTouchEnabled(true);
     chat_list->pushBackCustomItem(label);
@@ -167,6 +170,12 @@ bool lobby_scene::init()
             game_mgr->send_friend_match_ = false;
             game_mgr->accept_friend_match_ = false;
             game_mgr->friend_list_->removeAllItems();
+            
+            if (game_mgr->rating_image != nullptr)
+            {
+                game_mgr->rating_image->removeFromParent();
+                game_mgr->rating_image = nullptr;
+            }
 
             network_chat->destroy();
             network_lobby->destroy();
@@ -329,8 +338,23 @@ void lobby_scene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
             std::string real_str = "";
 
             bool is_whisper = false;
+            bool is_sound_option = false;
 
-            if (chat_str.find("/w ") != std::string::npos)
+            if (chat_str.find("/sound off") != std::string::npos)
+            {
+                game_mgr->bgm_ = false;
+                CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+
+                is_sound_option = true;
+            }
+            else if (chat_str.find("/sound on") != std::string::npos)
+            {
+                game_mgr->bgm_ = true;
+                CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("main_bgm.mp3", true);
+
+                is_sound_option = true;
+            }
+            else if (chat_str.find("/w ") != std::string::npos)
             {
                 for (int j = 3; j < chat_str.size(); j++)
                 {
@@ -345,7 +369,7 @@ void lobby_scene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
                 }
             }
 
-            if (is_whisper)
+            if (is_whisper && !is_sound_option)
             {
                 network_chat->send_packet_chat_whisper(
                     network_mgr->get_player_id(),
@@ -353,7 +377,7 @@ void lobby_scene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
                     real_str
                 );
             }
-            else
+            else if (!is_sound_option)
             {
                 network_chat->send_packet_chat_normal(
                     network_mgr->get_player_id(),

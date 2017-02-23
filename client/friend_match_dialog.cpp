@@ -28,7 +28,7 @@ bool friend_match_dialog::init()
     this->setCascadeOpacityEnabled(true);
 
     this->setOpacity(0);
-    this->runAction(Sequence::create(FadeIn::create(2.0f), NULL));
+    this->runAction(Sequence::create(FadeIn::create(1.0f), NULL));
 
     auto winSize = CCDirector::sharedDirector()->getWinSizeInPixels();
     auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -64,6 +64,8 @@ bool friend_match_dialog::init()
 
     accept_button->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
         if (type == ui::Widget::TouchEventType::ENDED) {
+            game_mgr->accept_friend_match_ = true;
+
             game_mgr->lobby_scene_->hide_friend_match_pop_up();
 
             game_mgr->get_scheduler()->performFunctionInCocosThread(
@@ -114,8 +116,8 @@ void friend_match_dialog::update(float delta)
     {
         friend_match_timer += delta;
 
-        char temp[10];
-        itoa(10 - friend_match_timer, temp, 10);
+        char temp[10] = "";
+        sprintf(temp, "%d\0", (int)(10 - friend_match_timer));
         timer_text->setText(temp);
     }
     else

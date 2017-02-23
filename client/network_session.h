@@ -19,7 +19,7 @@ using namespace google;
 
 #define network_mgr network_manager::get_instance()
 
-enum { BUFSIZE = 128 };
+enum { BUFSIZE = 1024 };
 
 class network_session : public multi_thread_sync<network_session> {
 protected:
@@ -27,8 +27,8 @@ protected:
 
     bool is_connected_;
 
-    boost::array<BYTE, BUFSIZE> recv_buf_;
-    boost::array<BYTE, BUFSIZE> send_buf_;
+    boost::array<unsigned char, BUFSIZE> recv_buf_;
+    boost::array<unsigned char, BUFSIZE> send_buf_;
 
     boost::thread* work_thread_;
     boost::thread* recv_thread_;

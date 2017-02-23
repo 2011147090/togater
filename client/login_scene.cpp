@@ -8,6 +8,7 @@
 #include "channel_session.h"
 #include "chat_session.h"
 #include "game_manager.h"
+#include <SimpleAudioEngine.h>
 
 using namespace cocos2d;
 
@@ -32,6 +33,9 @@ bool login_scene::init()
 
     auto winSize = CCDirector::sharedDirector()->getWinSizeInPixels();
     auto visibleSize = Director::getInstance()->getVisibleSize();
+
+    if (game_mgr->bgm_)
+        CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("main_bgm.mp3", true);
 
     auto background = Sprite::create("login_background.png");
     background->setAnchorPoint(Vec2(0, 0));
@@ -126,7 +130,7 @@ void login_scene::http_request_complete(cocos2d::network::HttpClient *sender, co
         network_mgr->set_player_key(sub);
 
         auto scene = lobby_scene::createScene();
-        Director::getInstance()->pushScene(TransitionCrossFade::create(2, scene));
+        Director::getInstance()->pushScene(TransitionMoveInR::create(2, scene));
     }
     else
     {

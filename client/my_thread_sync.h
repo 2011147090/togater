@@ -6,26 +6,26 @@
 class custom_mutex
 {
 private:
-    CRITICAL_SECTION section;
+    //CRITICAL_SECTION section;
     
 public:
     custom_mutex() 
     {
-        InitializeCriticalSection(&section);
+        //InitializeCriticalSection(&section);
     }
     ~custom_mutex() 
     {
-        DeleteCriticalSection(&section);
+        //DeleteCriticalSection(&section);
     }
 
     inline void enter()
     {
-        EnterCriticalSection(&section);
+        //EnterCriticalSection(&section);
     }
 
     inline void leave()
     {
-        LeaveCriticalSection(&section);
+        //LeaveCriticalSection(&section);
     }
 };
 
@@ -37,12 +37,12 @@ public:
     class thread_sync
     {
     public:
-        thread_sync(VOID)
+        thread_sync(void)
         {
             T::sync.enter();
         }
 
-        ~thread_sync(VOID)
+        ~thread_sync(void)
         {
             T::sync.leave();
         }

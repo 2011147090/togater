@@ -4,7 +4,7 @@
 #include "network_session.h"
 #include "channel_protobuf.pb.h"
 
-const std::string CHANNEL_SERVER_IP("192.168.1.16");
+const std::string CHANNEL_SERVER_IP("192.168.1.203");
 const std::string CHANNEL_SEFVER_PORT("8800");
 
 class channel_session : public network_session {

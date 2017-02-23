@@ -1,6 +1,7 @@
 #include "channel_session.h"
 #include "logic_session.h"
 #include "game_manager.h"
+#include "chat_session.h"
 #include "network_manager.h"
 
 bool channel_session::create()
@@ -45,7 +46,7 @@ void channel_session::handle_send(channel_server::message_type msg_type, const p
     int buf_size = 0;
     buf_size = message_header_size + message.ByteSize();
 
-    CopyMemory(send_buf_.begin(), (void*)&header, message_header_size);
+    memcpy(send_buf_.begin(), (void*)&header, message_header_size);
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
@@ -73,7 +74,7 @@ void channel_session::handle_read()
 
         MESSAGE_HEADER message_header;
 
-        CopyMemory(&message_header, recv_buf_.begin(), message_header_size);
+        memcpy(&message_header, recv_buf_.begin(), message_header_size);
 
         switch (message_header.type)
         {
@@ -268,7 +269,7 @@ void channel_session::process_packet_play_friend_game_rel(channel_server::packet
     switch(packet.type())
     {
     case channel_server::packet_play_friends_game_rel::APPLY:
-        if (game_mgr->send_friend_match_ == true)
+       /* if (game_mgr->send_friend_match_ == true || game_mgr->accept_friend_match_ == true)
         {
             game_mgr->accept_friend_match_ = false;
             game_mgr->send_friend_match_ = false;
@@ -283,9 +284,8 @@ void channel_session::process_packet_play_friend_game_rel(channel_server::packet
             cocos2d::CCDirector::getInstance()->popScene();
 
             return;
-        }
+        }*/
 
-        game_mgr->accept_friend_match_ = true;
         game_mgr->friend_match_id_ = packet.target_id();
 
         game_mgr->get_scheduler()->performFunctionInCocosThread(
@@ -299,6 +299,7 @@ void channel_session::process_packet_play_friend_game_rel(channel_server::packet
 
     case channel_server::packet_play_friends_game_rel::DENY:
         game_mgr->accept_friend_match_ = false;
+        game_mgr->send_friend_match_ = false;
                 
         cocos2d::CCDirector::getInstance()->popScene();
         break;
@@ -308,6 +309,14 @@ void channel_session::process_packet_play_friend_game_rel(channel_server::packet
 void channel_session::process_packet_matching_complete_ans(channel_server::packet_matching_complete_ans packet)
 {
     thread_sync sync;
+
+    game_mgr->get_scheduler()->performFunctionInCocosThread(
+        CC_CALLBACK_0(
+            chat_session::send_packet_enter_match_ntf,
+            network_chat,
+            packet.mutable_opponent_player()->mutable_basic_info_()->id()
+        )
+    );
     
     game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(

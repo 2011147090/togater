@@ -38,7 +38,7 @@ void chat_session::handle_send(chat_server::message_type msg_type, const protobu
     int buf_size = 0;
     buf_size = message_header_size + message.ByteSize();
 
-    CopyMemory(send_buf_.begin(), (void*)&header, message_header_size);
+    memcpy(send_buf_.begin(), (void*)&header, message_header_size);
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
@@ -65,7 +65,7 @@ void chat_session::handle_read()
 
         MESSAGE_HEADER message_header;
 
-        CopyMemory(&message_header, recv_buf_.begin(), message_header_size);
+        memcpy(&message_header, recv_buf_.begin(), message_header_size);
 
         switch (message_header.type)
         {
@@ -170,7 +170,7 @@ void chat_session::process_packet_chat_whisper(chat_server::packet_chat_whisper 
 
     if (packet.user_id() == "Error")
     {
-        id = "[w] - Invailed Command";
+        id = "[w] - Invaild Command";
         str = "";
     }
 

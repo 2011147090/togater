@@ -73,9 +73,12 @@ public:
 
     SCENE_TYPE scene_type_;
 
+    cocos2d::Sprite* rating_image;
+
+    bool bgm_;
 
     // function
-    
+
     void set_scene_status(SCENE_TYPE status);
     cocos2d::Scheduler* get_scheduler();
 
@@ -89,7 +92,7 @@ public:
     void check_public_card();
 
     void start_game();
-
+    
     void set_history(int win, int lose, int rating);
 
     void set_tear(int rating);

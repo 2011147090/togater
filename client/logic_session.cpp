@@ -41,7 +41,7 @@ void logic_session::handle_send(logic_server::message_type msg_type, const proto
     header.size = message.ByteSize();
     header.type = msg_type;
 
-    CopyMemory(send_buf_.begin(), (void*)&header, message_header_size);
+    memcpy(send_buf_.begin(), (void*)&header, message_header_size);
 
     message.SerializeToArray(send_buf_.begin() + message_header_size, header.size);
 
@@ -57,7 +57,7 @@ void logic_session::handle_read()
             break;
 
         boost::system::error_code error;
-        static boost::array<BYTE, 128> recv_buf_ori;
+        static boost::array<unsigned char, 128> recv_buf_ori;
 
         auto size = socket_->read_some(boost::asio::buffer(recv_buf_ori), error);
        
@@ -72,8 +72,8 @@ void logic_session::handle_read()
         do 
         {
             MESSAGE_HEADER message_header;
-            CopyMemory(&message_header, recv_buf_ori.begin() + process_size, message_header_size);
-            CopyMemory(recv_buf_.begin(), recv_buf_ori.begin() + process_size, message_header.size + message_header_size);
+            memcpy(&message_header, recv_buf_ori.begin() + process_size, message_header_size);
+            memcpy(recv_buf_.begin(), recv_buf_ori.begin() + process_size, message_header.size + message_header_size);
 
             process_size += message_header_size + message_header.size;
             remain_size -= process_size;
@@ -190,7 +190,7 @@ void logic_session::process_packet_process_check_card_ntf(logic_server::packet_p
 
     game_mgr->get_scheduler()->performFunctionInCocosThread(
         CC_CALLBACK_0(
-            game_manager::check_public_card, game_mgr,
+            game_manager::check_public_card, game_mgr
         )
     );
 }
@@ -209,9 +209,18 @@ void logic_session::process_packet_game_state_ntf(logic_server::packet_game_stat
     }
     else if (packet.state() == 2)
     {
+        std::string msg = "";
+
+        if (packet.win_player_key() == network_mgr->get_player_key())
+            msg = "Player Win@!!!!\nAfter 10 seconds, Scene is return.";
+        else
+            msg = "Opponent Player Win@!!!!\nAfter 10 seconds, Scene is return.";
+
         game_mgr->get_scheduler()->performFunctionInCocosThread(
             CC_CALLBACK_0(
-                main_scene::end, game_mgr->scene_,
+                main_scene::show_result, 
+                game_mgr->scene_,
+                msg
                 )
         );
     }

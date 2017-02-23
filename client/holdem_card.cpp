@@ -25,7 +25,7 @@ holdem_card::holdem_card(int layer, int num, bool is_rotated, std::string info)
     sprite_->setPosition(pivot_);
 
     char temp[3] = "";
-    itoa(num_, temp, 10);
+    sprintf(temp, "%d", num_);
     std::string number = temp;
     
     label_num_ = cocos2d::Label::createWithTTF(number, "fonts/arial.ttf", 30, cocos2d::Size::ZERO, cocos2d::TextHAlignment::CENTER);
